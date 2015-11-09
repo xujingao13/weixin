@@ -7,6 +7,8 @@ from wechat_sdk.exceptions import ParseError
 from wechat_sdk.messages import TextMessage
 from database_request import *
 from wechat.models import *
+from django.template.loader import get_template
+from django.template import Context
 from wechat_sdk.messages import (
     TextMessage, VoiceMessage, ImageMessage, VideoMessage, LinkMessage, LocationMessage, EventMessage
 )
@@ -53,34 +55,29 @@ def index(request):
                     #step = steplist[0][0]
                     #print step
                     print 2
-                    stepi = Record.objects.get(user = u"oFX57wUb4ud1w9Naf2BXIBclGiSs")
+                    stepi = Record.objects.get(user = u"jiji")
                     step = stepi.step
                     response = wechat.response_text(u'跑了' + str(step) + u'步咯')#里面的数字应由其他函数获取
                     return HttpResponse(response)
                 if message.key == 'CHART':
-                    
-                    print message.source
+                    response = wechat.response_news([{'title': 'sheep94lion', 'description':'handsome', 'picurl': 'http://t11.baidu.com/it/u=1102242709,380988438&fm=58', 'url': 'http://59.66.139.90/chart/' + message.source}])
+                    return HttpResponse(response)
         response = wechat.response_text(u'sheep94lion')
         return HttpResponse(response)
-        #print (request.POST['signature'])
-    # 对签名进行校验
-    """
-    if wechat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
-        # 对 XML 数据进行解析 (必要, 否则不可执行 response_text, response_image 等操作)
-        wechat.parse_data(data=request.body)
-        # 获得解析结果, message 为 WechatMessage 对象 (wechat_sdk.messages中定义)
-        message = wechat.get_message()
 
-        response = None
-        if message.type == 'text':
-            if message.content == 'wechat':
-                response = wechat.response_text(u'^_^')
-            else:
-                response = wechat.response_text(u'文字')
-        elif message.type == 'image':
-            response = wechat.response_text(u'图片')
-        else:
-            response = wechat.response_text(u'未知')
-        return HttpResponse(response)
-    else: return HttpResponse('wrong')
-    """
+@csrf_exempt
+def chart(request, user):
+    #print user
+    WECHAT_TOKEN = 'sheep94lion'
+    AppID = ''
+    AppSecret = ''
+ 
+    # 实例化 WechatBasic
+    wechat = WechatBasic(
+        token=WECHAT_TOKEN,
+        appid=AppID,
+        appsecret=AppSecret
+    )
+    t = get_template('index.html')
+    html = t.render(Context({}))
+    return HttpResponse(html)
