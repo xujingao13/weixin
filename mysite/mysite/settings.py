@@ -56,7 +56,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/zhaoyi/Documents/wechat/weixin/mysite/templates'],
+        'DIRS': ['G:/Documents/DjangoTest/weixin/mysite/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,7 +88,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Beijing'
 
 USE_I18N = True
 

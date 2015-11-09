@@ -1,7 +1,7 @@
 $(function () {
 	var data = new Array ();
     var ds = new Array();
-	
+
 	data.push ([[1,25],[2,34],[3,37],[4,45],[5,56]]);
 	data.push ([[1,13],[2,29],[3,25],[4,23],[5,31]]);
 	data.push ([[1,8],[2,13],[3,19],[4,15],[5,14]]);
@@ -26,7 +26,7 @@ $(function () {
 	    
     $.plot($("#bar-chart"), ds, {
     	colors: ["#F90", "#3C4049", "#666", "#BBB"]
-                
+
 
     });
                 
