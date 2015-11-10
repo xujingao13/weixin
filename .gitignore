@@ -1,8 +1,12 @@
 # Byte-compiled / optimized / DLL files
+.idea/
+db.sqlite3
+settings.py
+*.db
 __pycache__/
 *.py[cod]
 *.pyc
-*.DS_Store
+.DS_Store
 # C extensions
 *.so
 
