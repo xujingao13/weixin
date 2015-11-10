@@ -19,7 +19,7 @@ from wechat_sdk.messages import (
 @csrf_exempt
 def index(request):
 # 下面这些变量均假设已由 Request 中提取完毕
-    WECHAT_TOKEN = 'zzc'
+    WECHAT_TOKEN = 'Jingao'
     AppID = ''
     AppSecret = ''
  
@@ -63,7 +63,7 @@ def index(request):
                     response = wechat.response_text(u'跑了' + str(step) + u'步咯')#里面的数字应由其他函数获取
                     return HttpResponse(response)
                 if message.key == 'CHART':
-                    response = wechat.response_news([{'title': message.source, 'description':'data analysis', 'picurl': 'http://t11.baidu.com/it/u=1102242709,380988438&fm=58', 'url': 'http://59.66.139.204/chart/' + message.source}])
+                    response = wechat.response_news([{'title': message.source, 'description':'data analysis', 'picurl': 'http://t11.baidu.com/it/u=1102242709,380988438&fm=58', 'url': 'http://183.173.46.177/chart/' + message.source}])
                     return HttpResponse(response)
         response = wechat.response_text(u'sheep94lion')
         return HttpResponse(response)
@@ -71,7 +71,7 @@ def index(request):
 @csrf_exempt
 def chart(request, user):
     #print user
-    WECHAT_TOKEN = 'zzc'
+    WECHAT_TOKEN = 'Jingao'
     AppID = ''
     AppSecret = ''
  
@@ -81,7 +81,7 @@ def chart(request, user):
         appid=AppID,
         appsecret=AppSecret
     )
-    data = Record.objects.filter(user=user)
+    data = Record.objects.filter(user=u"oyVaDs1vEKOMKZhew7SVLLT2P0PA")
     print(user)
     last = len(data) - 1
     accuStep = data[last].step
@@ -89,6 +89,7 @@ def chart(request, user):
     leastRecent = data[0].time.time()
     fstTime = data[0].time
     info = []
+    print mostRecent
     for i in range(0, last + 1):
         if i == 0:
             info.append([0, data[0].step])
