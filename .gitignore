@@ -2,10 +2,10 @@
 __pycache__/
 *.py[cod]
 *.pyc
-*.DS_Store
+.DS_Store
+settings.py
 # C extensions
 *.so
-mysite/mysite/settings.py
 
 # Distribution / packaging
 .Python
