@@ -28,6 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+WECHAT_TOKEN = 'Jingao'
+SERVER_IP = 'http://59.66.139.120/'
+
 # Application definition
 
 INSTALLED_APPS = (
