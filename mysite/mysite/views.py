@@ -12,6 +12,8 @@ from django.template import Context
 from settings import WECHAT_TOKEN, SERVER_IP
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from datetime import *
+import time
 from wechat_sdk.messages import (
     TextMessage, VoiceMessage, ImageMessage, VideoMessage, LinkMessage, LocationMessage, EventMessage
 )
@@ -49,7 +51,6 @@ def index(request):
             return HttpResponseBadRequest('Invalid XML Data')
         message = wechat.get_message()
         if isinstance(message, EventMessage):
-            print message.source
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
                     stepi = Record.objects.filter(user = message.source)
@@ -60,13 +61,13 @@ def index(request):
                     response = wechat.response_news([{'title': message.source, 
                                         'description':'data analysis', 
                                         'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png', 
-                                        'url': SERVER_IP + 'chart/' + message.source}])
+                                        'url': SERVER_IP + 'TodayChart/' + message.source}])
                     return HttpResponse(response)
         response = wechat.response_text(u'sheep94lion')
         return HttpResponse(response)
 
 @csrf_exempt
-def chart(request, user):
+def TodayChart(request, user):
     AppID = ''
     AppSecret = ''
  
@@ -77,25 +78,119 @@ def chart(request, user):
         appsecret=AppSecret
     )
     data = Record.objects.filter(user=user)
-    print(user)
-    last = len(data) - 1
-    print last
-    accuStep = data[last].step
+    i = 0
+    length = len(data)
+    last = length - 1
+    Today = data[last].time.day
+    while(i < length):
+        if data[i].time.day == Today:
+            Today_Start = i
+            break
+        i += 1
+
+    accuStep = data[last].step - data[Today_Start].step
     mostRecent =data[last].time.time()
-    leastRecent = data[0].time.time()
-    fstTime = data[0].time
+    leastRecent =  data[Today_Start].time.time()
+    fstTime = data[Today_Start].time
+    data = data[Today_Start:length]
     info = []
-    print mostRecent
-    for i in range(0, last + 1):
+    length = len(data)
+    for i in range(0, length):
         if i == 0:
             info.append([0, data[0].step])
         else:
             info.append([(data[i].time - fstTime).seconds, data[i].step - data[i - 1].step])
-    return render_to_response('index.html', {
+    return render_to_response('TodayChart.html', {
         "user":user,
         "data":data,
         "info":info,
         "accuStep":accuStep,
         "leastRecent":leastRecent,
         "mostRecent":mostRecent,
+    },context_instance=RequestContext(request))
+
+def YesterdayChart(request, user):
+    AppID = ''
+    AppSecret = ''
+
+    # 实例化 WechatBasic
+    wechat = WechatBasic(
+        token=WECHAT_TOKEN,
+        appid=AppID,
+        appsecret=AppSecret
+    )
+    data = Record.objects.filter(user=user)
+    i = 0
+    length = len(data)
+    last = length - 1
+    Yesterday = data[last].time.day - 2
+    flag = 0
+    while(i < length):
+        if data[i].time.day == Yesterday and flag == 0:
+            Yesterday_Start = i
+            flag = 1
+        elif data[i].time.day != Yesterday and flag == 1:
+            last = i
+            break;
+        i += 1
+
+    accuStep = data[last].step - data[Yesterday_Start].step
+    endTime =data[last].time.time()
+    startTime =  data[Yesterday_Start].time.time()
+    fstTime = data[Yesterday_Start].time
+    data = data[Yesterday_Start:last]
+    info = []
+    length = len(data)
+    for i in range(0, length):
+        if i == 0:
+            info.append([0, data[0].step])
+        else:
+            info.append([(data[i].time - fstTime).seconds, data[i].step - data[i - 1].step])
+    return render_to_response('YesterdayChart.html', {
+        "user":user,
+        "data":data,
+        "info":info,
+        "accuStep":accuStep,
+        "startTime":startTime,
+        "endTime":endTime,
+    },context_instance=RequestContext(request))
+
+def LastWeekChart(request, user):
+    AppID = ''
+    AppSecret = ''
+
+    # 实例化 WechatBasic
+    wechat = WechatBasic(
+        token=WECHAT_TOKEN,
+        appid=AppID,
+        appsecret=AppSecret
+    )
+    data = Record.objects.filter(user=user)
+    info = []
+    i = 0
+    length = len(data)
+    last = length - 1
+    lastToday = data[last].time.day - 2
+    while i < length:
+        if data[i].time.day == lastToday:
+            startDay = i
+            break
+        i += 1
+    accuStep = data[last].step - data[startDay].step
+    j = 0
+    i = startDay
+    day = lastToday
+    while i < length and j < 7:
+        lastDayStep = data[i].step
+        while data[i].time.day == day and i < length - 1:
+            i += 1
+        j += 1
+        day += 1
+        info.append([j, data[i].step - lastDayStep])
+
+    return render_to_response('LastWeekChart.html', {
+        "user":user,
+        "info":info,
+        "data":data,
+        "accuStep":accuStep,
     },context_instance=RequestContext(request))
