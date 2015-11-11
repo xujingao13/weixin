@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Charts - Bootstrap Admin</title>
+    <title>{{ user }}</title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />    
@@ -52,7 +52,7 @@
 					<li class="dropdown">
 						
 						<a data-toggle="dropdown" class="dropdown-toggle " href="#">
-							Rod Howard <b class="caret"></b>							
+							{{ user }}  <b class="caret"></b>
 						</a>
 						
 						<ul class="dropdown-menu">
@@ -95,12 +95,12 @@
 				<div class="account-container">
 				
 					<div class="account-avatar">
-						<img src="/static/img/headshot.png" alt="" class="thumbnail" />
+						<img src="/static/img/headshot.jpg" alt="" class="thumbnail" />
 					</div> <!-- /account-avatar -->
 				
 					<div class="account-details">
 					
-						<span class="account-name">Rod Howard</span>
+						<span class="account-name">{{ user }}</span>
 						
 						<span class="account-role">Administrator</span>
 						
@@ -195,22 +195,22 @@
 										
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>564</span>							
-							Completed Sales							
+							<span>{{ accuStep }}</span>
+							Accumulative Steps
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
 					
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>423</span>							
-							Pending Sales							
+							<span>{{ leastRecent }}</span>
+							Least Recently Record Time
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
 					
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>96</span>							
-							Returned Sales							
+							<span>{{ mostRecent }}</span>
+							Most Recently Record Time
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
 					
@@ -311,7 +311,7 @@
 	
 	<div class="container">				
 		<hr />
-		<p>&copy; 2012 Go Ideate.</p>
+		<p>&copy; 2015 Go Ideate.</p>
 	</div> <!-- /container -->
 	
 </div> <!-- /footer -->
@@ -331,9 +331,50 @@
 
 
 <script src="/static/js/bootstrap.js"></script>
-<script src="/static/js/charts/bar.js"></script>
+ <script type="text/javascript">
+   $(function () {
+	var data = new Array ();
+    var ds = new Array();
+
+	data.push ({{ info }});
+
+    for (var i=0, j=data.length; i<j; i++) {
+
+	     ds.push({
+	        data:data[i],
+	        grid:{
+            hoverable:true
+        },
+	        bars: {
+	            show: true,
+	            barWidth: 2,
+	            order: 1,
+	            lineWidth: 0.5,
+				fillColor: { colors: [ { opacity: 0.65 }, { opacity: 1 } ] }
+	        }
+	    });
+	}
+
+    $.plot($("#bar-chart"), ds, {
+    	colors: ["#F90", "#3C4049", "#666", "#BBB"]
+    });
+    $.plot($("#line-chart"),
+           [ { data: {{ info }}, label: "real steps"} ], {
+               series: {
+                   lines: { show: true },
+                   points: { show: true }
+               },
+
+               grid: { hoverable: true, clickable: true },
+               yaxis: { min: 0, max: 200 },
+    	colors: ["#F90", "#3C4049", "#666", "#BBB"]
+             });
+
+
+});
+ </script>
+
 <script src="/static/js/charts/area.js"></script>
-<script src="/static/js/charts/line.js"></script>
 <script src="/static/js/charts/pie.js"></script>
 
 
