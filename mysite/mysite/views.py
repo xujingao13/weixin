@@ -99,3 +99,7 @@ def chart(request, user):
         "leastRecent":leastRecent,
         "mostRecent":mostRecent,
     },context_instance=RequestContext(request))
+
+@csrf_exempt
+def goal(request):
+    return render_to_response('goal.html', {},context_instance=RequestContext(request))

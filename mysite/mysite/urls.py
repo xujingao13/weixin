@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^weixin', 'mysite.views.index'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^chart/(.*)', 'mysite.views.chart'),
+    url(r'^goal/', 'mysite.views.goal'),
 ]
 
 
