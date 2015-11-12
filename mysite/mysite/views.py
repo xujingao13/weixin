@@ -22,8 +22,8 @@ from wechat_sdk.messages import (
 @csrf_exempt
 def index(request):
 # 下面这些变量均假设已由 Request 中提取完毕
-    AppID = ''
-    AppSecret = ''
+    AppID = 'wxbda096a619be4dd0'
+    AppSecret = 'd4624c36b6795d1d99dcf0547af5443d'
  
     # 实例化 WechatBasic
     wechat = WechatBasic(
@@ -54,16 +54,23 @@ def index(request):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
                     stepi = Record.objects.filter(user = message.source)
-                    step = stepi[len(stepi) - 1].step
-                    response = wechat.response_text(u'跑了' + str(step) + u'步咯')#里面的数字应由其他函数获取
-                    return HttpResponse(response)
+                    if stepi:
+                        step = stepi[len(stepi) - 1].step
+                        response = wechat.response_text(u'跑了' + str(step) + u'步咯')#里面的数字应由其他函数获取
+                        return HttpResponse(response)
+                    else:
+                        response = wechat.response_text(u'Sorry, there\' no data about you in our database.')
+                        return HttpResponse(response)
                 if message.key == 'CHART':
-                    response = wechat.response_news([{'title': message.source, 
+                    print 1
+                    #userinfo = wechat.get_user_info(message.source)
+                    #print userinfo
+                    response = wechat.response_news([{'title':u'Today\'s amount of exercise',
                                         'description':'data analysis', 
                                         'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png', 
                                         'url': SERVER_IP + 'TodayChart/' + message.source}])
                     return HttpResponse(response)
-        response = wechat.response_text(u'sheep94lion')
+        response = wechat.response_text(u'Cheer up!')
         return HttpResponse(response)
 
 @csrf_exempt
