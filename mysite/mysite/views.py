@@ -97,8 +97,8 @@ def TodayChart(request, user):
             i += 1
 
         accuStep = data[last].step - data[Today_Start].step
-        mostRecent =data[last].time.time()
-        leastRecent =  data[Today_Start].time.time()
+        mostRecent =data[last].time.time().strftime("%H:%M:%S")
+        leastRecent =  data[Today_Start].time.time().strftime("%H:%M:%S")
         fstTime = data[Today_Start].time
         data = data[Today_Start:length]
         info = []
@@ -148,8 +148,8 @@ def YesterdayChart(request, user):
             i += 1
 
         accuStep = data[last].step - data[Yesterday_Start].step
-        endTime =data[last].time.time()
-        startTime =  data[Yesterday_Start].time.time()
+        endTime =data[last].time.time().strftime("%H:%M:%S")
+        startTime =  data[Yesterday_Start].time.time().strftime("%H:%M:%S")
         fstTime = data[Yesterday_Start].time
         data = data[Yesterday_Start:last]
         info = []
