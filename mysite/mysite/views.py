@@ -80,34 +80,39 @@ def TodayChart(request, user):
     data = Record.objects.filter(user=user)
     i = 0
     length = len(data)
-    last = length - 1
-    Today = data[last].time.day
-    while(i < length):
-        if data[i].time.day == Today:
-            Today_Start = i
-            break
-        i += 1
+    if length > 0:
+        last = length - 1
+        Today = data[last].time.day
+        while(i < length):
+            if data[i].time.day == Today:
+                Today_Start = i
+                break
+            i += 1
 
-    accuStep = data[last].step - data[Today_Start].step
-    mostRecent =data[last].time.time()
-    leastRecent =  data[Today_Start].time.time()
-    fstTime = data[Today_Start].time
-    data = data[Today_Start:length]
-    info = []
-    length = len(data)
-    for i in range(0, length):
-        if i == 0:
-            info.append([0, data[0].step])
-        else:
-            info.append([(data[i].time - fstTime).seconds, data[i].step - data[i - 1].step])
-    return render_to_response('TodayChart.html', {
-        "user":user,
-        "data":data,
-        "info":info,
-        "accuStep":accuStep,
-        "leastRecent":leastRecent,
-        "mostRecent":mostRecent,
-    },context_instance=RequestContext(request))
+        accuStep = data[last].step - data[Today_Start].step
+        mostRecent =data[last].time.time()
+        leastRecent =  data[Today_Start].time.time()
+        fstTime = data[Today_Start].time
+        data = data[Today_Start:length]
+        info = []
+        length = len(data)
+        for i in range(0, length):
+            if i == 0:
+                info.append([0, data[0].step])
+            else:
+                info.append([(data[i].time - fstTime).seconds, data[i].step - data[i - 1].step])
+        return render_to_response('TodayChart.html', {
+            "user":user,
+            "data":data,
+            "info":info,
+            "accuStep":accuStep,
+            "leastRecent":leastRecent,
+            "mostRecent":mostRecent,
+        },context_instance=RequestContext(request))
+    else:
+        return render_to_response('noData.html', {
+            "user":user,
+        },context_instance=RequestContext(request))
 
 def YesterdayChart(request, user):
     AppID = ''
@@ -122,38 +127,43 @@ def YesterdayChart(request, user):
     data = Record.objects.filter(user=user)
     i = 0
     length = len(data)
-    last = length - 1
-    Yesterday = data[last].time.day - 2
-    flag = 0
-    while(i < length):
-        if data[i].time.day == Yesterday and flag == 0:
-            Yesterday_Start = i
-            flag = 1
-        elif data[i].time.day != Yesterday and flag == 1:
-            last = i
-            break;
-        i += 1
+    if length > 0:
+        last = length - 1
+        Yesterday = data[last].time.day - 2
+        flag = 0
+        while(i < length):
+            if data[i].time.day == Yesterday and flag == 0:
+                Yesterday_Start = i
+                flag = 1
+            elif data[i].time.day != Yesterday and flag == 1:
+                last = i
+                break;
+            i += 1
 
-    accuStep = data[last].step - data[Yesterday_Start].step
-    endTime =data[last].time.time()
-    startTime =  data[Yesterday_Start].time.time()
-    fstTime = data[Yesterday_Start].time
-    data = data[Yesterday_Start:last]
-    info = []
-    length = len(data)
-    for i in range(0, length):
-        if i == 0:
-            info.append([0, data[0].step])
-        else:
-            info.append([(data[i].time - fstTime).seconds, data[i].step - data[i - 1].step])
-    return render_to_response('YesterdayChart.html', {
-        "user":user,
-        "data":data,
-        "info":info,
-        "accuStep":accuStep,
-        "startTime":startTime,
-        "endTime":endTime,
-    },context_instance=RequestContext(request))
+        accuStep = data[last].step - data[Yesterday_Start].step
+        endTime =data[last].time.time()
+        startTime =  data[Yesterday_Start].time.time()
+        fstTime = data[Yesterday_Start].time
+        data = data[Yesterday_Start:last]
+        info = []
+        length = len(data)
+        for i in range(0, length):
+            if i == 0:
+                info.append([0, data[0].step])
+            else:
+                info.append([(data[i].time - fstTime).seconds, data[i].step - data[i - 1].step])
+        return render_to_response('YesterdayChart.html', {
+            "user":user,
+            "data":data,
+            "info":info,
+            "accuStep":accuStep,
+            "startTime":startTime,
+            "endTime":endTime,
+        },context_instance=RequestContext(request))
+    else:
+        return render_to_response('noData.html', {
+            "user":user,
+        },context_instance=RequestContext(request))
 
 def LastWeekChart(request, user):
     AppID = ''
@@ -169,28 +179,33 @@ def LastWeekChart(request, user):
     info = []
     i = 0
     length = len(data)
-    last = length - 1
-    lastToday = data[last].time.day - 2
-    while i < length:
-        if data[i].time.day == lastToday:
-            startDay = i
-            break
-        i += 1
-    accuStep = data[last].step - data[startDay].step
-    j = 0
-    i = startDay
-    day = lastToday
-    while i < length and j < 7:
-        lastDayStep = data[i].step
-        while data[i].time.day == day and i < length - 1:
+    if length > 0:
+        last = length - 1
+        lastToday = data[last].time.day - 2
+        while i < length:
+            if data[i].time.day == lastToday:
+                startDay = i
+                break
             i += 1
-        j += 1
-        day += 1
-        info.append([j, data[i].step - lastDayStep])
+        accuStep = data[last].step - data[startDay].step
+        j = 0
+        i = startDay
+        day = lastToday
+        while i < length and j < 7:
+            lastDayStep = data[i].step
+            while data[i].time.day == day and i < length - 1:
+                i += 1
+            j += 1
+            day += 1
+            info.append([j, data[i].step - lastDayStep])
 
-    return render_to_response('LastWeekChart.html', {
-        "user":user,
-        "info":info,
-        "data":data,
-        "accuStep":accuStep,
-    },context_instance=RequestContext(request))
+        return render_to_response('LastWeekChart.html', {
+            "user":user,
+            "info":info,
+            "data":data,
+            "accuStep":accuStep,
+        },context_instance=RequestContext(request))
+    else:
+        return render_to_response('noData.html', {
+            "user":user,
+        },context_instance=RequestContext(request))
