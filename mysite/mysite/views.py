@@ -53,7 +53,7 @@ def index(request):
         if isinstance(message, EventMessage):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
-                    stepi = Record.objects.filter(user = message.source)
+                    stepi = Record.objects.filter(user = u'oyVaDs1vEKOMKZhew7SVLLT2P0PA')
                     if stepi:
                         step = stepi[len(stepi) - 1].step
                         response = wechat.response_text(u'跑了' + str(step) + u'步咯')#里面的数字应由其他函数获取
@@ -84,7 +84,7 @@ def TodayChart(request, user):
         appid=AppID,
         appsecret=AppSecret
     )
-    data = Record.objects.filter(user=user)
+    data = Record.objects.filter(user=u'oyVaDs1vEKOMKZhew7SVLLT2P0PA')
     i = 0
     length = len(data)
     if length > 0:
@@ -97,8 +97,8 @@ def TodayChart(request, user):
             i += 1
 
         accuStep = data[last].step - data[Today_Start].step
-        mostRecent =data[last].time.time()
-        leastRecent =  data[Today_Start].time.time()
+        mostRecent =data[last].time.time().strftime("%H:%M:%S")
+        leastRecent =  data[Today_Start].time.time().strftime("%H:%M:%S")
         fstTime = data[Today_Start].time
         data = data[Today_Start:length]
         info = []
@@ -131,7 +131,7 @@ def YesterdayChart(request, user):
         appid=AppID,
         appsecret=AppSecret
     )
-    data = Record.objects.filter(user=user)
+    data = Record.objects.filter(user=u'oyVaDs1vEKOMKZhew7SVLLT2P0PA')
     i = 0
     length = len(data)
     if length > 0:
@@ -148,8 +148,8 @@ def YesterdayChart(request, user):
             i += 1
 
         accuStep = data[last].step - data[Yesterday_Start].step
-        endTime =data[last].time.time()
-        startTime =  data[Yesterday_Start].time.time()
+        endTime =data[last].time.time().strftime("%H:%M:%S")
+        startTime =  data[Yesterday_Start].time.time().strftime("%H:%M:%S")
         fstTime = data[Yesterday_Start].time
         data = data[Yesterday_Start:last]
         info = []
@@ -182,7 +182,7 @@ def LastWeekChart(request, user):
         appid=AppID,
         appsecret=AppSecret
     )
-    data = Record.objects.filter(user=user)
+    data = Record.objects.filter(user=u'oyVaDs1vEKOMKZhew7SVLLT2P0PA')
     info = []
     i = 0
     length = len(data)
