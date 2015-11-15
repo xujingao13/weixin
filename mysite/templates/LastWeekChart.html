@@ -166,7 +166,7 @@
 										
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>{{ accuStep }}</span>
+							<span>{{ all_steps }}</span>
 							Accumulative Steps
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
@@ -287,83 +287,83 @@
 
 
 <script src="/static/js/bootstrap.js"></script>
- <script type="text/javascript">
-   $(function () {
-	var data = new Array ();
-    var ds = new Array();
+<script type="text/javascript">
+    $(function () {
+        var data = new Array ();
+        var ds = new Array();
 
-	data.push ({{ info }});
+        data.push ({{ info }});
 
-    for (var i=0, j=data.length; i<j; i++) {
+        for (var i=0, j=data.length; i<j; i++) {
 
-	     ds.push({
-	        data:data[i],
-	        grid:{
-            hoverable:true
-        },
-	        bars: {
-	            show: true,
-	            barWidth: 0.5,
-	            order: 1,
-	            lineWidth: 0.5,
-				fillColor: { colors: [ { opacity: 0.65 }, { opacity: 1 } ] }
-	        }
-	    });
-	}
+             ds.push({
+                data:data[i],
+                grid:{
+                    hoverable:true
+                },
+                bars: {
+                    show: true,
+                    barWidth: 0.5,
+                    order: 1,
+                    lineWidth: 0.5,
+                    fillColor: { colors: [ { opacity: 0.65 }, { opacity: 1 } ] }
+                }
+            });
+        }
 
-    $.plot($("#bar-chart"), ds, {
-    	colors: ["#F90", "#3C4049", "#666", "#BBB"]
+        $.plot($("#bar-chart"), ds, {
+            colors: ["#F90", "#3C4049", "#666", "#BBB"]
+        });
+        $.plot($("#line-chart"),
+               [ { data: {{ info }}, label: "real steps"} ], {
+                   series: {
+                       lines: { show: true },
+                       points: { show: true }
+                   },
+
+                   grid: { hoverable: true, clickable: true },
+                    colors: ["#F90", "#3C4049", "#666", "#BBB"]
+                 });
+
+
+        var data = []
+        var series = 4;
+           data[0] = { label: "walk", data: Math.floor(Math.random()*100)+1 }
+           data[1] = { label: "heel-and-toe", data: Math.floor(Math.random()*100)+1 }
+           data[2] = { label: "bike", data: Math.floor(Math.random()*100)+1 }
+           data[3] = { label: "run", data: Math.floor(Math.random()*100)+1 }
+
+        $.plot($("#pie-chart"), data,
+        {
+                colors: ["#F90", "#3C4049", "#666", "#BBB"],
+                series: {
+                    pie: {
+                        show: true,
+                        label: {
+                            show: false,
+                            formatter: function(label, series){
+                                return '<div style="font-size:11px;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
+                            },
+                            threshold: 0.1
+                        }
+                    }
+                },
+                legend: {
+                    show: true,
+                    noColumns: 1, // number of colums in legend table
+                    labelFormatter: null, // fn: string -> string
+                    labelBoxBorderColor: "#888", // border color for the little label boxes
+                    container: null, // container (as jQuery object) to put legend in, null means default on top of graph
+                    position: "ne", // position of default legend container within plot
+                    margin: [0, 10], // distance from grid edge to default legend container within plot
+                    backgroundOpacity: 0 // set to 0 to avoid background
+                },
+                grid: {
+                    hoverable: false,
+                    clickable: false
+                },
+        });
     });
-    $.plot($("#line-chart"),
-           [ { data: {{ info }}, label: "real steps"} ], {
-               series: {
-                   lines: { show: true },
-                   points: { show: true }
-               },
-
-               grid: { hoverable: true, clickable: true },
-    	colors: ["#F90", "#3C4049", "#666", "#BBB"]
-             });
-    var data = []
-    var series = 4;
-       data[0] = { label: "walk", data: Math.floor(Math.random()*100)+1 }
-       data[1] = { label: "heel-and-toe", data: Math.floor(Math.random()*100)+1 }
-       data[2] = { label: "bike", data: Math.floor(Math.random()*100)+1 }
-       data[3] = { label: "run", data: Math.floor(Math.random()*100)+1 }
-
-    $.plot($("#pie-chart"), data,
-	{
-			colors: ["#F90", "#3C4049", "#666", "#BBB"],
-			series: {
-				pie: {
-					show: true,
-					label: {
-						show: false,
-						formatter: function(label, series){
-							return '<div style="font-size:11px;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
-						},
-						threshold: 0.1
-					}
-				}
-			},
-			legend: {
-				show: true,
-				noColumns: 1, // number of colums in legend table
-				labelFormatter: null, // fn: string -> string
-				labelBoxBorderColor: "#888", // border color for the little label boxes
-				container: null, // container (as jQuery object) to put legend in, null means default on top of graph
-				position: "ne", // position of default legend container within plot
-				margin: [0, 10], // distance from grid edge to default legend container within plot
-				backgroundOpacity: 0 // set to 0 to avoid background
-			},
-			grid: {
-				hoverable: false,
-				clickable: false
-			},
-	});
-
-
-});
  </script>
 
 <!--<script src="/static/js/charts/area.js"></script>-->
