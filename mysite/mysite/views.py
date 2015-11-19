@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from wechat_sdk import WechatBasic
+
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from wechat_sdk.exceptions import ParseError
-from wechat_sdk.messages import TextMessage
-from database_request import *
-from wechat.models import *
-from django.template.loader import get_template
-from django.template import Context
-from settings import WECHAT_TOKEN, SERVER_IP, AppID, AppSecret
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from datetime import *
-import time
+
+from wechat_sdk import WechatBasic
+from wechat_sdk.exceptions import ParseError
+from wechat.models import *
+from settings import WECHAT_TOKEN, SERVER_IP, AppID, AppSecret
 from wechat_sdk.messages import (
-    TextMessage, VoiceMessage, ImageMessage, VideoMessage, LinkMessage, LocationMessage, EventMessage
+    EventMessage
 )
 
 
