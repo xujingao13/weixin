@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from wechat_sdk import WechatBasic
+
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from wechat_sdk.exceptions import ParseError
-from wechat_sdk.messages import TextMessage
-from database_request import *
-from wechat.models import *
-from django.template.loader import get_template
-from django.template import Context
-from settings import WECHAT_TOKEN, SERVER_IP, AppID, AppSecret
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from datetime import *
-import time
+
+from wechat_sdk import WechatBasic
+from wechat_sdk.exceptions import ParseError
+from wechat.models import *
+from settings import WECHAT_TOKEN, SERVER_IP, AppID, AppSecret, RESPONSE_RANKLIST
 from wechat_sdk.messages import (
-    TextMessage, VoiceMessage, ImageMessage, VideoMessage, LinkMessage, LocationMessage, EventMessage
+    EventMessage
 )
 
 
@@ -50,6 +46,7 @@ def index(request):
         if isinstance(message, EventMessage):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
+                    '''
                     step_array = Record.objects.filter(user=message.source)
                     if step_array:
                         step = step_array[len(step_array) - 1].step
@@ -59,6 +56,12 @@ def index(request):
                     else:
                         response = we_chat.response_text(u'Sorry, there\' no data about you in our database.')
                         return HttpResponse(response)
+                    
+                    '''
+                    
+                    response = RESPONSE_RANKLIST % (message.source, message.target)
+                    return HttpResponse(response)
+                    
                 if message.key == 'CHART':
                     response = we_chat.response_news([{
                         'title': u'Today\'s amount of exercise',
@@ -165,5 +168,3 @@ def last_week_chart(request, user):
         return render_to_response('noData.html', {
             "user": user,
         }, context_instance=RequestContext(request))
-
-
