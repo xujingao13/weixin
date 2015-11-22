@@ -19,7 +19,6 @@ def get_data(type_list, start_time, end_time, type="", subType=""):
             return_data[type_name].append(val[type_name])
     return return_data
 
-
 #数据由三层结构构成
 #type_list["distance", "score", "wakeNum", "dsNum", "calories", "subType", "nonActTime", "wakeTimes", "steps", "startTime", "actTime", "lsNum", "endTime", "type"]
 '''startTime   该区块的开始时间，例如，用户早起跑步的跑步区块从 8:31 开始。
