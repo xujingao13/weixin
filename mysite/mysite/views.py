@@ -60,12 +60,18 @@ def index(request):
                     return HttpResponse(response)  
 
                 if message.key == 'CHART':
-                    response = we_chat.response_news([{
-                        'title': u'Today\'s amount of exercise',
-                        'description': 'data analysis',
-                        'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png',
-                        'url': SERVER_IP + 'TodayChart/' + message.source}])
-                    return HttpResponse(response)
+                    step_array = Record.objects.filter(user=message.source)
+                    if step_array:
+                        response = we_chat.response_news([{
+                            'title': u'Today\'s amount of exercise',
+                            'description': 'data analysis',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png',
+                            'url': SERVER_IP + 'TodayChart/' + message.source}])
+                        return HttpResponse(response)
+                    else:
+                        response = we_chat.response_text(u'Sorry, there\' no data about you in our database.')
+                        return HttpResponse(response)
+
         response = we_chat.response_text(u'Cheer up!')
         return HttpResponse(response)
 
@@ -120,7 +126,6 @@ def get_chart(request, user, dayFlag):
         return render_to_response('noData.html', {
             "user":user,
         }, context_instance=RequestContext(request))
-
 
 def today_chart(request, user):
     return get_chart(request, user, "today")
