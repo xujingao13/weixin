@@ -71,67 +71,36 @@ def index(request):
 
 
 @csrf_exempt
-def today_chart(request, user):
+def get_chart(request, user, dayFlag):
     data = Record.objects.filter(user=user)
     i = 0
+    html = "noData.html"
     length = len(data)
     if length > 0:
         last = length - 1
-        today = data[last].time.day
-        while i < length:
-            if data[i].time.day == today:
-                today_start = i
-                break
-            i += 1
+        if dayFlag == "today":
+            day = data[last].time.day
+            html = "TodayChart.html"
+        elif dayFlag == "yesterday":
+            day = data[last].time.day - 2
+            html = "YesterdayChart.html"
 
-        all_steps = data[last].step - data[today_start].step
-        most_recent = data[last].time.time().strftime("%H:%M:%S")
-        least_recent = data[today_start].time.time().strftime("%H:%M:%S")
-        first_time = data[today_start].time
-        data = data[today_start:length]
-        info = []
-        length = len(data)
-        for i in range(0, length):
-            if i == 0:
-                info.append([0, data[0].step])
-            else:
-                info.append([(data[i].time - first_time).seconds, data[i].step - data[i - 1].step])
-        return render_to_response('TodayChart.html', {
-            "user": user,
-            "data": data,
-            "info": info,
-            "all_steps": all_steps,
-            "least_recent": least_recent,
-            "most_recent": most_recent,
-        }, context_instance=RequestContext(request))
-    else:
-        return render_to_response('noData.html', {
-            "user":user,
-        }, context_instance=RequestContext(request))
-
-
-def yesterday_chart(request, user):
-    data = Record.objects.filter(user=user)
-    i = 0
-    length = len(data)
-    if length > 0:
-        last = length - 1
-        yesterday = data[last].time.day - 2
         flag = 0
+        #'start' variable is the item in the database which stores the data whose day is the variable 'day' first
         while i < length:
-            if data[i].time.day == yesterday and flag == 0:
-                yesterday_start = i
+            if data[i].time.day == day and flag == 0:
+                start = i
                 flag = 1
-            elif data[i].time.day != yesterday and flag == 1:
-                last = i
+            elif data[i].time.day != day and flag == 1:
                 break;
             i += 1
-
-        all_steps = data[last].step - data[yesterday_start].step
+        last = i - 1
+        #'last'variable is the item in the database which stores the data whose day is the variable 'day' last
+        all_steps = data[last].step - data[start].step
         end_time = data[last].time.time().strftime("%H:%M:%S")
-        start_time = data[yesterday_start].time.time().strftime("%H:%M:%S")
-        first_time = data[yesterday_start].time
-        data = data[yesterday_start:last]
+        start_time = data[start].time.time().strftime("%H:%M:%S")
+        first_time = data[start].time
+        data = data[start:last]
         info = []
         length = len(data)
         for i in range(0, length):
@@ -139,7 +108,7 @@ def yesterday_chart(request, user):
                 info.append([0, data[0].step])
             else:
                 info.append([(data[i].time - first_time).seconds, data[i].step - data[i - 1].step])
-        return render_to_response('YesterdayChart.html', {
+        return render_to_response(html, {
             "user": user,
             "data": data,
             "info": info,
@@ -151,6 +120,14 @@ def yesterday_chart(request, user):
         return render_to_response('noData.html', {
             "user":user,
         }, context_instance=RequestContext(request))
+
+
+def today_chart(request, user):
+    return get_chart(request, user, "today")
+
+
+def yesterday_chart(request, user):
+    return get_chart(request, user, "yesterday")
 
 
 def last_week_chart(request, user):
