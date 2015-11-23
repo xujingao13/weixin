@@ -55,11 +55,11 @@ def index(request):
                         response = we_chat.response_text(u'Sorry, there\' no data about you in our database.')
                         return HttpResponse(response)
 
-                if message.key == 'RANK_LIST':
+                elif message.key == 'RANK_LIST':
                     response = RESPONSE_RANKLIST % (message.source, message.target)
                     return HttpResponse(response)  
 
-                if message.key == 'CHART':
+                elif message.key == 'CHART':
                     step_array = Record.objects.filter(user=message.source)
                     if step_array:
                         response = we_chat.response_news([{
@@ -72,8 +72,9 @@ def index(request):
                         response = we_chat.response_text(u'Sorry, there\' no data about you in our database.')
                         return HttpResponse(response)
 
-        response = we_chat.response_text(u'Cheer up!')
-        return HttpResponse(response)
+                elif message.key == 'CHEER':
+                    response = we_chat.response_text(u'We are family!')
+                    return HttpResponse(response)
 
 
 @csrf_exempt
