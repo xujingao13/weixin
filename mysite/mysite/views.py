@@ -9,7 +9,7 @@ from django.template import RequestContext
 from wechat_sdk import WechatBasic
 from wechat_sdk.exceptions import ParseError
 from wechat.models import *
-from settings import WECHAT_TOKEN, SERVER_IP, AppID, AppSecret, RESPONSE_RANKLIST
+from settings import *
 from wechat_sdk.messages import (
     EventMessage
 )
@@ -17,7 +17,6 @@ from wechat_sdk.messages import (
 
 @csrf_exempt
 def index(request):
- 
     # 实例化 We_chat_Basic
     we_chat = WechatBasic(
         token=WECHAT_TOKEN,
@@ -46,7 +45,6 @@ def index(request):
         if isinstance(message, EventMessage):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
-                    '''
                     step_array = Record.objects.filter(user=message.source)
                     if step_array:
                         step = step_array[len(step_array) - 1].step
@@ -56,12 +54,11 @@ def index(request):
                     else:
                         response = we_chat.response_text(u'Sorry, there\' no data about you in our database.')
                         return HttpResponse(response)
-                    
-                    '''
-                    
+
+                if message.key == 'RANK_LIST':
                     response = RESPONSE_RANKLIST % (message.source, message.target)
-                    return HttpResponse(response)
-                    
+                    return HttpResponse(response)  
+
                 if message.key == 'CHART':
                     response = we_chat.response_news([{
                         'title': u'Today\'s amount of exercise',
