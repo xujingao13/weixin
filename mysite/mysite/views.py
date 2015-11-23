@@ -73,7 +73,7 @@ def index(request):
                         return HttpResponse(response)
 
                 elif message.key == 'CHEER':
-                    response = we_chat.response_text(u'Cheer up!')
+                    response = we_chat.response_text(u'We are family!')
                     return HttpResponse(response)
 
 
