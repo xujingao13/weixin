@@ -75,6 +75,14 @@ def index(request):
                             'url': SERVER_IP + 'flappy_bird'}])
                     return HttpResponse(response)
 
+                elif message.key == 'USER_INFO':
+                    response = we_chat.response_news([{
+                            'title': u'Welcome to Treasure Ring',
+                            'description': 'a userful ring',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
+                            'url': SERVER_IP + 'register'}])
+                    return HttpResponse(response)
+
                 elif message.key == 'CHART':
                     step_array = Record.objects.filter(user=message.source)
                     if step_array:
@@ -155,6 +163,10 @@ def play_game(request):
 
 def play_bird(request):
     return render_to_response('bird.html')
+
+
+def register(request):
+    return render_to_response('register.html')
 
 
 def yesterday_chart(request, user):
