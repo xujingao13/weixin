@@ -63,8 +63,16 @@ def index(request):
                     response = we_chat.response_news([{
                             'title': u'Let us play 2048 together',
                             'description': 'a simple but interesting game',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
                             'url': SERVER_IP + '2048'}])
+                    return HttpResponse(response)
+
+                elif message.key == 'FLAPPY':
+                    response = we_chat.response_news([{
+                            'title': u'Let us play Flappy Bird together',
+                            'description': 'a simple but interesting game',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
+                            'url': SERVER_IP + 'flappy_bird'}])
                     return HttpResponse(response)
 
                 elif message.key == 'CHART':
@@ -73,7 +81,7 @@ def index(request):
                         response = we_chat.response_news([{
                             'title': u'Today\'s amount of exercise',
                             'description': 'data analysis',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png',
                             'url': SERVER_IP + 'TodayChart/' + message.source}])
                         return HttpResponse(response)
                     else:
@@ -136,11 +144,14 @@ def get_chart(request, user, dayFlag):
             "user":user,
         }, context_instance=RequestContext(request))
 
+
 def today_chart(request, user):
     return get_chart(request, user, "today")
 
+
 def play_game(request):
     return render_to_response('2048.html')
+
 
 def play_bird(request):
     return render_to_response('bird.html')
