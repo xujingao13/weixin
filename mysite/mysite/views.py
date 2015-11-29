@@ -79,7 +79,7 @@ def index(request):
                     response = we_chat.response_news([{
                             'title': u'Welcome to Treasure Ring',
                             'description': 'a userful ring',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
                             'url': SERVER_IP + 'register'}])
                     return HttpResponse(response)
 
