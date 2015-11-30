@@ -2,11 +2,12 @@ from django.db import models
 
 
 class RingUser(models.Model):
-    user = models.CharField(max_length=30, primary_key=True)
-    sex = models.IntegerField()
+    user_id = models.CharField(max_length=30, primary_key=True)
+    sex = models.CharField(max_length=30)
     age = models.IntegerField()
     height = models.IntegerField()
     weight = models.IntegerField()
+    target = models.IntegerField()
     last_record = models.IntegerField()
 
 

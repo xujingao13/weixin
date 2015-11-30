@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^2048', 'mysite.views.play_game'),
     url(r'^flappy_bird', 'mysite.views.play_bird'),
+    url(r'^register', 'mysite.views.register'),
 ]
 
 
