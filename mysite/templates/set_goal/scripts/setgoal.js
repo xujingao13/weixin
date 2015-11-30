@@ -7,3 +7,4 @@ var update_step = function () {
 };
 $('#goal_step').on('input', update_dis);
 $('#goal_dis').on('input', update_step);
+
