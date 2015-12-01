@@ -14,5 +14,5 @@ function getUrlParameter(sParam) {
 };
 function getopenid(callback){
     var code = getUrlParameter('code');
-    $.getJSON("http://59.66.139.139/data/code/"+code, callback);
+    $.getJSON("data/code/"+code, callback);
 }

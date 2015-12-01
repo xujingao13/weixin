@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^weixin', 'wechat_response.views.weixin'),
     url(r'^data/code/(.*)', 'wechat_response.views.get_openid'),
     url(r'^data/register$', 'wechat_response.views.register'),
+    url(r'^data/ifregistered/(.*)', 'web_data.views.ifregistered'),
 ]
