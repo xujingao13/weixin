@@ -36,7 +36,7 @@ def weixin(request):
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
-            #create_menu()
+            create_menu()
             return HttpResponse(request.GET.get("echostr"), content_type="text/plain")
     else:
         signature = request.GET.get('signature')
@@ -108,15 +108,17 @@ def weixin(request):
                 elif message.key == 'CHEER':
                     response = we_chat.response_text(u'We are family!')
                     return HttpResponse(response)
+            return HttpResponse('OK')
+
 
 def get_openid(request, code):
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     f = urllib2.urlopen(get_url)
     string_json = f.read()
-    print  string_json
     openid = json.loads(string_json)['openid']
     print openid
     return HttpResponse(json.dumps(openid))
+
 @csrf_exempt
 def get_chart(request, user, dayFlag):
     data = Record.objects.filter(user=user)
@@ -246,12 +248,13 @@ def last_week_chart(request, user):
         }, context_instance=RequestContext(request))
 
 
+@csrf_exempt
 def create_menu():
     get_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (AppID,AppSecret)
     f = urllib2.urlopen(get_url)
     string_json = f.read()
     access_token = json.loads(string_json)['access_token']
     post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
-    print post_url
-    request = urllib2.urlopen(post_url, (MENU % SERVER_IP).encode('utf-8'))
+    request = urllib2.urlopen(post_url, (MENU % USER_URL).encode('utf-8'))
+    print MENU % USER_URL
     print request.read()

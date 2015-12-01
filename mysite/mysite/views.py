@@ -9,7 +9,7 @@ from django.template import RequestContext
 from wechat_sdk import WechatBasic
 from wechat_sdk.exceptions import ParseError
 from wechat.models import *
-from settings import *
+from wechat_treasure_ring.settings import *
 from wechat_sdk.messages import (
     EventMessage
 )
