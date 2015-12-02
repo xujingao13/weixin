@@ -36,7 +36,7 @@ def weixin(request):
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
-            create_menu()
+            #create_menu()
             return HttpResponse(request.GET.get("echostr"), content_type="text/plain")
     else:
         signature = request.GET.get('signature')
