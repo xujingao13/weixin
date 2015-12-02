@@ -71,7 +71,7 @@ def weixin(request):
                             'title': u'Let us play 2048 together',
                             'description': 'a simple but interesting game',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
-                            'url': SERVER_IP + '2048'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2f2048.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'FLAPPY':
@@ -79,21 +79,16 @@ def weixin(request):
                             'title': u'Let us play Flappy Bird together',
                             'description': 'a simple but interesting game',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
-                            'url': SERVER_IP + 'flappy_bird'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fbird.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'CHART':
-                    step_array = Record.objects.filter(user=message.source)
-                    if step_array:
-                        response = we_chat.response_news([{
-                            'title': u'Today\'s amount of exercise',
-                            'description': 'data analysis',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png',
-                            'url': SERVER_IP + 'TodayChart/' + message.source}])
-                        return HttpResponse(response)
-                    else:
-                        response = we_chat.response_text(u'Sorry, there\' no data about you in our database.')
-                        return HttpResponse(response)
+                    response = we_chat.response_news([{
+                        'title': u'Today\'s amount of exercise',
+                        'description': 'data analysis',
+                        'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/ez.png',
+                        'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
+                    return HttpResponse(response)
 
                 elif message.key == 'CHEER':
                     response = we_chat.response_text(u'We are family!')
