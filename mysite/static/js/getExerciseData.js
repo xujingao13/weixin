@@ -101,6 +101,10 @@ function drawChart(data, dataLength, chartId){
 		});
 }
 
+//set the advise
+function setExpertiseAdvise(yesterdayIntensity, sevenDayIntensity){
+
+}
 //set data according to the data, "suffix" is the unit
 function setDataText(idString, data, suffix){
 	$("#" + idString).text(String(data) + suffix);
