@@ -1,6 +1,7 @@
 /**
  * Created by littlepig on 2015/11/30.
  */
+ var openid;
 $(document).ready(function(){
 	$(function () {
 		$('#collapseOne').collapse('show');
@@ -9,6 +10,10 @@ $(document).ready(function(){
 		$('#collapseFour').collapse('show');
 	});
 	draw();
+	getopenid(function(data){
+		openid = data;
+		alert(openid);
+	});
 })
 //send ajax request
 function loadXMLDoc() {

@@ -6,7 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link href="/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="/bootstrap/bootstrap-responsive.min.css" rel="stylesheet" />
-
     <title>Sleep Analysis</title>
 </head>
 <body>
@@ -17,7 +16,7 @@
         <div>
            <ul class="nav nav-tabs-justified">
               <li class="active"><a href="/sleepAnalysis.html">睡眠数据</a></li>
-              <li><a href="/exerciseAnalysis.html">运动数据</a></li>
+              <li><a href="https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect">运动数据</a></li>
            </ul>
         </div>
     </nav>
@@ -132,6 +131,7 @@
     </div> <!-- /footer -->
 
     <script src="/jquery/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src = "getopenid.js"></script>
     <script src="/dataAnalysis/getSleepData.js" charset="UTF-8"></script>
     <script src="/jquery/jquery.flot.js" ></script>
     <script src="/jquery/jquery.flot.pie.js"></script>

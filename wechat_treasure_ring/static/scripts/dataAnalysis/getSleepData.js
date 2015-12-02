@@ -1,6 +1,20 @@
 /**
  * Created by littlepig on 2015/11/29.
  */
+ var openid;
+$(document).ready(function(){
+	$(function () {
+		$('#collapseOne').collapse('show');
+		$('#collapseTwo').collapse('show');
+		$('#collapseThree').collapse('show');
+		$('#collapseFour').collapse('show');
+	});
+	draw();
+	getopenid(function(data){
+		openid = data;
+		alert(openid);
+	});
+})
 $(document).ready(function(){
 	$(function () {
 		$('#collapseOne').collapse('show');
