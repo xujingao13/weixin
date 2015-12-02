@@ -82,16 +82,6 @@ def weixin(request):
                             'url': SERVER_IP + 'flappy_bird'}])
                     return HttpResponse(response)
 
-                elif message.key == 'USER_INFO':
-                    print message.source
-                    response = we_chat.response_news([{
-                            'title': u'Welcome to Treasure Ring',
-                            'description': 'a userful ring',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fregister.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
-                            #'url': SERVER_IP + 'register.html'}])
-                    return HttpResponse(response)
-
                 elif message.key == 'CHART':
                     step_array = Record.objects.filter(user=message.source)
                     if step_array:
@@ -181,31 +171,6 @@ def play_game(request):
 
 def play_bird(request):
     return render_to_response('bird.html')
-
-@csrf_exempt
-def register(request):
-    user_sex = request.POST.get("sex")
-    user_age = request.POST.get("age")
-    user_height = request.POST.get("height")
-    user_wight = request.POST.get("weight")
-    user_goal = request.POST.get("goal_step")
-    user_openid = request.POST.get("openid")
-    print user_openid
-    user_info = RingUser(
-        user_id=user_openid,
-        sex=user_sex,
-        age=user_age,
-        height=user_height,
-        weight=user_wight,
-        target=user_goal,
-        last_record=0
-    )
-    user_info.save()
-    return HttpResponse("add info successfully")
-
-
-
-
 
 def yesterday_chart(request, user):
     return get_chart(request, user, "yesterday")

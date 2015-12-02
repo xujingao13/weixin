@@ -4,8 +4,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link href="info/style.css" rel='stylesheet' type='text/css'>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script type="text/javascript" src = "/getopenid.js"></script>
-		<script type="text/javascript" src = "/info/setgoal.js"></script>	
+		<script type="text/javascript" src = "getopenid.js"></script>
+		<script type="text/javascript" src = "info/setgoal.js"></script>	
 		<title>珍环-目标设定</title>
 	</head>
 	<body>
@@ -13,7 +13,7 @@
 			<div class="header">
 				<h1>加入珍环</h1>
 			</div>
-			<form style="font-size:80px" action="data/register" method="post">
+			<div style="font-size:80px">
 				性别:<select  style="font-size:70px"  name="sex" id="sex">
 					<option value="male">男</option>
 					<option value="female">女</option>
@@ -27,9 +27,8 @@
 				<input style="visibility:hidden" type="text" name="openid" id="openid"><br>
 				步数:<input  style="font-size:70px" type="text" name="goal_step" id="goal_step"><br>
 				里程:<input  style="font-size:70px" type="text" name="goal_dis" id="goal_dis"><br>
-				<input style="font-size:50px" type="submit" value="提交" alt="Submit" width="48" height="48" >
-			</form>
-			<h1>
+				<input style="font-size:50px" type="submit" value="提交" alt="Submit" width="48" height="48" onclick="set_userinfo();">
+			</div>
 		</div>
 	</body>
 </html>
