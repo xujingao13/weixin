@@ -2,9 +2,11 @@
  * Created by littlepig on 2015/11/29.
  */
 $(document).ready(function(){
-	$(function () { $('#collapseOne').collapse('show')});
-   	$(function () { $('#collapseTwo').collapse('hide')});
-   	$(function () { $('#collapseThree').collapse('show')});
+	$(function () {
+		$('#collapseOne').collapse('show');
+		$('#collapseTwo').collapse('show');
+		$('#collapseThree').collapse('show');
+	});
 	draw();
 })
 //send ajax request

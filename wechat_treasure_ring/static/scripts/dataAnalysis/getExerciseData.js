@@ -2,10 +2,12 @@
  * Created by littlepig on 2015/11/30.
  */
 $(document).ready(function(){
-	$(function () { $('#collapseOne').collapse('show')});
-   	$(function () { $('#collapseTwo').collapse('show')});
-   	$(function () { $('#collapseThree').collapse('show')});
-    $(function () { $('#collapseFour').collapse('show')});
+	$(function () {
+		$('#collapseOne').collapse('show');
+		$('#collapseTwo').collapse('show');
+		$('#collapseThree').collapse('show');
+		$('#collapseFour').collapse('show');
+	});
 	draw();
 })
 //send ajax request
