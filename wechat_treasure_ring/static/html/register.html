@@ -1,3 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+	<meta charset="utf-8" />
+	<head>
+		<title>加入珍环</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="info/main.css">
+        <script src="jquery.min.js"></script>
+        <script type="text/javascript" src = "getopenid.js"></script>
+		<script type="text/javascript" src = "info/setgoal.js"></script>
+	</head>
+	<body>
+		<div class="form">
+			<div class="header"><h2>加入珍环</h2></div>
+			<div class="login">
+					<ul>
+						<li>
+							<span class="un"><i class="fa fa-child"></i></span><select id="sex" required class="text">
+								<option value="male">男</option>
+								<option value="female">女</option>
+							</select>
+						</li>
+						<li>
+							<span class="un"><i class="fa fa-user"></i></span><input type="text" id="age" required class="text" placeholder="年龄/岁"/>
+						</li>
+						<li>
+							<span class="un"><i class="fa fa-male"></i></span><input type="text" id="height" required class="text" placeholder="身高/cm"/>
+						</li>
+						<li>
+							<span class="un"><i class="fa fa-paw"></i></span><input type="text" id="weight" required class="text" placeholder="体重/kg"/>
+						</li>
+						<li>
+							<span class="un"><i class="fa fa-heart"></i></span><input type="text" id="goal_step" required class="text" placeholder="目标步数/步"/>
+						</li>
+						<li>
+							<span class="un"><i class="fa fa-flag"></i></span><input type="text" id="goal_dis" required class="text" placeholder="目标里程/m"/>
+						</li>
+						<li>
+							<input type="submit" value="REGISTER" class="btn" onclick="set_userinfo();">
+						</li>
+					</ul>
+			</div><br/>
+		</div>
+		<div id="footer">
+        	<div class="container">
+		    	<hr />
+            	<p style="font-size:xx-small;text-align: center">CopyRight &copy; 2015 珍环传</p>
+            	<p style="font-size:xx-small;text-align: center">All Rights Reserved</p>
+        	</div>
+    	</div>
+	</body>
+</html>
+
+
+<!--
 <!DOCTYPE html>
 <html>
 	<head>
@@ -32,5 +88,6 @@
 		</div>
 	</body>
 </html>
+
 
 

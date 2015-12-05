@@ -19,7 +19,6 @@ class Record(models.Model):
     endTime = models.IntegerField()
     type = models.IntegerField()
     distance = models.IntegerField()
-    #speed = models.FloatField()
     calories = models.IntegerField()
     steps = models.IntegerField()
     subType = models.IntegerField()
