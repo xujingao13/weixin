@@ -3,7 +3,6 @@ from django.db import models
 
 class RingUser(models.Model):
     user_id = models.CharField(max_length=30, primary_key=True)
-    user_ord = models.IntegerField()
     sex = models.CharField(max_length=30)
     age = models.IntegerField()
     height = models.IntegerField()
@@ -14,7 +13,6 @@ class RingUser(models.Model):
 
 class Record(models.Model):
     user_name = models.CharField(max_length=30)
-    user_ord = models.IntegerField()
     startTime = models.IntegerField()
     endTime = models.IntegerField()
     type = models.IntegerField()
