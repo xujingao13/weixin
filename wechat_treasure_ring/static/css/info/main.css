@@ -2,7 +2,7 @@
 @import url("http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700");
 *{margin:0; padding:0}
 body{background:#294072; font-family: 'Source Sans Pro', sans-serif}
-.form{width:400px; margin:0 auto; background:#1C2B4A; margin-top:150px}
+.form{width:400px; margin:0 auto; background:#1C2B4A; margin-top:50px}
 .header{height:44px; background:#17233B}
 .header h2{height:44px; line-height:44px; color:#fff; text-align:center}
 .login{padding:0 20px}
