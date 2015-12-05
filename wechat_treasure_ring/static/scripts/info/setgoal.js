@@ -14,15 +14,15 @@ function set_userinfo(){
 		height:$('#height').val(),
 		weight:$('#weight').val(),
 		goal_step:$('#goal_step').val(),
-		openid:$('#openid').val()
+		openid:$('#goal_step').val()
 	}, showinfo);
 }
 $(document).ready(function(){
 	$('#goal_step').on('input', update_dis);
 	$('#goal_dis').on('input', update_step);
 	getopenid(function(data){
-		$('#openid').val(data);
 		openid = data;
+		$('#openid').val(data);
 		$.getJSON("data/ifregistered/"+openid, function(data){
 			if (data.ifregistered == true) {
 				$('#sex').val(data.sex);
