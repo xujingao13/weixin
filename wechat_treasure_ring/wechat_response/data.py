@@ -123,7 +123,7 @@ def get_sleep_data(user):
     last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    data = get_data(["user", "dsNum", "lsNum", "startTime", "endTime"], start_time, end_time,  user)
+    data = get_data(["user", "dsNum", "lsNum", "startTime", "endTime"], start_time, end_time,  user.id)
     length = len(data["dsNum"])
     data["sleepNum"] = list()
     for i in range(length):
@@ -141,7 +141,7 @@ def get_exercise_data(user):
     last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    data = get_data(["user", "calories", "steps", "distance", "startTime", "endTime"], start_time, end_time,  user.user_ord)
+    data = get_data(["user", "calories", "steps", "distance", "startTime", "endTime"], start_time, end_time,  user.id)
     #data["speed"] = integrate_data(data["speed"], data["startTime"], data["endTime"])
     data["distance"] = integrate_data(data["distance"], data["startTime"], data["endTime"])
     data["steps"] = integrate_data(data["steps"], data["startTime"], data["endTime"])
@@ -156,11 +156,22 @@ def get_save(user):
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     now_time = time.localtime()
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    data = get_data(["user", 'startTime', 'endTime', 'type', 'distance', 'calories', 'steps', 'subType', 'actTime', 'nonActTime', 'dsNum', 'lsNum', 'wakeNum', 'wakeTimes', 'score'], start_time, end_time, user.user_ord)
+    data = get_data(["user", 'startTime', 'endTime', 'type', 'distance', 'calories', 'steps', 'subType', 'actTime', 'nonActTime', 'dsNum', 'lsNum', 'wakeNum', 'wakeTimes', 'score'], start_time, end_time, user.id)
     time_list = process_time_data(data["startTime"])
     save_data(data, time_list)
     new_record = time.time()
-    # 用new_record 更新last_record
+    if RingUser.objects.filter(user_id=user.user_id).exists():
+        user_temp = RingUser.objects.filter(user_id=user.user_id)[0]
+        user_new = RingUser(
+            user_id=user_temp.openid,
+            sex=user_temp.sex,
+            age=user_temp.age,
+            height=user_temp.height,
+            weight=user_temp.wight,
+            target=user_temp.goal,
+            last_record=new_record
+        )
+        user_new.save()
 
 
 # save data in the data base
