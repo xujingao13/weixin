@@ -14,7 +14,7 @@ function set_userinfo(){
 		height:$('#height').val(),
 		weight:$('#weight').val(),
 		goal_step:$('#goal_step').val(),
-		openid:$('#goal_step').val()
+		openid:$('#openid').val()
 	}, showinfo);
 }
 $(document).ready(function(){
