@@ -179,22 +179,20 @@ def save_data(data, time_list):
     length = len(data["user"])
     for i in range(length):
         data_model = Record(
-            user_name = str(data["user"][i])
-            user_ord =  data["user"][i]
-            startTime = time_list[i]
-            endTime = time_list[i]
-            type = data["type"][i]
-            distance = data["distance"][i]
-            #speed = data["speed"][i]
-            calories = data["calories"][i]
-            steps = data["steps"][i]
-            subType = data["subType"][i]
-            actTime = data["actTime"][i]
-            nonActTime = data["nonActTime"][i]
-            dsNum = data["dsNum"][i]
-            lsNum = data["lsNum"][i]
-            wakeNum = data["wakeNum"][i]
-            wakeTimes = data["wakeTimes"][i]
+            user_name=str(data["user"][i]),
+            startTime = time_list[i],
+            endTime = time_list[i],
+            type = data["type"][i],
+            distance = data["distance"][i],
+            calories = data["calories"][i],
+            steps = data["steps"][i],
+            subType = data["subType"][i],
+            actTime = data["actTime"][i],
+            nonActTime = data["nonActTime"][i],
+            dsNum = data["dsNum"][i],
+            lsNum = data["lsNum"][i],
+            wakeNum = data["wakeNum"][i],
+            wakeTimes = data["wakeTimes"][i],
             score = data["score"][i]
         )
         data_model.save()
