@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 #for sleeping assess
+import requests
+import json
 import time
 import numpy as np
 import random as ran
