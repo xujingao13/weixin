@@ -13,7 +13,6 @@ class RingUser(models.Model):
 
 class Record(models.Model):
     user_name = models.CharField(max_length=30)
-    user_ord = models.IntegerField()
     startTime = models.IntegerField()
     endTime = models.IntegerField()
     type = models.IntegerField()
