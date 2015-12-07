@@ -5,11 +5,13 @@
 		<title>加入珍环</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" type="text/css" href="info/main.css">
+        <link href="/bootstrap/bootstrap.min.css" rel="stylesheet" />
         <script src="jquery.min.js"></script>
+        <script type="text/javascript" src="/bootstrap/bootstrap.min.js"></script>
         <script type="text/javascript" src = "getopenid.js"></script>
 		<script type="text/javascript" src = "info/setgoal.js"></script>
 	</head>
-	<body>
+	<body style="background:#294072;">
 		<input style="visibility:hidden" type="text" name="openid" id="openid">
 		<div class="form">
 			<div class="header"><h2>加入珍环</h2></div>
@@ -37,7 +39,7 @@
                         <span class="un"><i class="fa fa-flag"></i></span><input type="text" id="goal_dis" required class="text" placeholder="目标里程/m"/>
                     </li>
                     <li>
-                        <input type="submit" value="REGISTE" class="btn" onclick="set_userinfo();">
+                        <input type="submit" value="REGISTE" class="btn btn-success" onclick="set_userinfo();">
                     </li>
                 </ul>
 			</div><br/>
