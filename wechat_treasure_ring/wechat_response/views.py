@@ -112,5 +112,5 @@ def create_menu():
     string_json = f.read()
     access_token = json.loads(string_json)['access_token']
     post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
-    request = urllib2.urlopen(post_url, (MENU % USER_URL).encode('utf-8'))
+    request = urllib2.urlopen(post_url, (MENU % (USER_URL,RANK_URL)).encode('utf-8'))
     print request.read()
