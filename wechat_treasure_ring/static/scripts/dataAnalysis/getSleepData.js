@@ -13,16 +13,11 @@ $(document).ready(function(){
 	getopenid(function(data){
 		openid = data;
 		alert(openid);
+		$.getJSON("/data/sleep/"+data, function(sleepData){
+			renderByJson(sleepData);
+		})
 	});
-})
-$(document).ready(function(){
-	$(function () {
-		$('#collapseOne').collapse('show');
-		$('#collapseTwo').collapse('show');
-		$('#collapseThree').collapse('show');
-	});
-	draw();
-})
+});
 //send ajax request
 function loadXMLDoc() {
 	var xhr;
