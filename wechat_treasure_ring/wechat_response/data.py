@@ -69,13 +69,23 @@ def transfer_time(time_str):
     return time_list
 
 
-# 把数据按天求和
-def integrate_data(data, s_time, e_time):
+def get_user_information(user_id):
+    if RingUser.objects.filter(user_id=openid).exists():
+        user = RingUser.objects.filter(user_id=openid)[0]
+    else:
+        user = None
+    return user
+
+
+
+# 把数据按天求和,第三个参数表示天数
+def integrate_data(data, s_time, days, is_score=False):
     length = len(s_time)
     processing_day = list()
     new_day = list()
     new_data = list()
     temp_data = 0
+    temp_num = 0
 
     temp_day = transfer_time(s_time[0])
     processing_day = [temp_day[0], temp_day[1], temp_day[2], 0, 0, 0, 0, 0, 0]
@@ -87,8 +97,14 @@ def integrate_data(data, s_time, e_time):
         temp_day = transfer_time(s_time[i])       
         new_day = time.mktime(time.struct_time([temp_day[0], temp_day[1], temp_day[2], 0, 0, 0, 0, 0, 0]))
         if new_day == processing_day:
-            temp_data += data[i]
+            if data[i] != 0:
+                temp_num += 1
+                temp_data += data[i]
         else: 
+            if is_score:
+                if temp_num != 0:
+                    temp_data /= temp_num
+                    temp_num = 0
             j += 1
             num_interval = int((new_day - processing_day) / 86400)
             temp_data /= num_interval
@@ -97,14 +113,17 @@ def integrate_data(data, s_time, e_time):
             processing_day = new_day
             temp_data = 0
     length = len(new_data)
-    residual = 30 -length
-    if length > 0:
-        temp_data = new_data[0] / (residual + 1)
-        new_data[0] = residual
+    if days > length:
+        residual = days - length
+        if length > 0:
+            temp_data = new_data[0] / (residual + 1)
+            new_data[0] = residual
+        else:
+            temp_data = 0
+        for i in range(residual):
+            new_data.insert(0, temp_data)
     else:
-        temp_data = 0
-    for i in range(residual):
-        new_data.insert(0, temp_data)
+        new_data = new_data[(-1 * days):]
     return new_data
 
 
@@ -115,8 +134,8 @@ def process_num(x):
         return str(x)
 
 
-# get sleep data for thirty days
-def get_sleep_data(user):
+# 更新睡眠数据,每天12:01:00
+def save_sleep_data(user):
     now_time = time.localtime()
     last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 12, 0, 0, 0, 0, 0]))
     last_time -= 86400 * 33
@@ -124,30 +143,166 @@ def get_sleep_data(user):
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
     data = get_data(["user", "dsNum", "lsNum", "startTime", "endTime"], start_time, end_time,  user.id)
+    for i in range(length):
+        data["sleepNum"].append(data["dsNum"][i] + data["lsNum"][i])
     length = len(data["dsNum"])
     data["sleepNum"] = list()
     for i in range(length):
         data["sleepNum"].append(data["dsNum"][i] + data["lsNum"][i])
-    data["dsNum"] = integrate_data(data["dsNum"], data["startTime"], data["endTime"])
-    data["sleepNum"] = integrate_data(data["sleepNum"], data["startTime"], data["endTime"])
+    data["dsNum"] = integrate_data(data["dsNum"], data["startTime"], 30)
+    data["sleepNum"] = integrate_data(data["sleepNum"], data["startTime"], 30)
+    data["score"] = integrate_data(data["score"], data["startTime"], 30, True)
+    data["date"] = get_date_list(30)
+    if RecordByDay.objects.filter(user_id=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_id=user.user_id)
+        length_of_user = len(user_temp)
+        for i in range(length_of_user):
+            data["date"][i] = data["date"][i].split('.')
+            user_temp[i].year = int(data["date"][i][0])
+            user_temp[i].month = int(data["date"][i][1])
+            user_temp[i].day = int(data["date"][i][2])
+            user_temp[i].dsNum = data["dsNum"][i]
+            user_temp[i].allNum = data["sleepNum"][i]
+            user_temp[i].score = data["score"][i]
+        user_temp[i].save()
+        if length_of_user < 30:
+            for i in range(length_of_user, 30):
+                data["date"][i] = data["date"][i].split('.')
+                user_temp = RecordByDay(
+                    user_name = user.user_name
+                    year = int(data["date"][i][0])
+                    month = int(data["date"][i][1])
+                    day = int(data["date"][i][2]) 
+                    dsNum = data["dsNum"][i]
+                    allNum = data["sleepNum"][i]
+                    calories = 0
+                    steps = 0
+                    distance = 0 
+                    score = data["score"][i]
+                    )
+                user_temp.save()
+
+    else:
+        for i in range(30):
+            data["date"][i] = data["date"][i].split('.')
+            user_temp = RecordByDay(
+                user_name = user.user_name
+                year = int(data["date"][i][0])
+                month = int(data["date"][i][1])
+                day = int(data["date"][i][2]) 
+                dsNum = data["dsNum"][i]
+                allNum = data["sleepNum"][i]
+                calories = 0
+                steps = 0
+                distance = 0 
+                score = data["score"][i]
+                )
+            user_temp.save()
+    
+
+
+def get_sleep_data(user):
+    data["dsNum"] = list(30)
+    data["sleepNum"] = list(30)
+    data["score"] = list(30)
+    if RecordByDay.objects.filter(user_id=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_id=user.user_id) 
+        length = len(user_temp)
+        for i in range(length):
+            data["dsNum"][i] = user_temp[i].dsNum
+            data["sleepNum"][i] = user_temp[i].sleepNum
+            data["score"][i] = user_temp[i].score
     data["date"] = get_date_list(30)
     return data
 
 
-def get_exercise_data(user):
+ #  获取今天到目前为止的步数
+def get_today_step(user):
     now_time = time.localtime()
-    last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 12, 0, 0, 0, 0, 0]))
+    last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
+    start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
+    end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
+    data["steps"] = integrate_data(data["steps"], data["startTime"], 1)
+    step = (integrate_data(data["steps"], data["startTime"]))[0]
+    return step  
+
+    
+# 获取并存储按天算的运动数据,每天00:01:00更新
+def save_exercise_data(user):
+    now_time = time.localtime()
+    last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
     last_time -= 86400 * 33
     last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
     data = get_data(["user", "calories", "steps", "distance", "startTime", "endTime"], start_time, end_time,  user.id)
     #data["speed"] = integrate_data(data["speed"], data["startTime"], data["endTime"])
-    data["distance"] = integrate_data(data["distance"], data["startTime"], data["endTime"])
-    data["steps"] = integrate_data(data["steps"], data["startTime"], data["endTime"])
-    data["calories"] = integrate_data(data["calories"], data["startTime"], data["endTime"])
+    data["distance"] = integrate_data(data["distance"], data["startTime"], 30)
+    data["steps"] = integrate_data(data["steps"], data["startTime"], 30)
+    data["calories"] = integrate_data(data["calories"], data["startTime"], 30)
+    data["date"] = get_date_list(30)
+    if RecordByDay.objects.filter(user_id=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_id=user.user_id)
+        length_of_user = len(user_temp)
+        for i in range(length_of_user):
+            data["date"][i] = data["date"][i].split('.')
+            user_temp[i].year = int(data["date"][i][0])
+            user_temp[i].month = int(data["date"][i][1])
+            user_temp[i].day = int(data["date"][i][2])
+            user_temp[i].calories = data["calories"][i]
+            user_temp[i].steps = data["steps"][i]
+            user_temp[i].distance = data["distance"][i]
+        user_temp[i].save()
+        if length_of_user < 30:
+            for i in range(length_of_user, 30):
+                data["date"][i] = data["date"][i].split('.')
+                user_temp = RecordByDay(
+                    user_name = user.user_name
+                    year = int(data["date"][i][0])
+                    month = int(data["date"][i][1])
+                    day = int(data["date"][i][2]) 
+                    dsNum = 0
+                    allNum = 0
+                    calories = data["calories"][i]
+                    steps = data["steps"][i]
+                    distance = data["distance"][i]
+                    score = 0
+                    )
+                user_temp.save()
+
+    else:
+        for i in range(30):
+            data["date"][i] = data["date"][i].split('.')
+            user_temp = RecordByDay(
+                user_name = user.user_name
+                    year = int(data["date"][i][0])
+                    month = int(data["date"][i][1])
+                    day = int(data["date"][i][2]) 
+                    dsNum = 0
+                    allNum = 0
+                    calories = data["calories"][i]
+                    steps = data["steps"][i]
+                    distance = data["distance"][i]
+                    score = 0
+                    )
+            user_temp.save()
+
+# 获取运动数据
+def get_exercise_data(user):
+    data["distance"] = list(30)
+    data["steps"] = list(30)
+    data["calories"] = list(30)
+    if RecordByDay.objects.filter(user_id=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_id=user.user_id) 
+        length = len(user_temp)
+        for i in range(length):
+            data["distance"][i] = user_temp[i].distance
+            data["steps"][i] = user_temp[i].steps
+            data["calories"][i] = user_temp[i].calories
     data["date"] = get_date_list(30)
     return data
+
+
 
 
 # update the data of the particular user defined by parameter user
@@ -228,12 +383,11 @@ def assess_sleeping(user_id):
         modified_time = seconds - ((now_time[3] - 12) * 3600 + (now_time[4] * 60) + now_time[5])'''
 
 # get user information
-    if RingUser.objects.filter(user_id=openid).exists():
-        information = RingUser.objects.filter(user_id=openid)[0]
+    information = get_user_information(user_id)
+    if information:
+        data = get_sleep_data(information)
     else:
-        return 0
-
-    data = get_sleep_data(information)
+        return None
 
 # set variation threshold and fft threshold
     var_threshold = 1
@@ -364,7 +518,10 @@ def assess_sleeping(user_id):
 # assess your exercising data
 def assess_exercising(user_id):
     information = get_user_information(user_id)
-    data = get_exercise_data(user_id)
+    if information:
+        data = get_exercise_data(information)
+    else:
+        return None
 
     report = dict()
 
