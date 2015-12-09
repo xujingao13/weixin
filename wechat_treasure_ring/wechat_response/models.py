@@ -31,6 +31,17 @@ class Record(models.Model):
     wakeTimes = models.IntegerField()
     score = models.FloatField()
 
+class RecordByDay(models.Model):
+    user_name = models.CharField(max_length=30)
+    year = models.IntegerField()
+    month = models.IntegerField()
+    day = models.IntegerField()
+    dsNum = models.IntegerField()
+    allNum = models.IntegerField()
+    calories = models.IntegerField()
+    steps = models.IntegerField()
+    distance = models.IntegerField()
+    score = models.FloatField()
 
 class BirdUser(models.Model):
     openid = models.CharField(max_length=30)

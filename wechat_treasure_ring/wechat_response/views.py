@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from wechat_sdk import WechatBasic
 from wechat_sdk.exceptions import ParseError
 from wechat_response.models import *
+from wechat_response.data import *
 from wechat_treasure_ring.settings import *
 from wechat_sdk.messages import (
     EventMessage
@@ -48,10 +49,12 @@ def weixin(request):
         if isinstance(message, EventMessage):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
-                    step_array = Record.objects.filter(user=message.source)
-                    if step_array:
-                        step = step_array[len(step_array) - 1].step
-                        response = we_chat.response_text(u'跑了' + str(step) + u'步咯')
+                    step_user = RingUser.objects.filter(user_id=message.source)[0]
+                    if step_user:
+                        target = step_user.target
+                        step = get_today_step(step_user)
+                        goal_ompletion = step / target * 100
+                        response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_ompletion) + u'%')
                         # 里面的数字应由其他函数获取
                         return HttpResponse(response)
                     else:
@@ -125,5 +128,5 @@ def create_menu():
     string_json = f.read()
     access_token = json.loads(string_json)['access_token']
     post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
-    request = urllib2.urlopen(post_url, (MENU % USER_URL).encode('utf-8'))
+    request = urllib2.urlopen(post_url, (MENU % (USER_URL,RANK_URL)).encode('utf-8'))
     print request.read()
