@@ -12,7 +12,7 @@ function getUrlParameter(sParam) {
         }
     }
 };
-function getopenid(callback){
+function get_userinfo(callback){
     var code = getUrlParameter('code');
-    $.getJSON("data/code/"+code, callback);
+    $.getJSON("data/getuserinfo?code="+code, callback);
 }

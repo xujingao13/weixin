@@ -1,7 +1,7 @@
-var openid;
 $(document).ready(function(){
-	getopenid(function(data){
-		openid = data;
-		alert(openid);
+	get_userinfo(function(data){
+		openid = data.openid;
+		nickname = data.nickname;
+		headimgurl = data.headimgurl;
 	});
 });
