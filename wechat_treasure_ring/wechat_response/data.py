@@ -46,7 +46,7 @@ score   睡眠质量评分'''
 #subType 1: 1 深睡眠 深度睡眠 2 浅睡眠 浅度睡眠 3 清醒 一次睡眠中的清醒状态
 #subType 2: 1 热身运动 和字面意思相同，运动强度最轻的一类运动。2 健走 强度稍高。3 运动 球类等运动。4 跑步 有氧跑步运动。5 游泳 游泳等水中运动。6 自行车 骑车等。
 #subType 3: 1 静坐  例如坐在椅子上办公。2 散步 速度相当于走路。3 交通工具 开车、乘公交等快速交通工具。4 活动 例如在办公室短时间走动
-print(get_data(["wakeNum"], "2015-11-05 10:05:06", "2015-11-05 10:06:06", "1","3"))
+#print(get_data(["wakeNum"], "2015-11-05 10:05:06", "2015-11-05 10:06:06", "1","3"))
 
 
 # get "num" days list
@@ -171,34 +171,34 @@ def save_sleep_data(user):
             for i in range(length_of_user, 30):
                 data["date"][i] = data["date"][i].split('.')
                 user_temp = RecordByDay(
-                    user_name = user.user_name
-                    year = int(data["date"][i][0])
-                    month = int(data["date"][i][1])
-                    day = int(data["date"][i][2]) 
-                    dsNum = data["dsNum"][i]
-                    allNum = data["sleepNum"][i]
-                    calories = 0
-                    steps = 0
-                    distance = 0 
-                    score = data["score"][i]
-                    )
+                    user_name=user.user_name,
+                    year=int(data["date"][i][0]),
+                    month=int(data["date"][i][1]),
+                    day=int(data["date"][i][2]),
+                    dsNum=data["dsNum"][i],
+                    allNum=data["sleepNum"][i],
+                    calories=0,
+                    steps=0,
+                    distance=0,
+                    score=data["score"][i]
+                )
                 user_temp.save()
 
     else:
         for i in range(30):
             data["date"][i] = data["date"][i].split('.')
             user_temp = RecordByDay(
-                user_name = user.user_name
-                year = int(data["date"][i][0])
-                month = int(data["date"][i][1])
-                day = int(data["date"][i][2]) 
-                dsNum = data["dsNum"][i]
-                allNum = data["sleepNum"][i]
-                calories = 0
-                steps = 0
-                distance = 0 
-                score = data["score"][i]
-                )
+                user_name=user.user_name,
+                year=int(data["date"][i][0]),
+                month=int(data["date"][i][1]),
+                day=int(data["date"][i][2]),
+                dsNum=data["dsNum"][i],
+                allNum=data["sleepNum"][i],
+                calories=0,
+                steps=0,
+                distance=0,
+                score=data["score"][i]
+            )
             user_temp.save()
     
 
@@ -208,7 +208,7 @@ def get_sleep_data(user):
     data["sleepNum"] = list(30)
     data["score"] = list(30)
     if RecordByDay.objects.filter(user_id=user.user_id).exists():
-        user_temp = RecordByDay.objects.filter(user_id=user.user_id) 
+        user_temp = RecordByDay.objects.filter(user_id=user.user_id)
         length = len(user_temp)
         for i in range(length):
             data["dsNum"][i] = user_temp[i].dsNum
@@ -222,11 +222,12 @@ def get_sleep_data(user):
 def get_today_step(user):
     now_time = time.localtime()
     last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
+    last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    data["steps"] = integrate_data(data["steps"], data["startTime"], 1)
-    step = (integrate_data(data["steps"], data["startTime"]))[0]
-    return step  
+    data = get_data(["user", "steps", "startTime"], start_time, end_time, user.id)
+    step = (integrate_data(data["steps"], data["startTime"],1))[0]
+    return step
 
     
 # 获取并存储按天算的运动数据,每天00:01:00更新
@@ -238,7 +239,6 @@ def save_exercise_data(user):
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
     data = get_data(["user", "calories", "steps", "distance", "startTime", "endTime"], start_time, end_time,  user.id)
-    #data["speed"] = integrate_data(data["speed"], data["startTime"], data["endTime"])
     data["distance"] = integrate_data(data["distance"], data["startTime"], 30)
     data["steps"] = integrate_data(data["steps"], data["startTime"], 30)
     data["calories"] = integrate_data(data["calories"], data["startTime"], 30)
@@ -259,34 +259,34 @@ def save_exercise_data(user):
             for i in range(length_of_user, 30):
                 data["date"][i] = data["date"][i].split('.')
                 user_temp = RecordByDay(
-                    user_name = user.user_name
-                    year = int(data["date"][i][0])
-                    month = int(data["date"][i][1])
-                    day = int(data["date"][i][2]) 
-                    dsNum = 0
-                    allNum = 0
-                    calories = data["calories"][i]
-                    steps = data["steps"][i]
-                    distance = data["distance"][i]
-                    score = 0
-                    )
+                    user_name=user.user_name,
+                    year=int(data["date"][i][0]),
+                    month=int(data["date"][i][1]),
+                    day=int(data["date"][i][2]),
+                    dsNum=0,
+                    allNum=0,
+                    calories=data["calories"][i],
+                    steps=data["steps"][i],
+                    distance=data["distance"][i],
+                    score=0
+                )
                 user_temp.save()
 
     else:
         for i in range(30):
             data["date"][i] = data["date"][i].split('.')
             user_temp = RecordByDay(
-                user_name = user.user_name
-                    year = int(data["date"][i][0])
-                    month = int(data["date"][i][1])
-                    day = int(data["date"][i][2]) 
-                    dsNum = 0
-                    allNum = 0
-                    calories = data["calories"][i]
-                    steps = data["steps"][i]
-                    distance = data["distance"][i]
-                    score = 0
-                    )
+                    user_name=user.user_name,
+                    year=int(data["date"][i][0]),
+                    month=int(data["date"][i][1]),
+                    day=int(data["date"][i][2]),
+                    dsNum=0,
+                    allNum=0,
+                    calories=data["calories"][i],
+                    steps=data["steps"][i],
+                    distance=data["distance"][i],
+                    score=0
+                )
             user_temp.save()
 
 # 获取运动数据
@@ -337,20 +337,20 @@ def save_data(data, time_list):
     for i in range(length):
         data_model = Record(
             user_name=str(data["user"][i]),
-            startTime = time_list[i],
-            endTime = time_list[i],
-            type = data["type"][i],
-            distance = data["distance"][i],
-            calories = data["calories"][i],
-            steps = data["steps"][i],
-            subType = data["subType"][i],
-            actTime = data["actTime"][i],
-            nonActTime = data["nonActTime"][i],
-            dsNum = data["dsNum"][i],
-            lsNum = data["lsNum"][i],
-            wakeNum = data["wakeNum"][i],
-            wakeTimes = data["wakeTimes"][i],
-            score = data["score"][i]
+            startTime=time_list[i],
+            endTime=time_list[i],
+            type=data["type"][i],
+            distance=data["distance"][i],
+            calories=data["calories"][i],
+            steps=data["steps"][i],
+            subType=data["subType"][i],
+            actTime=data["actTime"][i],
+            nonActTime=data["nonActTime"][i],
+            dsNum=data["dsNum"][i],
+            lsNum=data["lsNum"][i],
+            wakeNum=data["wakeNum"][i],
+            wakeTimes=data["wakeTimes"][i],
+            score=data["score"][i]
         )
         data_model.save()
 
