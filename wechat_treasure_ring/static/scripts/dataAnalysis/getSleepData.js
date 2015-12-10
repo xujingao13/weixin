@@ -13,45 +13,11 @@ $(document).ready(function(){
 	getopenid(function(data){
 		openid = data;
 		alert(openid);
+		$.getJSON("data/sleepData?openid="+data, function(sleepData){
+			renderByJson(sleepData);
+		})
 	});
-})
-$(document).ready(function(){
-	$(function () {
-		$('#collapseOne').collapse('show');
-		$('#collapseTwo').collapse('show');
-		$('#collapseThree').collapse('show');
-	});
-	draw();
-})
-//send ajax request
-function loadXMLDoc() {
-	var xhr;
-	if (window.XMLHttpRequest)
-  	{// code for IE7+, Firefox, Chrome, Opera, Safari
-  		xhr=new XMLHttpRequest();
-  	}
-  	try
-    {
-        xhr.onreadystatechange = function(){
-        	if (xhr.readyState == 4){
-        		if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
-        			var json = eval("(" + xhr.responseText + ")");
-
-        		}
-        		else {
-        		alert("Request was unsuccessful: " + xhr.status);
-        		}
-        	}
-
-        };
-        xhr.open("GET", "imgJson/" + time0 +".json", true);
-        xhr.send(null);
-    }
-    catch(exception)
-    {
-        alert("xhr Fail");
-    }
-}
+});
 
 //test drawing
 function draw(){
@@ -76,6 +42,10 @@ function draw(){
 
 //draw the charts and change the data according to the json
 function renderByJson(json){
+	if(json == []){
+		draw();
+		return;
+	}
 	sleepChart(json["7-days-sleep"], json["7-days-deep-sleep"], 7, "week_sleep_chart");
 	sleepChart(json["30-days-sleep"], json["30-days-deep-sleep"], 30, "month_sleep_chart");
 	setDataText("7-days-avg", json["7-days-avg"], "h");

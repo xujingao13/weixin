@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-from django.http.response import HttpResponse, HttpResponseBadRequest
 from wechat_response.models import *
-import json
-from django.views.decorators.csrf import csrf_exempt
 from wechat_response.data import *
+from django.http.response import HttpResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+<<<<<<< HEAD
+from wechat_response.data import *
+=======
+import json
+>>>>>>> 34fdc0e36af711c43b302646a5ce0942a40efbe6
 
 
 def ifregistered(request, openid):
@@ -116,7 +120,7 @@ def steps_info(request):
     if len(users) == 0:
         return HttpResponse("no user")
     user = users[0]
-    #获取该用户今天的总步数和已消耗步数
+    #鑾峰彇璇ョ敤鎴蜂粖澶╃殑鎬绘鏁板拰宸叉秷鑰楁鏁�
     steps_total = 100
     steps_left = steps_total - user.steps_totalused
     result = {
@@ -191,15 +195,18 @@ def game_rank(request):
     }
     return HttpResponse(json.dumps(result))
 
-
 def get_sleepdata(request):
     openid = request.GET.get("openid")
+    if not RingUser.objects.filter(user_id=openid).exists():
+        return HttpResponse("no user")
     data = access_sleeping(openid)
     return HttpResponse(json.dumps(data))
 
 
 def get_sportsdata(request):
     openid = request.GET.get("openid")
+    if not RingUser.objects.filter(user_id=openid).exists():
+        return HttpResponse("no user")
     data = access_exercising(openid)
     return HttpResponse(json.dumps(data))
 
