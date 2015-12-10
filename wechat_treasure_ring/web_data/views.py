@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.http.response import HttpResponse, HttpResponseBadRequest
 from wechat_response.models import *
-import json
+from wechat_response.data import *
+from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from wechat_response.data import *
+import json
 
 
 def ifregistered(request, openid):
@@ -115,7 +117,7 @@ def steps_info(request):
     if len(users) == 0:
         return HttpResponse("no user")
     user = users[0]
-    #获取该用户今天的总步数和已消耗步数
+    #鑾峰彇璇ョ敤鎴蜂粖澶╃殑鎬绘鏁板拰宸叉秷鑰楁鏁�
     steps_total = 100
     steps_left = steps_total - user.steps_totalused
     result = {
@@ -155,23 +157,56 @@ def end_game(request):
         gameuser.save()
     return HttpResponse("success")
 
+
+@csrf_exempt
 def game_rank(request):
     game = request.GET.get('game')
     start = request.GET.get('start')
     end = request.GET.get('end')
     if game == "bird":
-        results = BirdUser.objects.all().order_by('-score_total')[start:end]
-    ranklist = []
-    for item in results:
+        results_today = BirdUser.objects.all().order_by('-score_today')[start:end]
+        results_total = BirdUser.objects.all().order_by('-score_total')[start:end]
+    ranklist_today = []
+    ranklist_total = []
+    for item in results_today:
         itemuser = RingUser.objects.get(user_id=item.openid)
         rankitem = {
             "openid":item.openid,
             "nickname":itemuser.nickname,
-            "headimgurl":itemuser.headimgurl
+            "headimgurl":itemuser.headimgurl,
+            "score":item.score_today
         }
-        ranklist.append(rankitem)
-    return HttpResponse(json.dumps(ranklist))
+        ranklist_today.append(rankitem)
+    for item in results_total:
+        itemuser = RingUser.objects.get(user_id=item.openid)
+        rankitem = {
+            "openid":item.openid,
+            "nickname":itemuser.nickname,
+            "headimgurl":itemuser.headimgurl,
+            "score":item.score_total
+        }
+        ranklist_total.append(rankitem)
+    result = {
+        "today":ranklist_today,
+        "total":ranklist_total
+    }
+    return HttpResponse(json.dumps(result))
+
+def get_sleepdata(request):
+    return HttpResponse(json.dumps({'isnull':True}))
+    openid = request.GET.get("openid")
+    if not RingUser.objects.filter(user_id=openid).exists():
+        return HttpResponse("no user")
+    data = access_sleeping(openid)
+    data['isnull'] = False
+    return HttpResponse(json.dumps(data))
 
 
-
+def get_sportsdata(request):
+    return HttpResponse(json.dumps({'isnull':True}))
+    openid = request.GET.get("openid")
+    if not RingUser.objects.filter(user_id=openid).exists():
+        return HttpResponse("no user")
+    data = access_exercising(openid)
+    return HttpResponse(json.dumps(data))
 

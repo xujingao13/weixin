@@ -155,8 +155,8 @@ def save_sleep_data(user):
     data["sleepNum"] = integrate_data(data["sleepNum"], data["startTime"], 30)
     data["score"] = integrate_data(data["score"], data["startTime"], 30, True)
     data["date"] = get_date_list(30)
-    if RecordByDay.objects.filter(user_id=user.user_id).exists():
-        user_temp = RecordByDay.objects.filter(user_id=user.user_id)
+    if RecordByDay.objects.filter(user_name=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_name=user.user_id)
         length_of_user = len(user_temp)
         for i in range(length_of_user):
             data["date"][i] = data["date"][i].split('.')
@@ -205,11 +205,11 @@ def save_sleep_data(user):
 
 def get_sleep_data(user):
     data = dict()
-    data["dsNum"] = list(30)
-    data["sleepNum"] = list(30)
-    data["score"] = list(30)
-    if RecordByDay.objects.filter(user_id=user.user_id).exists():
-        user_temp = RecordByDay.objects.filter(user_id=user.user_id)
+    data["dsNum"] = range(30)
+    data["sleepNum"] = range(30)
+    data["score"] = range(30)
+    if RecordByDay.objects.filter(user_name=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_name=user.user_id)
         length = len(user_temp)
         for i in range(length):
             data["dsNum"][i] = user_temp[i].dsNum
@@ -244,8 +244,8 @@ def save_exercise_data(user):
     data["steps"] = integrate_data(data["steps"], data["startTime"], 30)
     data["calories"] = integrate_data(data["calories"], data["startTime"], 30)
     data["date"] = get_date_list(30)
-    if RecordByDay.objects.filter(user_id=user.user_id).exists():
-        user_temp = RecordByDay.objects.filter(user_id=user.user_id)
+    if RecordByDay.objects.filter(user_name=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_name=user.user_id)
         length_of_user = len(user_temp)
         for i in range(length_of_user):
             data["date"][i] = data["date"][i].split('.')
@@ -296,8 +296,8 @@ def get_exercise_data(user):
     data["distance"] = list(30)
     data["steps"] = list(30)
     data["calories"] = list(30)
-    if RecordByDay.objects.filter(user_id=user.user_id).exists():
-        user_temp = RecordByDay.objects.filter(user_id=user.user_id) 
+    if RecordByDay.objects.filter(user_name=user.user_id).exists():
+        user_temp = RecordByDay.objects.filter(user_name=user.user_id)
         length = len(user_temp)
         for i in range(length):
             data["distance"][i] = user_temp[i].distance
@@ -367,7 +367,7 @@ def process_time_data(time_list):
     return new_list
 
 
-def assess_sleeping(user_id):
+def access_sleeping(user_id):
     '''now_time = time.localtime()
     seconds = time.time()
     if now_time[3] < 12:
@@ -391,16 +391,16 @@ def assess_sleeping(user_id):
     reg_threshold = 1
 
 # get 30-day sleeping data and 7-day sleeping data
-    data = []
+    data_list = []
     if ran.random() > 0.5:
         for i in range(30):
-            data.append(ran.random() * 1.5 + 7)
+            data_list.append(ran.random() * 1.5 + 7)
     else:
         for i in range(30):
             if i % 7:
-                data.append(7.2)
+                data_list.append(7.2)
             else:
-                data.append(5)
+                data_list.append(5)
     thirty_sleep = np.array(data["sleepNum"][-30:])
     thirty_deep_sleep = np.array(data["dsNum"][-30:])
     seven_sleep = thirty_sleep[-7:]
@@ -495,13 +495,13 @@ def assess_sleeping(user_id):
     elif report["30-deep-avg"] == 0 and report["7-deep-avg"] == 0:
         report["anxious"] = 2
     else:
-        report["anxious"] == 0
+        report["anxious"] = 0
 
     # whether sleep regularly
     if report["30-days-reg"] < reg_threshold:
-        report["regular"] = 0;
+        report["regular"] = 0
     else:
-        report["regular"] = 1;
+        report["regular"] = 1
 
     # whether you have stark sleeping
     if report["7-days-max"] > 12:
@@ -513,7 +513,7 @@ def assess_sleeping(user_id):
 
 
 # assess your exercising data
-def assess_exercising(user_id):
+def access_exercising(user_id):
     information = get_user_information(user_id)
     if information:
         data = get_exercise_data(information)
@@ -572,3 +572,4 @@ def calc_intensity(cb_rate):
     elif 0.725 < cb_rate < 0.9:
         intensity = 4
     return intensity
+
