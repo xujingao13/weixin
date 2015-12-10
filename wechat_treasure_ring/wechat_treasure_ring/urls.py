@@ -25,6 +25,6 @@ urlpatterns = [
     url(r'^data/sleepData', 'web_data.views.getSleepData'),
     url(r'^data/gamerank', 'web_data.views.game_rank'),
     url(r'^data/stepsinfo', 'web_data.views.steps_info'),
-    url(r'^data/get_sleepdata', 'web_data.views.get_sleepdata'),
-    url(r'^data/get_sportsdata', 'web_data.views.get_sportsdata')
+    url(r'^data/getsleepdata', 'web_data.views.get_sleepdata'),
+    url(r'^data/getsportsdata', 'web_data.views.get_sportsdata')
 ]

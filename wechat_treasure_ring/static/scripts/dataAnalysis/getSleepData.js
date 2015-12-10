@@ -1,7 +1,6 @@
 /**
  * Created by littlepig on 2015/11/29.
  */
- var openid;
 $(document).ready(function(){
 	$(function () {
 		$('#collapseOne').collapse('show');
@@ -9,11 +8,12 @@ $(document).ready(function(){
 		$('#collapseThree').collapse('show');
 		$('#collapseFour').collapse('show');
 	});
-	draw();
-	getopenid(function(data){
-		openid = data;
-		alert(openid);
-		$.getJSON("data/sleepData?openid="+data, function(sleepData){
+	get_userinfo(function(data){
+		openid = data.openid;
+		nickname = data.nickname;
+		headimgurl = data.headimgurl;
+		headimgurl = data.headimgurl;
+		$.getJSON("data/getsleepdata?openid="+openid, function(sleepData){
 			renderByJson(sleepData);
 		})
 	});
@@ -42,9 +42,9 @@ function draw(){
 
 //draw the charts and change the data according to the json
 function renderByJson(json){
-	if(json == []){
+	alert(JSON.stringify(json));
+	if (json.isnull == true) {
 		draw();
-		return;
 	}
 	sleepChart(json["7-days-sleep"], json["7-days-deep-sleep"], 7, "week_sleep_chart");
 	sleepChart(json["30-days-sleep"], json["30-days-deep-sleep"], 30, "month_sleep_chart");

@@ -7,6 +7,7 @@ from wechat_sdk.exceptions import ParseError
 from wechat_response.models import *
 from wechat_response.data import *
 from wechat_treasure_ring.settings import *
+from wechat_treasure_ring.define import *
 from wechat_sdk.messages import (
     EventMessage
 )
@@ -26,6 +27,7 @@ def weixin(request):
         appid=AppID,
         appsecret=AppSecret
     )
+    print "i am here"
     if request.method == "GET":
         signature = request.GET.get('signature')
         timestamp = request.GET.get('timestamp')
@@ -82,6 +84,7 @@ def weixin(request):
                     return HttpResponse(response)
 
                 elif message.key == 'CHART':
+                    print "here"
                     response = we_chat.response_news([{
                         'title': u'Today\'s amount of exercise',
                         'description': 'data analysis',

@@ -3,11 +3,8 @@ from wechat_response.models import *
 from wechat_response.data import *
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-<<<<<<< HEAD
 from wechat_response.data import *
-=======
 import json
->>>>>>> 34fdc0e36af711c43b302646a5ce0942a40efbe6
 
 
 def ifregistered(request, openid):
@@ -196,14 +193,17 @@ def game_rank(request):
     return HttpResponse(json.dumps(result))
 
 def get_sleepdata(request):
+    return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
     data = access_sleeping(openid)
+    data['isnull'] = False
     return HttpResponse(json.dumps(data))
 
 
 def get_sportsdata(request):
+    return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
