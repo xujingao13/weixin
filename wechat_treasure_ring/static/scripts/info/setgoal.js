@@ -13,7 +13,7 @@ function set_userinfo(){
 		height:$('#height').val(),
 		weight:$('#weight').val(),
 		goal_step:$('#goal_step').val(),
-		openid:$('#openid').val()
+		openid:openid
 	}, showinfo);
 }
 $(document).ready(function(){
