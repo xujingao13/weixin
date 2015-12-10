@@ -24,4 +24,6 @@ urlpatterns = [
     url(r'^data/ifregistered/(.*)', 'web_data.views.ifregistered'),
     url(r'^data/gamerank', 'web_data.views.game_rank'),
     url(r'^data/stepsinfo', 'web_data.views.steps_info'),
+    url(r'^data/get_sleepdata', 'web_data.views.get_sleepdata'),
+    url(r'^data/get_sportsdata', 'web_data.views.get_sportsdata')
 ]

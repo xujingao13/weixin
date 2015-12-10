@@ -3,6 +3,7 @@ from django.http.response import HttpResponse, HttpResponseBadRequest
 from wechat_response.models import *
 import json
 from django.views.decorators.csrf import csrf_exempt
+from wechat_response.data import *
 
 
 def ifregistered(request, openid):
@@ -155,23 +156,50 @@ def end_game(request):
         gameuser.save()
     return HttpResponse("success")
 
+
+@csrf_exempt
 def game_rank(request):
     game = request.GET.get('game')
     start = request.GET.get('start')
     end = request.GET.get('end')
     if game == "bird":
-        results = BirdUser.objects.all().order_by('-score_total')[start:end]
-    ranklist = []
-    for item in results:
+        results_today = BirdUser.objects.all().order_by('-score_today')[start:end]
+        results_total = BirdUser.objects.all().order_by('-score_total')[start:end]
+    ranklist_today = []
+    ranklist_total = []
+    for item in results_today:
         itemuser = RingUser.objects.get(user_id=item.openid)
         rankitem = {
             "openid":item.openid,
             "nickname":itemuser.nickname,
-            "headimgurl":itemuser.headimgurl
+            "headimgurl":itemuser.headimgurl,
+            "score":item.score_today
         }
-        ranklist.append(rankitem)
-    return HttpResponse(json.dumps(ranklist))
+        ranklist_today.append(rankitem)
+    for item in results_total:
+        itemuser = RingUser.objects.get(user_id=item.openid)
+        rankitem = {
+            "openid":item.openid,
+            "nickname":itemuser.nickname,
+            "headimgurl":itemuser.headimgurl,
+            "score":item.score_total
+        }
+        ranklist_total.append(rankitem)
+    result = {
+        "today":ranklist_today,
+        "total":ranklist_total
+    }
+    return HttpResponse(json.dumps(result))
 
 
+def get_sleepdata(request):
+    openid = request.GET.get("openid")
+    data = access_sleeping(openid)
+    return HttpResponse(json.dumps(data))
 
+
+def get_sportsdata(request):
+    openid = request.GET.get("openid")
+    data = access_exercising(openid)
+    return HttpResponse(json.dumps(data))
 

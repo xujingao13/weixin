@@ -370,7 +370,7 @@ def process_time_data(time_list):
     return new_list
 
 
-def assess_sleeping(user_id):
+def access_sleeping(user_id):
     '''now_time = time.localtime()
     seconds = time.time()
     if now_time[3] < 12:
@@ -516,7 +516,7 @@ def assess_sleeping(user_id):
 
 
 # assess your exercising data
-def assess_exercising(user_id):
+def access_exercising(user_id):
     information = get_user_information(user_id)
     if information:
         data = get_exercise_data(information)
@@ -575,4 +575,3 @@ def calc_intensity(cb_rate):
     elif 0.725 < cb_rate < 0.9:
         intensity = 4
     return intensity
-

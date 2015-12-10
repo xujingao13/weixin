@@ -7,13 +7,14 @@ var update_step = function () {
 	$('#goal_step').val(Math.floor((Number($('#goal_dis').val()) / STEP_METER).toString()));
 };
 function set_userinfo(){
+	alert(openid);
 	$.post("data/register",{
 		sex:$('#sex').val(),
 		age:$('#age').val(),
 		height:$('#height').val(),
 		weight:$('#weight').val(),
 		goal_step:$('#goal_step').val(),
-		openid:$('#openid').val()
+		openid:openid
 	}, showinfo);
 }
 $(document).ready(function(){
