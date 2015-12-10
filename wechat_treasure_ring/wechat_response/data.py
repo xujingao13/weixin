@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 #for sleeping assess
-import requests
+import request as requests
 import json
 import time
 import numpy as np
@@ -72,8 +72,8 @@ def transfer_time(time_str):
 
 
 def get_user_information(user_id):
-    if RingUser.objects.filter(user_id=openid).exists():
-        user = RingUser.objects.filter(user_id=openid)[0]
+    if RingUser.objects.filter(user_id=user_id).exists():
+        user = RingUser.objects.filter(user_id=user_id)[0]
     else:
         user = None
     return user
@@ -145,10 +145,10 @@ def save_sleep_data(user):
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
     data = get_data(["user", "dsNum", "lsNum", "startTime", "endTime"], start_time, end_time,  user.id)
-    for i in range(length):
-        data["sleepNum"].append(data["dsNum"][i] + data["lsNum"][i])
     length = len(data["dsNum"])
     data["sleepNum"] = list()
+    for i in range(length):
+        data["sleepNum"].append(data["dsNum"][i] + data["lsNum"][i])
     for i in range(length):
         data["sleepNum"].append(data["dsNum"][i] + data["lsNum"][i])
     data["dsNum"] = integrate_data(data["dsNum"], data["startTime"], 30)
@@ -204,6 +204,7 @@ def save_sleep_data(user):
 
 
 def get_sleep_data(user):
+    data = dict()
     data["dsNum"] = list(30)
     data["sleepNum"] = list(30)
     data["score"] = list(30)
@@ -291,6 +292,7 @@ def save_exercise_data(user):
 
 # 获取运动数据
 def get_exercise_data(user):
+    data = dict()
     data["distance"] = list(30)
     data["steps"] = list(30)
     data["calories"] = list(30)
@@ -314,8 +316,9 @@ def get_save(user):
     now_time = time.localtime()
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
     data = get_data(["user", 'startTime', 'endTime', 'type', 'distance', 'calories', 'steps', 'subType', 'actTime', 'nonActTime', 'dsNum', 'lsNum', 'wakeNum', 'wakeTimes', 'score'], start_time, end_time, user.id)
-    time_list = process_time_data(data["startTime"])
-    save_data(data, time_list)
+    time_list_start = process_time_data(data["startTime"])
+    time_list_end = process_time_data(data["endTime"])
+    save_data(data, time_list_start, time_list_end)
     new_record = time.time()
     if RingUser.objects.filter(user_id=user.user_id).exists():
         user_temp = RingUser.objects.filter(user_id=user.user_id)[0]
@@ -332,13 +335,13 @@ def get_save(user):
 
 
 # save data in the data base
-def save_data(data, time_list):
+def save_data(data, time_list_start, time_list_end):
     length = len(data["user"])
     for i in range(length):
         data_model = Record(
             user_name=str(data["user"][i]),
-            startTime=time_list[i],
-            endTime=time_list[i],
+            startTime=time_list_start[i],
+            endTime=time_list_end[i],
             type=data["type"][i],
             distance=data["distance"][i],
             calories=data["calories"][i],
@@ -353,12 +356,6 @@ def save_data(data, time_list):
             score=data["score"][i]
         )
         data_model.save()
-
-
-# get data from the Internet and save in the database
-def get_and_save_data(time_list, user_id=0, type="1", subType="1"):
-    data = get_data(["user", 'startTime', 'endTime', 'type', 'distance', 'speed', 'calories', 'steps', 'subType', 'actTime', 'nonActTime', 'dsNum', 'lsNum', 'wakeNum', 'wakeTimes', 'score'], start_time, end_time, user_id, type, subType)
-    save_data(data, time_list)
 
 
 # transform the string time to integer time
@@ -575,4 +572,3 @@ def calc_intensity(cb_rate):
     elif 0.725 < cb_rate < 0.9:
         intensity = 4
     return intensity
-
