@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.http.response import HttpResponse, HttpResponseBadRequest
 from wechat_response.models import *
-import json
+from wechat_response.data import *
+from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 def ifregistered(request, openid):
@@ -173,18 +174,9 @@ def game_rank(request):
     return HttpResponse(json.dumps(ranklist))
 
 
-def sleepData(request, openid):
+def getSleepData(request, openid):
     if RingUser.objects.filter(user_id=openid).exists():
-        user = RingUser.objects.filter(user_id=openid)[0]
-        user_info = {
-            "ifregistered": True,
-            "sex": user.sex,
-            "age": user.age,
-            "height": user.height,
-            "weight": user.weight,
-            "goal_step": user.target,
-        }
-        return HttpResponse(json.dumps(user_info))
+        sleepData = assess_sleeping(openid);
+        return HttpResponse(json.dumps(sleepData))
     else:
-        user_info = {"ifregistered": False}
-        return HttpResponse(json.dumps(user_info))
+        return HttpResponse(json.dumps({}))

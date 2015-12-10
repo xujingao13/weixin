@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^data/getuserinfo', 'wechat_response.views.get_userinfo'),
     url(r'^data/register$', 'web_data.views.register'),
     url(r'^data/ifregistered/(.*)', 'web_data.views.ifregistered'),
-    url(r'^data/sleep/(.*)', 'web_data.views.sleepData'),
+    url(r'^data/sleepData', 'web_data.views.getSleepData'),
     url(r'^data/gamerank', 'web_data.views.game_rank'),
     url(r'^data/stepsinfo', 'web_data.views.steps_info'),
 ]
