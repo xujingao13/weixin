@@ -19,8 +19,10 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^weixin', 'wechat_response.views.weixin'),
-    url(r'^data/code/(.*)', 'wechat_response.views.get_openid'),
+    url(r'^data/getuserinfo', 'wechat_response.views.get_userinfo'),
     url(r'^data/register$', 'web_data.views.register'),
     url(r'^data/ifregistered/(.*)', 'web_data.views.ifregistered'),
     url(r'^data/sleep/(.*)', 'web_data.views.sleepData'),
+    url(r'^data/gamerank', 'web_data.views.game_rank'),
+    url(r'^data/stepsinfo', 'web_data.views.steps_info'),
 ]

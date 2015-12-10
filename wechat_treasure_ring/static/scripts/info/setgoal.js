@@ -1,5 +1,4 @@
 var STEP_METER = 0.6;
-var openid;
 var update_dis = function () {
 	console.log(1);
 	$('#goal_dis').val(Math.floor((Number($('#goal_step').val()) * STEP_METER).toString()));
@@ -20,9 +19,10 @@ function set_userinfo(){
 $(document).ready(function(){
 	$('#goal_step').on('input', update_dis);
 	$('#goal_dis').on('input', update_step);
-	getopenid(function(data){
-		openid = data;
-		$('#openid').val(data);
+	get_userinfo(function(data){
+		openid = data.openid;
+		nickname = data.nickname;
+		headimgurl = data.headimgurl;
 		$.getJSON("data/ifregistered/"+openid, function(data){
 			if (data.ifregistered == true) {
 				$('#sex').val(data.sex);

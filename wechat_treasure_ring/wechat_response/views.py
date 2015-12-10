@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-
 from wechat_sdk import WechatBasic
 from wechat_sdk.exceptions import ParseError
 from wechat_response.models import *
@@ -74,7 +70,7 @@ def weixin(request):
                             'title': u'Let us play 2048 together',
                             'description': 'a simple but interesting game',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2f2048.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2f2048.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'FLAPPY':
@@ -82,7 +78,7 @@ def weixin(request):
                             'title': u'Let us play Flappy Bird together',
                             'description': 'a simple but interesting game',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fbird.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fbird.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'CHART':
@@ -90,7 +86,7 @@ def weixin(request):
                         'title': u'Today\'s amount of exercise',
                         'description': 'data analysis',
                         'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
-                        'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
+                        'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'CHEER':
@@ -99,13 +95,30 @@ def weixin(request):
             return HttpResponse('OK')
 
 
-def get_openid(request, code):
+def get_userinfo(request):
+    code = request.GET.get("code")
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     f = urllib2.urlopen(get_url)
     string_json = f.read()
-    openid = json.loads(string_json)['openid']
+    reply = json.loads(string_json)
+    openid = reply['openid']
+    access_token = reply['access_token']
+    get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
+    f = urllib2.urlopen(get_url)
+    string_json = f.read()
+    reply = json.loads(string_json)
+    result = {
+        "openid":reply['openid'],
+        "nickname":reply['nickname'],
+        "headimgurl":reply['headimgurl']
+    }
     print openid
-    return HttpResponse(json.dumps(openid))
+    if RingUser.objects.filter(user_id=openid).exists():
+        user = RingUser.objects.get(user_id=openid)
+        user.nickname = reply['nickname']
+        user.headimgurl = reply['headimgurl']
+        user.save()
+    return HttpResponse(json.dumps(result))
 
 
 @csrf_exempt
