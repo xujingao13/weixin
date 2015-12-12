@@ -5,7 +5,14 @@
     <meta charset="UTF-8">
     <title>游戏龙虎榜</title>
 	<link rel="stylesheet" type="text/css" href="semantic/semantic.css">
+	<script>
+    		var openid;
+    		var nickname;
+    		var headimgurl;
+  	</script>
 	<script src="jquery.min.js"></script>
+	<script src="getuserinfo.js"></script>
+	<script src="userdata.js"></script>
 	<script src="semantic/semantic.min.js"></script>
     <script src="rank/getRank.js"></script>
 </head>
@@ -22,9 +29,7 @@
         <a id="all" class="item" onclick="get_allRank();">总体排行</a>
     </div>
 	<div class="ui inverted segment" style="background-color: #1E90FF">
-		<div id="rank_content" class="ui big inverted animated relaxed divided list">
-
-		</div>
+		<div id="rank_content" class="ui big inverted animated relaxed divided list"></div>
 	</div>
 
     <div id="footer">

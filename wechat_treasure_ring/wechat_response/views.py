@@ -8,6 +8,7 @@ import wechat_sdk as sdk
 from wechat_response.models import *
 from wechat_response.data import *
 from wechat_treasure_ring.settings import *
+from wechat_treasure_ring.define import *
 from wechat_sdk.messages import (
     EventMessage,
     TextMessage
@@ -87,6 +88,7 @@ def weixin(request):
                     return HttpResponse(response)
 
                 elif message.key == 'CHART':
+                    print "here"
                     response = we_chat.response_news([{
                         'title': u'Today\'s amount of exercise',
                         'description': 'data analysis',

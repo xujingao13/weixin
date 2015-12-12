@@ -1,7 +1,6 @@
 /**
  * Created by littlepig on 2015/11/30.
  */
- var openid;
 $(document).ready(function(){
 	$(function () {
 		$('#collapseOne').collapse('show');
@@ -9,43 +8,17 @@ $(document).ready(function(){
 		$('#collapseThree').collapse('show');
 		$('#collapseFour').collapse('show');
 	});
-	draw();
-	getopenid(function(data){
-		openid = data;
-		alert(openid);
+	get_userinfo(function(data){
+		openid = data.openid;
+		nickname = data.nickname;
+		headimgurl = data.headimgurl;
+		headimgurl = data.headimgurl;
+		$.getJSON("data/getsportsdata?openid="+openid, function(sportsData){
+			renderByJson(sportsData);
+		})
 	});
 })
-//send ajax request
-function loadXMLDoc() {
-	var xhr;
-	if (window.XMLHttpRequest)
-  	{// code for IE7+, Firefox, Chrome, Opera, Safari
-  		xhr=new XMLHttpRequest();
-  	}
-  	try
-    {
-        xhr.onreadystatechange = function(){
-        	if (xhr.readyState == 4){
-        		if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
-        			var json = eval("(" + xhr.responseText + ")");
 
-        		}
-        		else {
-        		alert("Request was unsuccessful: " + xhr.status);
-        		}
-        	}
-
-        };
-        xhr.open("GET", "imgJson/" + time0 +".json", true);
-        xhr.send(null);
-    }
-    catch(exception)
-    {
-        alert("xhr Fail");
-    }
-}
-
-//test drawing
 function draw(){
 
 	drawChart(getRandomArray(7), 7,"7-days-dis");
@@ -70,6 +43,9 @@ function draw(){
 
 //draw the charts and change the data according to the json
 function renderByJson(json){
+	if (json.isnull == true) {
+		draw();
+	}
 	drawChart(json["7-days-dis"], 7,"7-days-dis");
 	drawChart(json["7-days-steps"], 7, "7-days-steps");
 	drawChart(json["7-days-speed"], 7, "7-days-speed");

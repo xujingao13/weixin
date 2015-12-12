@@ -1,7 +1,6 @@
 /**
  * Created by littlepig on 2015/11/29.
  */
- var openid;
 $(document).ready(function(){
 	$(function () {
 		$('#collapseOne').collapse('show');
@@ -9,49 +8,16 @@ $(document).ready(function(){
 		$('#collapseThree').collapse('show');
 		$('#collapseFour').collapse('show');
 	});
-	draw();
-	getopenid(function(data){
-		openid = data;
-		alert(openid);
+	get_userinfo(function(data){
+		openid = data.openid;
+		nickname = data.nickname;
+		headimgurl = data.headimgurl;
+		headimgurl = data.headimgurl;
+		$.getJSON("data/getsleepdata?openid="+openid, function(sleepData){
+			renderByJson(sleepData);
+		})
 	});
-})
-$(document).ready(function(){
-	$(function () {
-		$('#collapseOne').collapse('show');
-		$('#collapseTwo').collapse('show');
-		$('#collapseThree').collapse('show');
-	});
-	draw();
-})
-//send ajax request
-function loadXMLDoc() {
-	var xhr;
-	if (window.XMLHttpRequest)
-  	{// code for IE7+, Firefox, Chrome, Opera, Safari
-  		xhr=new XMLHttpRequest();
-  	}
-  	try
-    {
-        xhr.onreadystatechange = function(){
-        	if (xhr.readyState == 4){
-        		if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
-        			var json = eval("(" + xhr.responseText + ")");
-
-        		}
-        		else {
-        		alert("Request was unsuccessful: " + xhr.status);
-        		}
-        	}
-
-        };
-        xhr.open("GET", "imgJson/" + time0 +".json", true);
-        xhr.send(null);
-    }
-    catch(exception)
-    {
-        alert("xhr Fail");
-    }
-}
+});
 
 //test drawing
 function draw(){
@@ -76,6 +42,10 @@ function draw(){
 
 //draw the charts and change the data according to the json
 function renderByJson(json){
+	alert(JSON.stringify(json));
+	if (json.isnull == true) {
+		draw();
+	}
 	sleepChart(json["7-days-sleep"], json["7-days-deep-sleep"], 7, "week_sleep_chart");
 	sleepChart(json["30-days-sleep"], json["30-days-deep-sleep"], 30, "month_sleep_chart");
 	setDataText("7-days-avg", json["7-days-avg"], "h");
@@ -91,7 +61,7 @@ function renderByJson(json){
 //draw the sleep chart(including sleep time and deep sleep time)
 function sleepChart(chartSleepTime,chartDeepSleepTime, days, chartId){
 	var sleepTime = [], deepSleepTime = [];
-    for (var i = 0; i < 7; i += 1) {
+    for (var i = 0; i < days; i += 1) {
         sleepTime.push([i,chartSleepTime[i]]);
         deepSleepTime.push([i, chartDeepSleepTime[i]]);
     }
@@ -103,7 +73,7 @@ function sleepChart(chartSleepTime,chartDeepSleepTime, days, chartId){
 			},
 
 			grid: { hoverable: true, clickable: true },
-			xaxis: { min: 1, max: 7 },
+			xaxis: { min: 1, max: days },
 			yaxis: { min: 1, max: 15 },
 			colors: ["#F90", "#3C4049"]
 		});
