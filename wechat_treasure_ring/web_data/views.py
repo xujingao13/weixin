@@ -117,8 +117,7 @@ def steps_info(request):
     if len(users) == 0:
         return HttpResponse("no user")
     user = users[0]
-    #鑾峰彇璇ョ敤鎴蜂粖澶╃殑鎬绘鏁板拰宸叉秷鑰楁鏁�
-    steps_total = 100
+    steps_total = get_today_step(user)
     steps_left = steps_total - user.steps_totalused
     result = {
         "total": steps_total,
@@ -193,20 +192,20 @@ def game_rank(request):
     return HttpResponse(json.dumps(result))
 
 def get_sleepdata(request):
-    return HttpResponse(json.dumps({'isnull':True}))
+    #return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
     data = access_sleeping(openid)
+    print data
     data['isnull'] = False
     return HttpResponse(json.dumps(data))
 
 
 def get_sportsdata(request):
-    return HttpResponse(json.dumps({'isnull':True}))
+    #return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
     data = access_exercising(openid)
     return HttpResponse(json.dumps(data))
-
