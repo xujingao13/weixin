@@ -2,13 +2,14 @@ from django.db import models
 
 
 class RingUser(models.Model):
-    user_id = models.CharField(max_length=30, primary_key=True)
+    user_id = models.CharField(max_length=30)
     sex = models.CharField(max_length=30)
     age = models.IntegerField()
     height = models.IntegerField()
     weight = models.IntegerField()
     target = models.IntegerField()
     last_record = models.IntegerField()
+    steps_totalused = models.IntegerField()
 
 
 class Record(models.Model):
@@ -17,7 +18,6 @@ class Record(models.Model):
     endTime = models.IntegerField()
     type = models.IntegerField()
     distance = models.IntegerField()
-    #speed = models.FloatField()
     calories = models.IntegerField()
     steps = models.IntegerField()
     subType = models.IntegerField()
@@ -40,4 +40,5 @@ class RecordByDay(models.Model):
     steps = models.IntegerField()
     distance = models.IntegerField()
     score = models.FloatField()
+
 
