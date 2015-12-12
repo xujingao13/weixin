@@ -230,12 +230,10 @@ Screen - Game
    position: absolute;
    display: none;
    opacity: 0;
-   top: 64px;
+   top: 30px;
    left: 43px;
    width: 236px;
    height: 280px;
-   background-image: url('scoreboard.png');
-   background-repeat: no-repeat;
    
    z-index: 1000;
 }
@@ -284,7 +282,7 @@ Screen - Game
 {
    position: absolute;
    opacity: 0;
-   top: 205px;
+   top: 260px;
    left: 61px;
    height: 115px;
    width: 70px;
