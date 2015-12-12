@@ -293,9 +293,9 @@ def save_exercise_data(user):
 # 获取运动数据
 def get_exercise_data(user):
     data = dict()
-    data["distance"] = list(30)
-    data["steps"] = list(30)
-    data["calories"] = list(30)
+    data["distance"] = range(30)
+    data["steps"] = range(30)
+    data["calories"] = range(30)
     if RecordByDay.objects.filter(user_name=user.user_id).exists():
         user_temp = RecordByDay.objects.filter(user_name=user.user_id)
         length = len(user_temp)
@@ -391,16 +391,6 @@ def access_sleeping(user_id):
     reg_threshold = 1
 
 # get 30-day sleeping data and 7-day sleeping data
-    data_list = []
-    if ran.random() > 0.5:
-        for i in range(30):
-            data_list.append(ran.random() * 1.5 + 7)
-    else:
-        for i in range(30):
-            if i % 7:
-                data_list.append(7.2)
-            else:
-                data_list.append(5)
     thirty_sleep = np.array(data["sleepNum"][-30:])
     thirty_deep_sleep = np.array(data["dsNum"][-30:])
     seven_sleep = thirty_sleep[-7:]
@@ -413,8 +403,11 @@ def access_sleeping(user_id):
     report["30-days-deep-sleep"] = thirty_deep_sleep
     report["30-days-avg"] = np.average(thirty_sleep)
     report["30-days-var"] = np.abs(np.var(thirty_sleep))
-    report["30-days-reg"] = np.abs(np.fft.fft(thirty_sleep)[1:])
+    report["30-days-reg"] = np.abs(np.fft.fft(thirty_sleep)[1:]).max()
     report["30-days-deep-avg"] = np.average(thirty_deep_sleep)
+    if 0 in thirty_sleep:
+        for i in range(len(thirty_sleep)):
+            thirty_sleep[i] = 1
     report["30-days-deep-rate"] = np.divide(thirty_deep_sleep, thirty_sleep)
     report["30-days-avg-rate"] = np.average(report["30-days-deep-rate"])
 
@@ -511,10 +504,18 @@ def access_sleeping(user_id):
     else:
         report["stark-sleep"] = 0
 
+    report["30-days-sleep"] = list(report["30-days-sleep"])
+    report["30-days-deep-sleep"] = list(report["30-days-deep-sleep"])
+    report["7-days-sleep"] = list(report["7-days-sleep"])
+    report["7-days-deep-sleep"] = list(report["7-days-deep-sleep"])
+    report['30-days-deep-rate'] = list(report['30-days-deep-rate'])
+    return report
+
 
 # assess your exercising data
 def access_exercising(user_id):
     information = get_user_information(user_id)
+    print information
     if information:
         data = get_exercise_data(information)
     else:
@@ -545,19 +546,21 @@ def access_exercising(user_id):
 
 # compare data and get report
     # 0 female, 1 male
-    if information["sex"] == 1:
-        report["BMR"] = 13.7516 * information["weight"] + 5.0033 * information["height"] - 6.7550 * information["age"] + 66.4730
-    elif information["sex"] == 0:
-        report["BMR"] = 9.5634 * information["weight"] + 1.8496 * information["height"] - 4.6756 * information["age"] + 655.0955
+    if information.sex == 'male':
+        report["BMR"] = 13.7516 * information.weight + 5.0033 * information.height - 6.7550 * information.age + 66.4730
+    elif information.sex == 'female':
+        report["BMR"] = 9.5634 * information.weight + 1.8496 * information.height - 4.6756 * information.age + 655.0955
     else:
         report["BMR"] = 0
 
     # BMR is the number of calories that you need every day if you don't exercise
     # Now compare the calories
-    cb_rate = report["calories"][-1] / report["BMR"]
+    cb_rate = report["30-days-calories"][-1] / report["BMR"]
     report["yesterday-intensity"] = calc_intensity(cb_rate)
-    cb_rate = report["7-days-calories-avg"][-1] / report["BMR"]
+    cb_rate = report["7-days-calories-avg"] / report["BMR"]
     report["7-days-intensity"] = calc_intensity(cb_rate)
+
+    return report
 
 
 def calc_intensity(cb_rate):

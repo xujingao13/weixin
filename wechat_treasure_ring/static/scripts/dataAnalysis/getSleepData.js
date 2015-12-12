@@ -61,7 +61,7 @@ function renderByJson(json){
 //draw the sleep chart(including sleep time and deep sleep time)
 function sleepChart(chartSleepTime,chartDeepSleepTime, days, chartId){
 	var sleepTime = [], deepSleepTime = [];
-    for (var i = 0; i < 7; i += 1) {
+    for (var i = 0; i < days; i += 1) {
         sleepTime.push([i,chartSleepTime[i]]);
         deepSleepTime.push([i, chartDeepSleepTime[i]]);
     }
@@ -73,7 +73,7 @@ function sleepChart(chartSleepTime,chartDeepSleepTime, days, chartId){
 			},
 
 			grid: { hoverable: true, clickable: true },
-			xaxis: { min: 1, max: 7 },
+			xaxis: { min: 1, max: days },
 			yaxis: { min: 1, max: 15 },
 			colors: ["#F90", "#3C4049"]
 		});
