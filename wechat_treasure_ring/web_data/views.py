@@ -65,7 +65,7 @@ def register(request):
     return HttpResponse("add info successfully")
 
 
-def game_rank(request):
+def ingame_rank(request):
     openid = request.GET.get("openid")
     game = request.GET.get("game")
     print openid
