@@ -114,7 +114,6 @@ def get_userinfo(request):
         "nickname":reply['nickname'],
         "headimgurl":reply['headimgurl']
     }
-    print openid
     if RingUser.objects.filter(user_id=openid).exists():
         user = RingUser.objects.get(user_id=openid)
         user.nickname = reply['nickname']

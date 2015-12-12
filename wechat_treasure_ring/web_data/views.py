@@ -65,7 +65,7 @@ def register(request):
     return HttpResponse("add info successfully")
 
 
-def game_rank(request):
+def ingame_rank(request):
     openid = request.GET.get("openid")
     game = request.GET.get("game")
     print openid
@@ -117,7 +117,6 @@ def steps_info(request):
     if len(users) == 0:
         return HttpResponse("no user")
     user = users[0]
-    #鑾峰彇璇ョ敤鎴蜂粖澶╃殑鎬绘鏁板拰宸叉秷鑰楁鏁�
     steps_total = 100
     steps_left = steps_total - user.steps_totalused
     result = {

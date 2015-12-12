@@ -12,9 +12,8 @@
   	</script>
 	<script src="jquery.min.js"></script>
 	<script src="getuserinfo.js"></script>
-	<script src="userdata.js"></script>
 	<script src="semantic/semantic.min.js"></script>
-    <script src="rank/getRank.js"></script>
+    <script src="rank/getRank.js?dsddddddddddddsd"></script>
 </head>
 <body style="background-color:#FFE4C4">
 	<br/>
@@ -25,8 +24,10 @@
 		</div>
 	</h1>
     <div class="ui three item stackable tabs menu">
-        <a id="today" class="item" onclick="get_todayRank();">今日排行</a>
-        <a id="all" class="item" onclick="get_allRank();">总体排行</a>
+        <a id="todaybird" class="item" onclick="get_todayBird();">今日排行(Flappy Bird)</a>
+		<a id="todaysquare" class="item" onclick="get_todaySquare();">今日排行(2048)</a>
+        <a id="allbird" class="item" onclick="get_allBird();">总体排行(Flappy Bird)</a>
+		<a id="allsquare" class="item" onclick="get_allSquare();">总体排行(2048)</a>
     </div>
 	<div class="ui inverted segment" style="background-color: #1E90FF">
 		<div id="rank_content" class="ui big inverted animated relaxed divided list"></div>
