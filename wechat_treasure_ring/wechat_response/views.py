@@ -27,7 +27,6 @@ def weixin(request):
         appid=AppID,
         appsecret=AppSecret
     )
-    print "i am here"
     if request.method == "GET":
         signature = request.GET.get('signature')
         timestamp = request.GET.get('timestamp')
