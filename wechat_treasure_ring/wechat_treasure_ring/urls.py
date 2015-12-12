@@ -23,8 +23,11 @@ urlpatterns = [
     url(r'^data/register$', 'web_data.views.register'),
     url(r'^data/ifregistered/(.*)', 'web_data.views.ifregistered'),
     url(r'^data/sleepData', 'web_data.views.getSleepData'),
+    url(r'^data/ingamerank', 'web_data.views.ingame_rank'),
     url(r'^data/gamerank', 'web_data.views.game_rank'),
     url(r'^data/stepsinfo', 'web_data.views.steps_info'),
     url(r'^data/getsleepdata', 'web_data.views.get_sleepdata'),
-    url(r'^data/getsportsdata', 'web_data.views.get_sportsdata')
+    url(r'^data/getsportsdata', 'web_data.views.get_sportsdata'),
+    url(r'^data/endgame', 'web_data.views.end_game'),
+    url(r'^data/start', 'web_data.views.start_game')
 ]

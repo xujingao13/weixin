@@ -21,14 +21,9 @@
       <title>Flappy Bird</title>
       <meta charset="UTF-8">
 	  <link rel="stylesheet" type="text/css" href="semantic/semantic.css">
-      <script>
-              var openid;
-              var nickname;
-              var headimgurl;
-      </script>
       <script src="jquery.min.js"></script>
+      <script src="getuserinfo.js"></script>
 	  <script src="semantic/semantic.min.js"></script>
-      <script src="rank/getRank.js"></script>
       <meta http-equiv="content-type" content="text/html; charset=utf-8" />
       <meta name="author" content="Nebez Briefkani" />
       <meta name="description" content="play floppy bird. a remake of popular game flappy bird using just html/css/js" />
@@ -59,65 +54,14 @@
                   <div id="bigscore"></div>
                   
                   <div id="splash"></div>
-                  <div id="scoreboard" class="ui big inverted animated relaxed divided list">
-                      <a id="today" class="item" onclick="get_todayRank();">今日排行</a>
-                      <a id="all" class="item" onclick="get_allRank();">总体排行</a>
-                      <div class="item" style="background-color:#00FF7F">
-                           <div class="ui big teal label">1</div>
-                           <img class="ui avatar image" src="rank/1.jpg">
-                           <div class="content">
-                               <div class="header">Jingao</div>
-                               <div class="meta">
-                                   <span class="cinema">15:00</span>
-                               </div>
-                           </div>
-                           <div class="right floated content">
-                               <span class="left floated content">20关</span>
-                               <i class="smile icon"></i>
-                           </div>
+                  <div id="scoreboard">
+                      <div class="ui three item stackable tabs menu">
+                          <a id="todaybird" class="item" onclick="get_todayRank();">今日排行</a>
+                          <a id="allbird" class="item" onclick="get_allRank();">总体排行</a>
                       </div>
-                      <div class="item" style="background-color:#1E90FF">
-                          <div class="ui big teal label">2</div>
-                              <img class="ui avatar image" src="rank/2.jpg">
-                                  <div class="content">
-                                      <div class="header">赵毅</div>
-                                      <div class="meta">
-                                          <span class="cinema">14:00</span>
-                                      </div>
-                                  </div>
-                                  <div class="right floated content">
-                                      <span class="left floated content">10关</span>
-                                      <i class="smile icon"></i>
-                                  </div>
-                      </div>
-                      <div class="item" style="background-color:#1E90FF">
-                          <div class="ui big teal label">3</div>
-                              <img class="ui avatar image" src="rank/3.jpg">
-                              <div class="content">
-                                  <div class="header">朱子晨</div>
-                                  <div class="meta">
-                                      <span class="cinema">13:00</span>
-                                  </div>
-                              </div>
-                              <div class="right floated content">
-                                  <span class="left floated content">5关</span>
-                                  <i class="smile icon"></i>
-                              </div>
-                      </div>
-                      <div class="item" style="background-color:#1E90FF">
-                          <div class="ui big teal label">4</div>
-                          <img class="ui avatar image" src="rank/4.jpg">
-                          <div class="content">
-                              <div class="header">学弟</div>
-                              <div class="meta">
-                                  <span class="cinema">12:00</span>
-                              </div>
-                          </div>
-                          <div class="right floated content">
-                              <span class="left floated content">4关</span>
-                              <i class="smile icon"></i>
-                          </div>
-                      </div>
+                      <div class="ui inverted segment" style="background-color: #1E90FF">
+                          <div id="rank_content" class="ui big inverted animated relaxed divided list"></div>
+	                  </div>
                       <div id="replay"><img src="bird/replay.png" alt="replay"></div>
                   </div>
                   <!--
@@ -131,7 +75,11 @@
                   <!-- Pipes go here! -->
                </div>
             </div>
-            <div id="land" class="animated"><div id="debug"></div></div>
+            <div id="land" class="animated"><div id="debug"></div>
+                <p style="top:30px;left:30px;position:absolute">
+                    <font id = "steps_left" size=5 color="red"></font>
+                </p>
+            </div>
          </div>
       </div>
       <div id="footer">
@@ -143,12 +91,13 @@
          var openid;
          var nickname;
          var headimgurl;
+         var lives;
       </script>
       <script src="jquery.min.js"></script>
-      <script src="user_data.js"></script>
       <script type="text/javascript" src = "getuserinfo.js"></script>
       <script src="jquery.transit.min.js"></script>
       <script src="bird/buzz.min.js"></script>
       <script src="bird/main.js"></script>
+      <script src="bird/user_data.js"></script>
    </body>
 </html>

@@ -35,6 +35,7 @@ function handle_data(data,data_list){
         data.push(data_object);
     }
 }
+
 function get_rank(type){
     var data = [];
     $('a').attr({'class':'item'});
@@ -73,7 +74,6 @@ function get_rank(type){
         </div>`
         $('#rank_content').append(dom_template);
     }
-
 }
 function get_todayBird(){
     get_rank(0);

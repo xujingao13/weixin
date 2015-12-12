@@ -83,7 +83,7 @@ def ingame_rank(request):
 
 
 def get_partial_ranklist(openid, objects):
-    l = objects.len()
+    l = len(objects)
     entries = []
     n = 0
     for item in objects:
@@ -101,11 +101,13 @@ def get_partial_ranklist(openid, objects):
         indexlist = range(l)
     for i in indexlist:
         entry_object = objects[i]
+        entry_user = RingUser.objects.get(user_id=entry_object.openid)
         entry = {
             "openid": entry_object.openid,
-            "nickname": entry_object.nickname,
+            "nickname": entry_user.nickname,
             "score": entry_object.score_today,
-            "rank": i+1
+            "rank": i+1,
+            "headimgurl": entry_user.headimgurl
         }
         entries.append(entry)
     return entries
@@ -130,7 +132,7 @@ def start_game(request):
     openid = request.GET.get("openid")
     users = RingUser.objects.filter(user_id=openid)
     if len(users) == 0:
-        return HttpResponse("no user")
+        return HttpResponse(json.dumps({"result": "nouser"}))
     user = users[0]
     game = request.GET.get("game")
     if game == "bird":
@@ -139,7 +141,7 @@ def start_game(request):
         gameuser.steps_used += 1000
         user.save()
         gameuser.save()
-    return HttpResponse("success")
+    return HttpResponse(json.dumps({"result": "success"}))
 
 
 def end_game(request):
@@ -151,10 +153,10 @@ def end_game(request):
         if len(gameusers) == 0:
             return HttpResponse("no user")
         gameuser = gameusers[0]
-        gameuser.score_today += score
-        gameuser.score_total += score
+        gameuser.score_today += int(score)
+        gameuser.score_total += int(score)
         gameuser.save()
-    return HttpResponse("success")
+    return HttpResponse(json.dumps({"result": "success"}))
 
 
 @csrf_exempt
