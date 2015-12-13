@@ -195,6 +195,8 @@ def integrate_by_class(data):
             new_data.append(one_data)
             one_data = init_temp()
             one_data["startTime"] = val["startTime"]
+            one_data["type"] = val["type"]
+            one_data["subType"] = val["subType"]
             modify(one_data, val)
     return new_data
 
