@@ -4,16 +4,19 @@ from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from wechat_sdk import WechatBasic
 from wechat_sdk.exceptions import ParseError
+import wechat_sdk as sdk
 from wechat_response.models import *
 from wechat_response.data import *
 from wechat_treasure_ring.settings import *
 from wechat_treasure_ring.define import *
 from wechat_sdk.messages import (
-    EventMessage
+    EventMessage,
+    TextMessage
 )
 import urllib2
 import json
 import sys
+import wechat_response.data as data_tool
 
 reload(sys)
 sys.setdefaultencoding('UTF-8')
@@ -42,11 +45,13 @@ def weixin(request):
         nonce = request.GET.get('nonce')
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
-        try:
+        try:       
             we_chat.parse_data(data=request.body)
         except ParseError:
             return HttpResponseBadRequest('Invalid XML Data')
         message = we_chat.get_message()
+        if isinstance(message, TextMessage):
+                print(message.content)
         if isinstance(message, EventMessage):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':

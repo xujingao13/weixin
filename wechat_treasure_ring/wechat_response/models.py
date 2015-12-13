@@ -3,8 +3,6 @@ from django.db import models
 
 class RingUser(models.Model):
     user_id = models.CharField(max_length=30)
-    nickname = models.CharField(max_length=30)
-    headimgurl = models.CharField(max_length=300)
     sex = models.CharField(max_length=30)
     age = models.IntegerField()
     height = models.IntegerField()
@@ -42,10 +40,4 @@ class RecordByDay(models.Model):
     steps = models.IntegerField()
     distance = models.IntegerField()
     score = models.FloatField()
-
-class BirdUser(models.Model):
-    openid = models.CharField(max_length=30)
-    steps_used = models.IntegerField()
-    score_today = models.IntegerField()
-    score_total = models.IntegerField()
 

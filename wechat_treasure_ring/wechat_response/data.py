@@ -1,21 +1,35 @@
 # -*- coding: UTF-8 -*-
 
+# for sleeping assess
+import urllib
+
 #for sleeping assess
-import request as requests
 import json
 import time
 import numpy as np
 import random as ran
 from wechat_response.models import *
 
+def get_url(parameter, base_addr):
+    if not parameter:
+        return base_addr
+    base_addr += "?"
+    for val in parameter:
+        base_addr += val + '=' + str(parameter[val]) + '&'
+    base_addr = base_addr.strip("&")
+    return base_addr
+
 def get_data(type_list, start_time, end_time, user=0, type="", subType=""):
-    param={'startTime':start_time, 'endTime':end_time, 'user':user}
+    #start_time = "2015-11-18 00:10:05"
+    #end_time = "2015-11-19 20:08:05"
+    param = {'startTime':start_time, 'endTime':end_time, 'user': user}
     if type:
         param["type"] = type
         if subType:
             param["subType"] = subType
-    req = requests.get(url='http://wrist.ssast2015.com/bongdata', params=param)
-    data = json.loads(req.text)
+    get_url(param, 'http://wrist.ssast2015.com/bongdata')
+    req = urllib.urlopen(url=get_url(param, 'http://wrist.ssast2015.com/bongdata'))
+    data = json.loads(req.read())
     return_data = dict()
     for type_name in type_list:
         return_data[type_name] = []
@@ -26,7 +40,7 @@ def get_data(type_list, start_time, end_time, user=0, type="", subType=""):
 
 
 #数据由三层结构构成
-#type_list["distance", "score", "wakeNum", "dsNum", "calories", "subType", "nonActTime", "wakeTimes", "steps", "startTime", "actTime", "lsNum", "endTime", "type"]
+# type_list["distance", "score", "wakeNum", "dsNum", "calories", "subType", "nonActTime", "wakeTimes", "steps", "startTime", "actTime", "lsNum", "endTime", "type"]
 '''startTime   该区块的开始时间，例如，用户早起跑步的跑步区块从 8:31 开始。
 endTime 该区块的结束时间，例如这个用户跑了 20 分钟，那么区块结束时间是 8:51 分。通过块的划分，可以使用户和开发者均能方便对一天的活动状态做出归纳。
 type    该区块的类型，用这个来区分bong和非bong状态。如果这个区段是bong态，则返回值是「2」，如果是比较平静的非bong态，则返回值是「3」。
@@ -42,11 +56,11 @@ lsNum   浅睡眠时长，单位：分钟
 wakeNum 清醒时长，单位：分钟
 wakeTimes   清醒次数，单位：次
 score   睡眠质量评分'''
-#type=1(睡眠),type=2(bong),type=3(非bong)
-#subType 1: 1 深睡眠 深度睡眠 2 浅睡眠 浅度睡眠 3 清醒 一次睡眠中的清醒状态
-#subType 2: 1 热身运动 和字面意思相同，运动强度最轻的一类运动。2 健走 强度稍高。3 运动 球类等运动。4 跑步 有氧跑步运动。5 游泳 游泳等水中运动。6 自行车 骑车等。
-#subType 3: 1 静坐  例如坐在椅子上办公。2 散步 速度相当于走路。3 交通工具 开车、乘公交等快速交通工具。4 活动 例如在办公室短时间走动
-#print(get_data(["wakeNum"], "2015-11-05 10:05:06", "2015-11-05 10:06:06", "1","3"))
+# type=1(睡眠),type=2(bong),type=3(非bong)
+# subType 1: 1 深睡眠 深度睡眠 2 浅睡眠 浅度睡眠 3 清醒 一次睡眠中的清醒状态
+# subType 2: 1 热身运动 和字面意思相同，运动强度最轻的一类运动。2 健走 强度稍高。3 运动 球类等运动。4 跑步 有氧跑步运动。5 游泳 游泳等水中运动。6 自行车 骑车等。
+# subType 3: 1 静坐  例如坐在椅子上办公。2 散步 速度相当于走路。3 交通工具 开车、乘公交等快速交通工具。4 活动 例如在办公室短时间走动
+# print(get_data(["wakeNum"], "2015-11-05 10:05:06", "2015-11-05 10:06:06", "1","3"))
 
 
 # get "num" days list
@@ -88,7 +102,7 @@ def integrate_data(data, s_time, days, is_score=False):
     new_data = list()
     temp_data = 0
     temp_num = 0
-
+    
     temp_day = transfer_time(s_time[0])
     processing_day = [temp_day[0], temp_day[1], temp_day[2], 0, 0, 0, 0, 0, 0]
     processing_day = time.mktime(time.struct_time(processing_day))
@@ -114,12 +128,20 @@ def integrate_data(data, s_time, days, is_score=False):
                 new_data.append(temp_data)
             processing_day = new_day
             temp_data = 0
+    if is_score:
+        if temp_num != 0:
+            temp_data /= float(temp_num)
+            temp_num = 0
+    new_data.append(temp_data)
     length = len(new_data)
     if days > length:
         residual = days - length
         if length > 0:
-            temp_data = new_data[0] / (residual + 1)
-            new_data[0] = residual
+            if is_score:
+                temp_data = 0
+            else:    
+                temp_data = new_data[0] / (residual + 1)
+                new_data[0] = temp_data
         else:
             temp_data = 0
         for i in range(residual):
@@ -138,17 +160,17 @@ def process_num(x):
 
 # 更新睡眠数据,每天12:01:00
 def save_sleep_data(user):
-    now_time = time.localtime()
+    #now_time = time.localtime()
+    now_time = time.time() - 86400
+    now_time = time.localtime(now_time)
     last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 12, 0, 0, 0, 0, 0]))
     last_time -= 86400 * 33
     last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    data = get_data(["user", "dsNum", "lsNum", "startTime", "endTime"], start_time, end_time,  user.id)
+    data = get_data(["user", "dsNum", "lsNum", "startTime", "endTime", "score"], start_time, end_time,  user.id - 1)
     length = len(data["dsNum"])
     data["sleepNum"] = list()
-    for i in range(length):
-        data["sleepNum"].append(data["dsNum"][i] + data["lsNum"][i])
     for i in range(length):
         data["sleepNum"].append(data["dsNum"][i] + data["lsNum"][i])
     data["dsNum"] = integrate_data(data["dsNum"], data["startTime"], 30)
@@ -166,12 +188,13 @@ def save_sleep_data(user):
             user_temp[i].dsNum = data["dsNum"][i]
             user_temp[i].allNum = data["sleepNum"][i]
             user_temp[i].score = data["score"][i]
-        user_temp[i].save()
+            user_temp[i].save()
         if length_of_user < 30:
+            print "gg"
             for i in range(length_of_user, 30):
                 data["date"][i] = data["date"][i].split('.')
                 user_temp = RecordByDay(
-                    user_name=user.user_name,
+                    user_name=user.user_id,
                     year=int(data["date"][i][0]),
                     month=int(data["date"][i][1]),
                     day=int(data["date"][i][2]),
@@ -186,9 +209,10 @@ def save_sleep_data(user):
 
     else:
         for i in range(30):
+            print "gg"
             data["date"][i] = data["date"][i].split('.')
             user_temp = RecordByDay(
-                user_name=user.user_name,
+                user_name=user.user_id,
                 year=int(data["date"][i][0]),
                 month=int(data["date"][i][1]),
                 day=int(data["date"][i][2]),
@@ -261,7 +285,7 @@ def save_exercise_data(user):
             for i in range(length_of_user, 30):
                 data["date"][i] = data["date"][i].split('.')
                 user_temp = RecordByDay(
-                    user_name=user.user_name,
+                    user_name=user.user_id,
                     year=int(data["date"][i][0]),
                     month=int(data["date"][i][1]),
                     day=int(data["date"][i][2]),
@@ -278,7 +302,7 @@ def save_exercise_data(user):
         for i in range(30):
             data["date"][i] = data["date"][i].split('.')
             user_temp = RecordByDay(
-                    user_name=user.user_name,
+                    user_name=user.user_id,
                     year=int(data["date"][i][0]),
                     month=int(data["date"][i][1]),
                     day=int(data["date"][i][2]),
@@ -319,28 +343,20 @@ def get_save(user):
     data = get_data(["user", 'startTime', 'endTime', 'type', 'distance', 'calories', 'steps', 'subType', 'actTime', 'nonActTime', 'dsNum', 'lsNum', 'wakeNum', 'wakeTimes', 'score'], start_time, end_time, user.id)
     time_list_start = process_time_data(data["startTime"])
     time_list_end = process_time_data(data["endTime"])
-    save_data(data, time_list_start, time_list_end)
+    save_data(data, time_list_start, time_list_end, user.user_id)
     new_record = time.time()
     if RingUser.objects.filter(user_id=user.user_id).exists():
         user_temp = RingUser.objects.filter(user_id=user.user_id)[0]
-        user_new = RingUser(
-            user_id=user_temp.openid,
-            sex=user_temp.sex,
-            age=user_temp.age,
-            height=user_temp.height,
-            weight=user_temp.wight,
-            target=user_temp.goal,
-            last_record=new_record
-        )
-        user_new.save()
+        user_temp.last_record = new_record
+        user_temp.save()
 
 
 # save data in the data base
-def save_data(data, time_list_start, time_list_end):
+def save_data(data, time_list_start, time_list_end, user_id):
     length = len(data["user"])
     for i in range(length):
         data_model = Record(
-            user_name=str(data["user"][i]),
+            user_name=user_id,
             startTime=time_list_start[i],
             endTime=time_list_end[i],
             type=data["type"][i],
@@ -576,4 +592,3 @@ def calc_intensity(cb_rate):
     elif 0.725 < cb_rate < 0.9:
         intensity = 4
     return intensity
-
