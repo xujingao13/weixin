@@ -1,6 +1,6 @@
 var data_todaybird = [];
 var data_allbird = [];
-$(document).ready(function(){
+window.onload = function(){
     get_userinfo(function(data){
 		openid = data.openid;
 		nickname = data.nickname;
@@ -12,7 +12,7 @@ $(document).ready(function(){
             get_todayBird();
         });
 	});
-});
+}
 
 function handle_data(data,data_list){
     for(var i = 0; i < data_list.length; i++){
@@ -55,7 +55,7 @@ function get_rank(type){
         data = data_all;
     }
     $('#rank_content').html("");
-    for(var i = 0; i < 4; i++){
+    for(var i = 0; i < data.length; i++){
         var dom_template = `
         <div class="item" style="background-color:${data[i].user_color}">
                <div class="ui big teal label">${data[i].user_rank}</div>

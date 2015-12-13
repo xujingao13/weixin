@@ -59,9 +59,8 @@ def weixin(request):
                     if step_user:
                         target = step_user.target
                         step = get_today_step(step_user)
-                        goal_ompletion = int(float(step) / target * 100)
-                        print (step, target, goal_ompletion)
-                        response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_ompletion) + u'%')
+                        goal_completion = int(float(step) / target * 100)
+                        response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
                         # 里面的数字应由其他函数获取
                         return HttpResponse(response)
                     else:

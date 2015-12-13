@@ -139,7 +139,9 @@ def start_game(request):
         return HttpResponse(json.dumps({"result": "nouser"}))
     user = users[0]
     game = request.GET.get("game")
+    print 1.1
     if game == "bird":
+        print 1
         gameuser = BirdUser.objects.get(openid=openid)
         user.steps_totalused += 1000
         gameuser.steps_used += 1000
