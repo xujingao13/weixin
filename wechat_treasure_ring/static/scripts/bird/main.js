@@ -119,6 +119,10 @@ function showSplash()
 
 function startGame()
 {
+   openid = 'oFX57wR4_d3ZHsJnaTGdyyIPsO9M';
+   $.getJSON("data/startgame?game=bird&openid="+openid, function(data){
+      update_lives();
+   });
    currentstate = states.GameScreen;
    
    //fade out the splash
@@ -275,7 +279,12 @@ function screenClick()
    }
    else if(currentstate == states.SplashScreen)
    {
-      startGame();
+      if (lives > 0) {
+         startGame();
+      }
+      else {
+         alert("已经没机会了哟，多走几步再来吧～")
+      }
    }
 }
 
@@ -346,6 +355,7 @@ function setMedal()
 
 function playerDead()
 {
+   $.getJSON("data/endgame?game=bird&openid="+openid+'&score='+score);
    //stop animating everything!
    $(".animated").css('animation-play-state', 'paused');
    $(".animated").css('-webkit-animation-play-state', 'paused');
@@ -389,7 +399,6 @@ function showScore()
    
    //remove the big score
    setBigScore(true);
-   
    //have they beaten their high score?
    if(score > highscore)
    {
@@ -409,6 +418,7 @@ function showScore()
    soundSwoosh.play();
    
    //show the scoreboard
+   get_todayRank();
    $("#scoreboard").css({ y: '40px', opacity: 0 }); //move it down so we can slide it up
    $("#replay").css({ y: '40px', opacity: 0 });
    $("#scoreboard").transition({ y: '0px', opacity: 1}, 600, 'ease', function() {
@@ -496,3 +506,92 @@ var isIncompatible = {
    return (isIncompatible.Android() || isIncompatible.BlackBerry() || isIncompatible.iOS() || isIncompatible.Opera() || isIncompatible.Safari() || isIncompatible.Windows());
    }
 };
+
+function get_rank(data){
+    $('#rank_content').html("");
+    for(var i = 0; i < 4; i++){
+        var dom_template = `
+        <div class="item" style="background-color:${data[i].user_color}">
+               <div class="ui big teal label">${data[i].user_rank}</div>
+               <img class="ui avatar image" src=${data[i].user_photo}>
+               <div class="content">
+                   <div class="header">${data[i].user_name}</div>
+                   <div class="meta">
+                       <span class="cinema">${data[i].user_title}</span>
+                   </div>
+               </div>
+               <div class="right floated content">
+                   <span class="left floated content">${data[i].user_num}</span>
+                   <i class="smile icon"></i>
+               </div>
+        </div>`
+        $('#rank_content').append(dom_template);
+    }
+}
+
+function handle_data(data, data_list){
+    for(var i = 0; i < data_list.length; i++){
+        var color;
+        if(data_list[i].openid == openid){
+            color = "#00FF7F";
+        }
+        else{
+            color = "#1E90FF";
+        }
+        var data_object = {
+            user_rank: data_list[i].rank,
+            user_photo: data_list[i].headimgurl,
+            user_name: data_list[i].nickname,
+            user_num: data_list[i].score,
+            user_title: get_title(i),
+            user_color: color
+        };
+        data.push(data_object);
+    }
+}
+
+function get_todayRank() {
+   $('#todaybird').attr({'class':'item active'});
+   $('#allbird').attr({'class':'item'});
+   $.getJSON("data/ingamerank?game=bird&openid="+openid, function(data){
+      var datatoday = [];
+      handle_data(datatoday, data.today);
+      get_rank(datatoday);
+   });
+}
+
+
+function get_allRank() {
+   $('#allbird').attr({'class':'item active'});
+   $('#todaybird').attr({'class':'item'});
+   $.getJSON("data/ingamerank?game=bird&openid="+openid, function(data){
+      var datatotal = [];
+      handle_data(datatotal, data.total);
+      get_rank(datatotal);
+   });
+}
+
+
+function get_title(i){
+    if(i == 0)
+        return "王牌战鸡";
+    if(i == 1)
+        return "王牌飞鸡";
+    if(i == 2)
+        return "王牌僚鸡";
+    else{
+        return "菜鸡";
+    }
+}
+
+function update_lives() {
+   //openid = 'oFX57wR4_d3ZHsJnaTGdyyIPsO9M';
+   $.getJSON("data/stepsinfo?openid="+openid, function(data){
+      lives = Math.floor(data.left/1000);
+      text = '';
+      for (i = 0; i < lives; i++) {
+         text += "❤";
+      }
+      $('#steps_left').html("目前剩余次数:"+text);
+   });
+}

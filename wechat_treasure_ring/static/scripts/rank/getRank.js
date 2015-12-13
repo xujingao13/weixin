@@ -1,37 +1,59 @@
-var data_today = [
-    {'user_rank': 1,'user_photo': "rank/1.jpg",'user_name': "Jingao",'user_lastTime': "15:00",'user_num':"20关",'user_color':"#00FF7F"},
-    {'user_rank': 2,'user_photo': "rank/2.jpg",'user_name': "赵毅",'user_lastTime': "14:00",'user_num':"10关",'user_color':"#1E90FF"},
-    {'user_rank': 3,'user_photo': "rank/3.jpg",'user_name': "朱子晨",'user_lastTime': "13:00",'user_num':"5关",'user_color':"#1E90FF"},
-    {'user_rank': 4,'user_photo': "rank/4.jpg",'user_name': "学弟",'user_lastTime': "12:00",'user_num':"4关",'user_color':"#1E90FF"}
-];
-var data_all = [
-    {'user_rank': 1,'user_photo': "rank/1.jpg",'user_name': "Jingao",'user_lastTime': "今天",'user_num':"80关",'user_color':"#00FF7F"},
-    {'user_rank': 2,'user_photo': "rank/2.jpg",'user_name': "赵毅",'user_lastTime': "昨天",'user_num':"70关",'user_color':"#1E90FF"},
-    {'user_rank': 3,'user_photo': "rank/3.jpg",'user_name': "朱子晨",'user_lastTime': "星期五",'user_num':"60关",'user_color':"#1E90FF"},
-    {'user_rank': 4,'user_photo': "rank/4.jpg",'user_name': "学弟",'user_lastTime': "星期四",'user_num':"50关",'user_color':"#1E90FF"}
-];
+var data_todaybird = [];
+var data_allbird = [];
 $(document).ready(function(){
-    get_todayRank();
+    alert('1');
+    get_userinfo(function(data){
+		openid = data.openid;
+		nickname = data.nickname;
+		headimgurl = data.headimgurl;
+        $.getJSON("data/gamerank?game=bird&start=0&end=100",function(data){
+            alert(JSON.stringify(data));
+            handle_data(data_todaybird, data.today);
+            handle_data(data_allbird, data.total);
+            get_todayBird();
+        });
+	});
 });
-function get_rank(time){
-    var data = [];
-    if(time == 0){
-        data = data_today;
-        $('#today').attr({
-            'class':'item active'
-        });
-        $('#all').attr({
-            'class':'item'
-        });
+
+function handle_data(data,data_list){
+    for(var i = 0; i < data_list.length; i++){
+        var color;
+        if(data_list[i].openid == openid){
+            color = "#00FF7F";
+        }
+        else{
+            color = "#1E90FF";
+        }
+        var data_object = {
+            user_rank: i+1,
+            user_photo: data_list[i].headimgurl,
+            user_name: data_list[i].nickname,
+            user_num: data_list[i].score,
+            user_title: get_title(i),
+            user_color: color
+        };
+        data.push(data_object);
     }
-    else{
+}
+
+function get_rank(type){
+    var data = [];
+    $('a').attr({'class':'item'});
+    if(type == 0){
+        $('#todaybird').attr({'class':'item active'});
+        data = data_todaybird;
+    }
+    else if(type == 1){
+        $('#todaysquare').attr({'class':'item active'});
+        data = data_today;
+    }
+    else if(type == 2){
+        $('#allbird').attr({'class':'item active'});
+        data = data_allbird;
+    }
+    else if(type == 3){
+        $('#allsquare').attr({'class':'item active'});
         data = data_all;
-        $('#today').attr({
-            'class':'item'
-        });
-        $('#all').attr({
-            'class':'item active'
-        });
     }
     $('#rank_content').html("");
     for(var i = 0; i < 4; i++){
@@ -42,7 +64,7 @@ function get_rank(time){
                <div class="content">
                    <div class="header">${data[i].user_name}</div>
                    <div class="meta">
-                       <span class="cinema">${data[i].user_lastTime}</span>
+                       <span class="cinema">${data[i].user_title}</span>
                    </div>
                </div>
                <div class="right floated content">
@@ -52,11 +74,27 @@ function get_rank(time){
         </div>`
         $('#rank_content').append(dom_template);
     }
-
 }
-function get_todayRank(){
+function get_todayBird(){
     get_rank(0);
 }
-function get_allRank(){
+function get_todaySquare(){
     get_rank(1);
+}
+function get_allBird(){
+    get_rank(2);
+}
+function get_allSquare(){
+    get_rank(3);
+}
+function get_title(i){
+    if(i == 0)
+        return "王牌战斗鸡";
+    if(i == 1)
+        return "王牌飞行鸡";
+    if(i == 2)
+        return "王牌僚鸡";
+    else{
+        return "菜鸡";
+    }
 }

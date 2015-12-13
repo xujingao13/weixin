@@ -245,6 +245,7 @@ def get_sleep_data(user):
 
  #  获取今天到目前为止的步数
 def get_today_step(user):
+    return 10000
     now_time = time.localtime()
     last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
     last_time = time.localtime(last_time)
