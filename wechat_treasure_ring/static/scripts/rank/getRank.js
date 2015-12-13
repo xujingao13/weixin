@@ -1,7 +1,6 @@
 var data_todaybird = [];
 var data_allbird = [];
 $(document).ready(function(){
-    alert('1');
     get_userinfo(function(data){
 		openid = data.openid;
 		nickname = data.nickname;
