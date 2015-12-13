@@ -73,8 +73,8 @@ def ingame_rank(request):
     if game == "bird":
         today_objects = BirdUser.objects.all().order_by('-score_today')
         total_objects = BirdUser.objects.all().order_by('-score_total')
-    today_entries = get_partial_ranklist(openid, today_objects)
-    total_entries = get_partial_ranklist(openid, total_objects)
+    today_entries = get_partial_ranklist(openid, today_objects, 'today')
+    total_entries = get_partial_ranklist(openid, total_objects, 'total')
     result = {
         "today": today_entries,
         "total": total_entries
@@ -82,7 +82,7 @@ def ingame_rank(request):
     return HttpResponse(json.dumps(result))
 
 
-def get_partial_ranklist(openid, objects):
+def get_partial_ranklist(openid, objects, type):
     l = len(objects)
     entries = []
     n = 0
@@ -102,10 +102,14 @@ def get_partial_ranklist(openid, objects):
     for i in indexlist:
         entry_object = objects[i]
         entry_user = RingUser.objects.get(user_id=entry_object.openid)
+        if type == "today":
+            score = entry_object.score_today
+        else:
+            score = entry_object.score_total
         entry = {
             "openid": entry_object.openid,
             "nickname": entry_user.nickname,
-            "score": entry_object.score_today,
+            "score": score,
             "rank": i+1,
             "headimgurl": entry_user.headimgurl
         }

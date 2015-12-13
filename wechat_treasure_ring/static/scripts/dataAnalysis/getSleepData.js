@@ -42,7 +42,7 @@ function draw(){
 
 //draw the charts and change the data according to the json
 function renderByJson(json){
-	alert(JSON.stringify(json));
+	//alert(JSON.stringify(json));
 	if (json.isnull == true) {
 		draw();
 	}
