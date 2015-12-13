@@ -45,14 +45,14 @@ def weixin(request):
         nonce = request.GET.get('nonce')
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
-        try:
+        try:       
             we_chat.parse_data(data=request.body)
         except ParseError:
             return HttpResponseBadRequest('Invalid XML Data')
         message = we_chat.get_message()
-        if isinstance(message, EventMessage):
-            if isinstance(message, TextMessage):
+        if isinstance(message, TextMessage):
                 print(message.content)
+        if isinstance(message, EventMessage):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
                     step_user = RingUser.objects.filter(user_id=message.source)[0]
