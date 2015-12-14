@@ -17,6 +17,7 @@ import urllib2
 import json
 import sys
 import wechat_response.data as data_tool
+import time
 
 reload(sys)
 sys.setdefaultencoding('UTF-8')
@@ -51,7 +52,9 @@ def weixin(request):
             return HttpResponseBadRequest('Invalid XML Data')
         message = we_chat.get_message()
         if isinstance(message, TextMessage):
-                print(message.content)
+            result = process_text_message(message)
+            response = we_chat.response_text(result)
+            return HttpResponse(response)
         if isinstance(message, EventMessage):
             if message.type == 'click':
                 if message.key == 'STEP_COUNT':
@@ -125,6 +128,29 @@ def get_userinfo(request):
         user.headimgurl = reply['headimgurl']
         user.save()
     return HttpResponse(json.dumps(result))
+
+
+def process_text_message(msg):
+    con = msg.content.split(" ")
+    if con[0] == u"关注":
+        step_user = RingUser.objects.filter(nickname=con[1])[0]
+        new_relation = RecordAttention(
+            source_user_id = msg.source,
+            target_user_id = step_user.user_id,
+            attentionTime = int(time.time())
+            )
+        new_relation.save()
+        return u"成功"
+    elif con[0] == u"关注列表":
+        name_list = ""
+        step_user = RecordAttention.objects.filter(source_user_id=msg.source)
+        for val in step_user:
+            target_user_id = val.target_user_id
+            target_user = RingUser.objects.filter(user_id=target_user_id)[0]
+            name_list += target_user.nickname + "\n"
+        length = len(name_list)
+        name_list = name_list[0:(length-1)]
+        return name_list
 
 
 @csrf_exempt
