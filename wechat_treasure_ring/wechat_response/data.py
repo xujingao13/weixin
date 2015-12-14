@@ -19,7 +19,7 @@ def get_url(parameter, base_addr):
     base_addr = base_addr.strip("&")
     return base_addr
 
-def get_data(type_list, start_time, end_time, user=0, type="", subType=""):
+def get_data(type_list, start_time, end_time, user=0, type="", subType="", raw=False):
     #start_time = "2015-11-18 00:10:05"
     #end_time = "2015-11-19 20:08:05"
     param = {'startTime':start_time, 'endTime':end_time, 'user': user}
@@ -30,6 +30,8 @@ def get_data(type_list, start_time, end_time, user=0, type="", subType=""):
     get_url(param, 'http://wrist.ssast2015.com/bongdata')
     req = urllib.urlopen(url=get_url(param, 'http://wrist.ssast2015.com/bongdata'))
     data = json.loads(req.read())
+    if raw:
+        return data
     return_data = dict()
     for type_name in type_list:
         return_data[type_name] = []
@@ -151,6 +153,111 @@ def integrate_data(data, s_time, days, is_score=False):
     return new_data
 
 
+# 获取各时间段状态
+def get_today_condition(user):
+    now_time = time.localtime()
+    last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0])) - 12 * 3600
+    today = now_time.tm_mday
+    last_time = time.localtime(last_time)
+    start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
+    end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
+    data = get_data(["user", 'startTime', 'endTime', 'type', 'distance', 'calories', 'steps', 'subType', 'actTime', 'nonActTime', 'dsNum', 'lsNum', 'wakeNum', 'wakeTimes', 'score'], start_time, end_time, user.id, raw=True)   
+    i = 0
+    length = len(data)
+    while data[i]["endTime"].split('-')[2].split(' ')[0] != str(today) and i < length:
+        data.pop(0)
+    new_data = integrate_by_class(data)
+    calculate_time(new_data)
+    new_data.pop(0)
+    time_first = new_data[0]["endTime"].split('-')[2].split(' ')[1].split(':')
+    time_first = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, int(time_first[0]), int(time_first[1]), int(time_first[2]), 0, 0, 0]))
+    time_00 = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
+    rate = float(time_first - time_00) / new_data[0]["allTime"]
+    new_data[0]["allTime"] -= (time_first - time_00)
+    new_data[0]["startTime"] = (str(now_time.tm_year) + "-" + str(now_time.tm_mon) + "-" + str(now_time.tm_mday) + " " + "00:00:00").encode("utf-8")
+    new_data[0]["distance"] = int(new_data[0]["distance"] * rate)
+    new_data[0]["steps"] = int(new_data[0]["steps"] * rate)
+    new_data[0]["calories"] = int(new_data[0]["calories"] * rate)
+    new_data[0]["dsNum"] = int(new_data[0]["dsNum"] * rate)
+    new_data[0]["sleepNum"] = int(new_data[0]["sleepNum"] * rate)
+    return new_data
+    
+
+# 把数据按种类结合
+def integrate_by_class(data):
+    new_data = list()
+    one_data = init_temp()
+    for val in data:
+        if not judge_change(one_data, val):
+            modify(one_data, val)
+        else:
+            one_data["endTime"] = val["startTime"]
+            new_data.append(one_data)
+            one_data = init_temp()
+            one_data["startTime"] = val["startTime"]
+            one_data["type"] = val["type"]
+            one_data["subType"] = val["subType"]
+            modify(one_data, val)
+    return new_data
+
+
+def judge_change(one_data, val):
+    if one_data["type"] == val["type"] and one_data["subType"] == val["subType"]:
+        return False
+    elif one_data["type"] == val["type"]:
+        if one_data["type"] == 1:
+            if ((one_data["subType"] == 1 or one_data["subType"] == 2) and (val["subType"] == 1 or val["subType"] == 2)) or ((one_data["subType"] == 0) and (val["subType"] == 0)):
+                return False
+            else:
+                return True
+        else:
+            return True
+    else: 
+        return True
+
+
+def modify(one_data, val):
+    if val['type'] == 1:
+        one_data["sleepNum"] += val["dsNum"] + val["lsNum"]
+        if val['subType'] == 1:
+            one_data["dsNum"] += val["dsNum"]
+    elif val["type"] == 2:
+        one_data["calories"] += val["calories"]
+        one_data["distance"] += val["distance"]
+        one_data["steps"] += val["steps"]
+    elif val["type"] == 3:
+        if val['subType'] == 2 or val['subType'] == 4:
+            one_data["calories"] += val["calories"]
+            one_data["distance"] += val["distance"]
+            one_data["steps"] += val["steps"]
+
+
+def init_temp():
+    one_data = dict()
+    one_data["distance"] = 0
+    one_data["steps"] = 0
+    one_data["calories"] = 0
+    one_data["dsNum"] = 0
+    one_data["sleepNum"] = 0
+    one_data["score"] = 0
+    one_data["startTime"] = "0-0-0 00:00:00"
+    one_data["endTime"] = "0-0-0 00:00:00"
+    one_data["allTime"] = 0
+    one_data['type'] = 0
+    one_data['subType'] = 0
+    return one_data  
+
+
+def calculate_time(data):
+    length = len(data)
+    all_time = list()
+    for i in range(length):
+        s = transfer_time(data[i]["startTime"])
+        e = transfer_time(data[i]["endTime"])
+        data[i]["allTime"] = (time.mktime(time.struct_time([e[0], e[1], e[2], e[3], e[4], e[5], 0, 0, 0])) - time.mktime(time.struct_time([s[0], s[1], s[2], s[3], s[4], s[5], 0, 0, 0])))
+
+
+# 时间转换函数，补0
 def process_num(x):
     if x < 10:
         return "0" + str(x)
@@ -245,17 +352,13 @@ def get_sleep_data(user):
 
  #  获取今天到目前为止的步数
 def get_today_step(user):
-    #return 10000
     now_time = time.localtime()
     last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
     last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    print (start_time, end_time)
     data = get_data(["user", "steps", "startTime"], start_time, end_time, user.id)
     step = (integrate_data(data["steps"], data["startTime"],1))[0]
-    if step < 4000:
-        return 10000
     return step
 
     
@@ -300,7 +403,6 @@ def save_exercise_data(user):
                     score=0
                 )
                 user_temp.save()
-
     else:
         for i in range(30):
             data["date"][i] = data["date"][i].split('.')
@@ -317,6 +419,7 @@ def save_exercise_data(user):
                     score=0
                 )
             user_temp.save()
+
 
 # 获取运动数据
 def get_exercise_data(user):
