@@ -6,7 +6,7 @@ window.onload = function(){
 		nickname = data.nickname;
 		headimgurl = data.headimgurl;
         $.getJSON("data/gamerank?game=bird&start=0&end=100",function(data){
-            //alert(JSON.stringify(data));
+            alert(JSON.stringify(data));
             handle_data(data_todaybird, data.today);
             handle_data(data_allbird, data.total);
             get_todayBird();
@@ -58,7 +58,22 @@ function get_rank(type){
     }
     $('#rank_content').html("");
     for(var i = 0; i < data.length; i++){
-        var dom_template = `
+        var dom_template =
+            '<div class="item" style="background-color:'+data[i].user_color+'">'+
+                '<div class="ui big teal label">'+data[i].user_rank+'</div>'+
+                '<img class="ui avatar image" src='+data[i].user_photo+'>'+
+                '<div class="content">'+
+                    '<div class="header">'+data[i].user_name+'</div>'+
+                    '<div class="meta">'+
+                        '<span class="cinema">'+data[i].user_title+'</span>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="right floated content">'+
+                    '<span class="left floated content">'+data[i].user_num+'</span>'+
+                    '<div id="follow" temp="1" class="ui red button" openid=' + data[i].user_openid+'><i class="empty heart icon"></i> 取关 </div>'+
+                '</div>'+
+            '</div>';
+        /*
         <div class="item" style="background-color:${data[i].user_color}">
                <div class="ui big teal label">${data[i].user_rank}</div>
                <img class="ui avatar image" src=${data[i].user_photo}>
@@ -72,7 +87,7 @@ function get_rank(type){
                    <span class="left floated content">${data[i].user_num}</span>
                     <div id="follow" openid=${data[i].user_openid} temp="1" class="ui red button" ><i class="empty heart icon"></i> 取关 </div>
                </div>
-        </div>`
+        </div>`*/
         $('#rank_content').append(dom_template);
     }
 }
@@ -112,6 +127,12 @@ function add_follow(){
                 'temp':"0"
             });
             $(this).html('<i class="heart icon"></i> 关注');
+            $.ajax({
+                url: "data/cancelfollow/" + openid + '@' + target_openid,
+                success: function(result){
+                    alert('取消关注成功');
+                }
+            });
         }
         else{
             $(this).attr({
@@ -119,6 +140,12 @@ function add_follow(){
                 'temp':"1"
             });
             $(this).html('<i class="empty heart icon"></i> 取关');
+            $.ajax({
+                url: "data/addfollow/" + openid + '@' + target_openid,
+                success: function(result){
+                    alert('关注成功');
+                }
+            });
         }
     });
 }

@@ -5,6 +5,7 @@ from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from wechat_response.data import *
 import json
+import time
 
 
 def ifregistered(request, openid):
@@ -217,3 +218,22 @@ def get_sportsdata(request):
         return HttpResponse("no user")
     data = access_exercising(openid)
     return HttpResponse(json.dumps(data))
+
+
+def cancel_follow(request, message):
+    source_id, target_id = message.split('@')
+    print source_id, target_id
+    RecordAttention.objects.get(source_user_id=source_id, target_user_id=target_id).delete()
+    return HttpResponse('OK')
+
+
+def add_follow(request, message):
+    source_id, target_id = message.split('@')
+    print source_id, target_id
+    new_relation = RecordAttention(
+        source_user_id=source_id,
+        target_user_id=target_id,
+        attentionTime=int(time.time())
+    )
+    new_relation.save()
+    return HttpResponse('OK')
