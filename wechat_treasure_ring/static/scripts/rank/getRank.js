@@ -6,7 +6,7 @@ window.onload = function(){
 		nickname = data.nickname;
 		headimgurl = data.headimgurl;
         $.getJSON("data/gamerank?game=bird&start=0&end=100",function(data){
-            //alert(JSON.stringify(data));
+            alert(JSON.stringify(data));
             handle_data(data_todaybird, data.today);
             handle_data(data_allbird, data.total);
             get_todayBird();
