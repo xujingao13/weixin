@@ -107,6 +107,7 @@ def weixin(request):
 
 def get_userinfo(request):
     code = request.GET.get("code")
+    #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     f = urllib2.urlopen(get_url)
     string_json = f.read()
