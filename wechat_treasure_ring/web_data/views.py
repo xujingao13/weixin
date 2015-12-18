@@ -171,6 +171,11 @@ def game_rank(request):
     game = request.GET.get('game')
     start = request.GET.get('start')
     end = request.GET.get('end')
+    openid = request.GET.get('openid')
+    attention = RecordAttention.objects.filter(source_user_id=openid)
+    attention_list = []
+    for val in attention:
+        attention_list.append(val.target_user_id)
     if game == "bird":
         results_today = BirdUser.objects.all().order_by('-score_today')[start:end]
         results_total = BirdUser.objects.all().order_by('-score_total')[start:end]
@@ -178,20 +183,30 @@ def game_rank(request):
     ranklist_total = []
     for item in results_today:
         itemuser = RingUser.objects.get(user_id=item.openid)
+        if item.openid in attention_list:
+            is_attention = True
+        else:
+            is_attention = False
         rankitem = {
-            "openid":item.openid,
-            "nickname":itemuser.nickname,
-            "headimgurl":itemuser.headimgurl,
-            "score":item.score_today
+            "openid": item.openid,
+            "nickname": itemuser.nickname,
+            "headimgurl": itemuser.headimgurl,
+            "score": item.score_today,
+            "is_attention": is_attention
         }
         ranklist_today.append(rankitem)
     for item in results_total:
         itemuser = RingUser.objects.get(user_id=item.openid)
+        if item.openid in attention_list:
+            is_attention = True
+        else:
+            is_attention = False
         rankitem = {
-            "openid":item.openid,
-            "nickname":itemuser.nickname,
-            "headimgurl":itemuser.headimgurl,
-            "score":item.score_total
+            "openid": item.openid,
+            "nickname": itemuser.nickname,
+            "headimgurl": itemuser.headimgurl,
+            "score": item.score_total,
+            "is_attention": is_attention
         }
         ranklist_total.append(rankitem)
     result = {
