@@ -107,6 +107,7 @@ def weixin(request):
 
 def get_userinfo(request):
     code = request.GET.get("code")
+    #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     f = urllib2.urlopen(get_url)
     string_json = f.read()
@@ -133,15 +134,23 @@ def get_userinfo(request):
 def process_text_message(msg):
     con = msg.content.split(" ")
     if con[0] == u"关注":
-        step_user = RingUser.objects.filter(nickname=con[1])[0]
-        new_relation = RecordAttention(
-            source_user_id = msg.source,
-            target_user_id = step_user.user_id,
-            attentionTime = int(time.time())
+        step_user = RingUser.objects.filter(nickname=con[1])
+        relation = RecordAttention.objects.filter(source_user_id=msg.source)
+        if step_user:
+            for var in relation:
+                if var.target_user_id == step_user[0].user_id:
+                    return u"你已经关注此人了"
+            new_relation = RecordAttention(
+                source_user_id=msg.source,
+                target_user_id=step_user[0].user_id,
+                attentionTime=int(time.time())
             )
-        new_relation.save()
-        return u"成功"
-    elif con[0] == u"关注列表":
+            new_relation.save()
+            message_return = u"关注:" + con[1] + u" 成功"
+            return message_return
+        else:
+            return u"没有此用户或此用户没有注册><"
+    elif con[0] == u"关注列表" or con[0] == u"我的关注":
         name_list = ""
         step_user = RecordAttention.objects.filter(source_user_id=msg.source)
         for val in step_user:
@@ -151,6 +160,24 @@ def process_text_message(msg):
         length = len(name_list)
         name_list = name_list[0:(length-1)]
         return name_list
+    elif con[0] == u"取消关注":
+        target_user = RingUser.objects.filter(nickname=con[1])
+        if target_user:
+            step_user = RecordAttention.objects.filter(source_user_id=msg.source)
+            temp = 0
+            for val in step_user:
+                if val.target_user_id == target_user[0].user_id:
+                    temp = 1
+                    break
+            print temp
+            if temp == 1:
+                RecordAttention.objects.get(source_user_id=msg.source, target_user_id=target_user[0].user_id).delete()
+                message_return = u"取消关注:" + con[1] + u" 成功"
+            else:
+                message_return = u"你并没有关注此人"
+            return message_return
+        else:
+            return u"没有此用户或此用户没有注册><"
 
 
 @csrf_exempt
