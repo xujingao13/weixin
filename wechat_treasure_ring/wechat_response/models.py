@@ -51,6 +51,11 @@ class BirdUser(models.Model):
     score_total = models.IntegerField()
 
 
+class ActivityRecord(models.Model):
+    user_name = models.CharField(max_length=30)
+    data = models.CharField(max_length=20000)
+    
+
 class RecordAttention(models.Model):
     source_user_id = models.CharField(max_length=30)
     target_user_id = models.CharField(max_length=30)
