@@ -2,7 +2,6 @@
  * Created by littlepig on 2015/12/20.
  */
 $(document).ready(function(){
-    /*
     get_userinfo(function(data){
 		openid = data.openid;
 		nickname = data.nickname;
@@ -11,25 +10,31 @@ $(document).ready(function(){
 		$.getJSON("data/getTimeLineData?openid="+openid, function(data){
 			renderByJson(data);
 		})
-	});*/
-    data = getData();
-    renderByJson(data);
+	});
 });
 
-function renderByJson(data){
-    for(j = 0; j < 7; j++){
-        for(i = 0; i < data.length; i++){
-            if(!("none" in data[i])){
-                addOneElement(getHTMLDict(data[i]), j);
+function renderByJson(json){
+    var data;
+    if (json.isnull == true) {
+		data = getData();
+	}else{
+        data = json.data;
+    }
+    for(var j = 0; j < 7; j++){
+        addItem(data[j][0]["startTime"].split(" ")[0], j);
+        var i = 0;
+        for(; i < data[j].length; i++){
+            addOneElement(getHTMLDict(data[j][i]), j);
+            if(("none" in data[j][i])  || !("type" in data[j][i])){
+                i = data[j].length;
             }
         }
-        addItem(j);
     }
 }
 
-function addItem(j){
-    $("#item"+j).append("<div class=\"carousel-caption\">"+ "title" + j + "</div>");
-    $("#item"+j).append("<div style=\"height:20px;\"><div>");
+function addItem(date, j){
+    $("#item"+j).append("<div class=\"carousel-caption\" color=\"black\">"+ date + "</div>");
+    $("#item"+j).append("<div style=\"height:20px;\"></div>");
 }
 
 function addOneElement(data, num){
@@ -46,7 +51,16 @@ function addOneElement(data, num){
 
 function getHTMLDict(data){
     if("none" in data){
-        return "";
+        return {
+            imgString:getImgString(""),
+            dataString:getH2Element("Don't forget uploading data!~")
+        }
+    }
+    else if(!("type" in data)){
+        return {
+            imgString:getImgString(""),
+            dataString:getH2Element("Don't forget uploading data!~")
+        }
     }
     else if(data["type"] == 1){
         return {
@@ -118,7 +132,7 @@ function getHTMLDict(data){
 }
 
 function getImgString(data){
-    return "<img src=\"images/TimeLine/" + data  + "\"alt=\"Picture\"> "
+    return "<img src=\"/TimeLine/" + data  + "\"alt=\"Picture\"> "
 }
 
 function getPElement(data){

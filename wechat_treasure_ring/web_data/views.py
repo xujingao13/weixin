@@ -232,10 +232,18 @@ def get_sportsdata(request):
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
     data = access_exercising(openid)
+    data['isnull'] = False
     return HttpResponse(json.dumps(data))
 
 
 def get_time_line_data(request):
+    '''testData = {}
+    testData['isnull'] = False
+    testData['data'] = [[{"type":1,"startTime":"2015-1-1"}], [{"none":1, "startTime":"2015-1-1"}],
+                        [{"type":2,"subType":1,"startTime":"2015-1-1"}],[{"type":2,"subType":1,"startTime":"2015-1-1"}],
+                        [{"type":3,"subType":1,"startTime":"2015-1-1"}],[{"type":2,"subType":2,"startTime":"2015-1-1"}],
+                        [{"type":2,"subType":3,"startTime":"2015-1-1"}]]
+    return HttpResponse(json.dumps(testData))'''
     openid = request.GET.get("openid")
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
