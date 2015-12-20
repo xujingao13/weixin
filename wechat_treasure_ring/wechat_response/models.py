@@ -43,6 +43,10 @@ class RecordByDay(models.Model):
     distance = models.IntegerField()
     score = models.FloatField()
 
+class ActivityRecord(models.Model):
+    user_name = models.CharField(max_length=30)
+    data = models.CharField(max_length=20000)
+
 class RecordAttention(models.Model):
     source_user_id = models.CharField(max_length=30)
     target_user_id = models.CharField(max_length=30)
