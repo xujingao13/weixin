@@ -235,6 +235,16 @@ def get_sportsdata(request):
     return HttpResponse(json.dumps(data))
 
 
+def get_time_line_data(request):
+    openid = request.GET.get("openid")
+    if not RingUser.objects.filter(user_id=openid).exists():
+        return HttpResponse("no user")
+    data = save_time_line(RingUser.objects.filter(user_id=openid)[0]);
+    print data
+    data['isnull'] = False
+    return HttpResponse(json.dumps(data))
+
+
 def cancel_follow(request, message):
     source_id, target_id = message.split('@')
     print source_id, target_id
