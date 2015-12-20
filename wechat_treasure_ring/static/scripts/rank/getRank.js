@@ -73,21 +73,6 @@ function get_rank(type){
                     '<div id="follow" temp="1" class="ui red button" openid=' + data[i].user_openid+'><i class="empty heart icon"></i> 取关 </div>'+
                 '</div>'+
             '</div>';
-        /*
-        <div class="item" style="background-color:${data[i].user_color}">
-               <div class="ui big teal label">${data[i].user_rank}</div>
-               <img class="ui avatar image" src=${data[i].user_photo}>
-               <div class="content">
-                   <div class="header">${data[i].user_name}</div>
-                   <div class="meta">
-                       <span class="cinema">${data[i].user_title}</span>
-                   </div>
-               </div>
-               <div class="right floated content">
-                   <span class="left floated content">${data[i].user_num}</span>
-                    <div id="follow" openid=${data[i].user_openid} temp="1" class="ui red button" ><i class="empty heart icon"></i> 取关 </div>
-               </div>
-        </div>`*/
         $('#rank_content').append(dom_template);
     }
 }
