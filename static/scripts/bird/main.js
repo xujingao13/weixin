@@ -29,7 +29,7 @@ var gravity = 0.2;
 var velocity = 0;
 var position = 180;
 var rotation = 0;
-var jump = -5;
+var jump = -4.6;
 
 var score = 0;
 var highscore = 0;
@@ -141,7 +141,7 @@ function startGame()
    }
 
    //start up our loops
-   var updaterate = 1000.0 / 100.0 ; //60 times a second
+   var updaterate = 1000.0 / 60.0 ; //60 times a second
    loopGameloop = setInterval(gameloop, updaterate);
    loopPipeloop = setInterval(updatePipes, 1400);
    
