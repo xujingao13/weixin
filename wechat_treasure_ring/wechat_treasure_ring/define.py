@@ -1,7 +1,13 @@
 # -*-coding:utf-8-*-
 import os
-LOCAL_IP = os.environ.get('STIE_DOMAIN')
+import urllib2
+import json
+import sys
+reload(sys)
+sys.setdefaultencoding('UTF-8')
+LOCAL_IP = os.environ.get('SITE_DOMAIN')
 AppID = os.environ.get('APP_ID')
+AppSecret = os.environ.get('APP_SECRET')
 MENU = """
 {
     "button": [

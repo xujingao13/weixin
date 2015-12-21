@@ -109,20 +109,23 @@ def get_userinfo(request):
     code = request.GET.get("code")
     #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
-    f = urllib2.urlopen(get_url)
-    string_json = f.read()
-    reply = json.loads(string_json)
-    openid = reply['openid']
-    access_token = reply['access_token']
-    get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
-    f = urllib2.urlopen(get_url)
-    string_json = f.read()
-    reply = json.loads(string_json)
-    result = {
-        "openid":reply['openid'],
-        "nickname":reply['nickname'],
-        "headimgurl":reply['headimgurl']
-    }
+    try:
+        f = urllib2.urlopen(get_url)
+        string_json = f.read()
+        reply = json.loads(string_json)
+        openid = reply['openid']
+        access_token = reply['access_token']
+        get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
+        f = urllib2.urlopen(get_url)
+        string_json = f.read()
+        reply = json.loads(string_json)
+        result = {
+            "openid":reply['openid'],
+            "nickname":reply['nickname'],
+            "headimgurl":reply['headimgurl']
+        }
+    except:
+        return HttpResponse("Invalid code")
     if RingUser.objects.filter(user_id=openid).exists():
         user = RingUser.objects.get(user_id=openid)
         user.nickname = reply['nickname']
