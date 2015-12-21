@@ -1,5 +1,5 @@
 wechat_treasure_ring:
-  image: sheep94lion/wechat_treasure_ring:0.11
+  image: sheep94lion/wechat_treasure_ring:1.0
   environment:
     - PRODUCTION=True
     - DB_NAME=wechat_treasure_ring

@@ -8,6 +8,7 @@ migrations/
 settings.py
 secret.env
 db.sqlite3
+secret.env
 # C extensions
 *.so
 
@@ -21,6 +22,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+datadir/
 lib64/
 parts/
 sdist/

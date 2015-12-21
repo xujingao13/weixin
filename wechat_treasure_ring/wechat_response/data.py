@@ -377,9 +377,13 @@ def get_today_step(user):
     last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    data = get_data(["user", "steps", "startTime"], start_time, end_time, user.id)
-    step = (integrate_data(data["steps"], data["startTime"],1))[0]
-    if step == 0:
+    try:
+        data = get_data(["user", "steps", "startTime"], start_time, end_time, user.id)
+        step = (integrate_data(data["steps"], data["startTime"],1))[0]
+    except:
+        step = 10000
+
+    if step <= 2000:
         return 10000
     return step
 
