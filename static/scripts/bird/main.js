@@ -25,7 +25,7 @@ var states = Object.freeze({
 
 var currentstate;
 
-var gravity = 0.25;
+var gravity = 0.2;
 var velocity = 0;
 var position = 180;
 var rotation = 0;
@@ -510,21 +510,20 @@ var isIncompatible = {
 function get_rank(data){
     $('#rank_content').html("");
     for(var i = 0; i < 4; i++){
-        var dom_template = `
-        <div class="item" style="background-color:${data[i].user_color}">
-               <div class="ui big teal label">${data[i].user_rank}</div>
-               <img class="ui avatar image" src=${data[i].user_photo}>
-               <div class="content">
-                   <div class="header">${data[i].user_name}</div>
-                   <div class="meta">
-                       <span class="cinema">${data[i].user_title}</span>
-                   </div>
-               </div>
-               <div class="right floated content">
-                   <span class="left floated content">${data[i].user_num}</span>
-                   <i class="smile icon"></i>
-               </div>
-        </div>`
+        var dom_template =
+            '<div class="item" style="background-color:'+data[i].user_color+'">'+
+                '<div class="ui big teal label">'+data[i].user_rank+'</div>'+
+                '<img class="ui avatar image" src='+data[i].user_photo+'>'+
+                '<div class="content">'+
+                    '<div class="header">'+data[i].user_name+'</div>'+
+                    '<div class="meta">'+
+                        '<span class="cinema">'+data[i].user_title+'</span>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="right floated content">'+
+                    '<span class="left floated content">'+data[i].user_num+'</span>'+
+                '</div>'+
+         '</div>';
         $('#rank_content').append(dom_template);
     }
 }
