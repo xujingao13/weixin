@@ -7,6 +7,7 @@ __pycache__/
 migrations/
 settings.py
 db.sqlite3
+secret.env
 # C extensions
 *.so
 
