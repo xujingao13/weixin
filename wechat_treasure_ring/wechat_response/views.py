@@ -109,20 +109,23 @@ def get_userinfo(request):
     code = request.GET.get("code")
     #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
-    f = urllib2.urlopen(get_url)
-    string_json = f.read()
-    reply = json.loads(string_json)
-    openid = reply['openid']
-    access_token = reply['access_token']
-    get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
-    f = urllib2.urlopen(get_url)
-    string_json = f.read()
-    reply = json.loads(string_json)
-    result = {
-        "openid":reply['openid'],
-        "nickname":reply['nickname'],
-        "headimgurl":reply['headimgurl']
-    }
+    try:
+        f = urllib2.urlopen(get_url)
+        string_json = f.read()
+        reply = json.loads(string_json)
+        openid = reply['openid']
+        access_token = reply['access_token']
+        get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
+        f = urllib2.urlopen(get_url)
+        string_json = f.read()
+        reply = json.loads(string_json)
+        result = {
+            "openid":reply['openid'],
+            "nickname":reply['nickname'],
+            "headimgurl":reply['headimgurl']
+        }
+    except:
+        return HttpResponse("Invalid code")
     if RingUser.objects.filter(user_id=openid).exists():
         user = RingUser.objects.get(user_id=openid)
         user.nickname = reply['nickname']
@@ -133,7 +136,10 @@ def get_userinfo(request):
 
 def process_text_message(msg):
     con = msg.content.split(" ")
+    argus = len(con)
     if con[0] == u"关注":
+        if argus == 1:
+            return u"输入‘关注’+‘用户名’关注别人"
         step_user = RingUser.objects.filter(nickname=con[1])
         relation = RecordAttention.objects.filter(source_user_id=msg.source)
         if step_user:
@@ -161,6 +167,8 @@ def process_text_message(msg):
         name_list = name_list[0:(length-1)]
         return name_list
     elif con[0] == u"取消关注":
+        if argus == 1:
+            return u"输入‘取消关注’+‘用户名’取消关注他人"
         target_user = RingUser.objects.filter(nickname=con[1])
         if target_user:
             step_user = RecordAttention.objects.filter(source_user_id=msg.source)
@@ -179,13 +187,3 @@ def process_text_message(msg):
         else:
             return u"没有此用户或此用户没有注册><"
 
-
-@csrf_exempt
-def create_menu():
-    get_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (AppID,AppSecret)
-    f = urllib2.urlopen(get_url)
-    string_json = f.read()
-    access_token = json.loads(string_json)['access_token']
-    post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
-    request = urllib2.urlopen(post_url, (MENU % (USER_URL,RANK_URL)).encode('utf-8'))
-    print request.read()

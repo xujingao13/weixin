@@ -6,7 +6,9 @@ __pycache__/
 .idea/
 migrations/
 settings.py
+secret.env
 db.sqlite3
+secret.env
 # C extensions
 *.so
 
