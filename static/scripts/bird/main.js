@@ -29,7 +29,7 @@ var gravity = 0.2;
 var velocity = 0;
 var position = 180;
 var rotation = 0;
-var jump = -4.6;
+var jump = -5;
 
 var score = 0;
 var highscore = 0;
@@ -42,12 +42,13 @@ var replayclickable = false;
 
 //sounds
 var volume = 30;
+/*
 var soundJump = new buzz.sound("bird/sounds/sfx_wing.ogg");
 var soundScore = new buzz.sound("bird/sounds/sfx_point.ogg");
 var soundHit = new buzz.sound("bird/sounds/sfx_hit.ogg");
 var soundDie = new buzz.sound("bird/sounds/sfx_die.ogg");
 var soundSwoosh = new buzz.sound("bird/sounds/sfx_swooshing.ogg");
-buzz.all().setVolume(volume);
+buzz.all().setVolume(volume);*/
 
 //loops
 var loopGameloop;
@@ -102,8 +103,8 @@ function showSplash()
    $("#player").css({ y: 0, x: 0});
    updatePlayer($("#player"));
    
-   soundSwoosh.stop();
-   soundSwoosh.play();
+   //soundSwoosh.stop();
+   //soundSwoosh.play();
    
    //clear out all the pipes if there are any
    $(".pipe").remove();
@@ -140,7 +141,7 @@ function startGame()
    }
 
    //start up our loops
-   var updaterate = 1000.0 / 60.0 ; //60 times a second
+   var updaterate = 1000.0 / 100.0 ; //60 times a second
    loopGameloop = setInterval(gameloop, updaterate);
    loopPipeloop = setInterval(updatePipes, 1400);
    
@@ -292,8 +293,8 @@ function playerJump()
 {
    velocity = jump;
    //play jump sound
-   soundJump.stop();
-   soundJump.play();
+   //soundJump.stop();
+   //soundJump.play();
 }
 
 function setBigScore(erase)
@@ -384,11 +385,11 @@ function playerDead()
    else
    {
       //play the hit sound (then the dead sound) and then show score
-      soundHit.play().bindOnce("ended", function() {
-         soundDie.play().bindOnce("ended", function() {
-            showScore();
-         });
-      });
+      //soundHit.play().bindOnce("ended", function() {
+      //   soundDie.play().bindOnce("ended", function() {
+      //      showScore();
+      //   });
+      //});
    }
 }
 
@@ -414,8 +415,8 @@ function showScore()
    var wonmedal = setMedal();
    
    //SWOOSH!
-   soundSwoosh.stop();
-   soundSwoosh.play();
+   //soundSwoosh.stop();
+   //soundSwoosh.play();
    
    //show the scoreboard
    get_todayRank();
@@ -423,8 +424,8 @@ function showScore()
    $("#replay").css({ y: '40px', opacity: 0 });
    $("#scoreboard").transition({ y: '0px', opacity: 1}, 600, 'ease', function() {
       //When the animation is done, animate in the replay button and SWOOSH!
-      soundSwoosh.stop();
-      soundSwoosh.play();
+      //soundSwoosh.stop();
+      //soundSwoosh.play();
       $("#replay").transition({ y: '0px', opacity: 1}, 600, 'ease');
       
       //also animate in the MEDAL! WOO!
@@ -446,8 +447,8 @@ $("#replay").click(function() {
    else
       replayclickable = false;
    //SWOOSH!
-   soundSwoosh.stop();
-   soundSwoosh.play();
+   //soundSwoosh.stop();
+   //soundSwoosh.play();
    
    //fade out the scoreboard
    $("#scoreboard").transition({ y: '-40px', opacity: 0}, 1000, 'ease', function() {
@@ -463,8 +464,8 @@ function playerScore()
 {
    score += 1;
    //play score sound
-   soundScore.stop();
-   soundScore.play();
+   //soundScore.stop();
+   //soundScore.play();
    setBigScore();
 }
 
