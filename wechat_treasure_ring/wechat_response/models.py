@@ -49,7 +49,17 @@ class ActivityRecord(models.Model):
     data = models.TextField(max_length = 30000)
 
 
+class BirdUser(models.Model):
+    openid = models.CharField(max_length=30)
+    steps_used = models.IntegerField()
+    score_today = models.IntegerField()
+    score_total = models.IntegerField()
+
+
+
 class RecordAttention(models.Model):
     source_user_id = models.CharField(max_length=30)
     target_user_id = models.CharField(max_length=30)
     attentionTime = models.IntegerField()
+
+

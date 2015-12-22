@@ -5,6 +5,7 @@ from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from wechat_response.data import *
 import json
+import time
 
 
 def ifregistered(request, openid):
@@ -73,8 +74,8 @@ def ingame_rank(request):
     if game == "bird":
         today_objects = BirdUser.objects.all().order_by('-score_today')
         total_objects = BirdUser.objects.all().order_by('-score_total')
-    today_entries = get_partial_ranklist(openid, today_objects)
-    total_entries = get_partial_ranklist(openid, total_objects)
+    today_entries = get_partial_ranklist(openid, today_objects, 'today')
+    total_entries = get_partial_ranklist(openid, total_objects, 'total')
     result = {
         "today": today_entries,
         "total": total_entries
@@ -82,7 +83,7 @@ def ingame_rank(request):
     return HttpResponse(json.dumps(result))
 
 
-def get_partial_ranklist(openid, objects):
+def get_partial_ranklist(openid, objects, type):
     l = len(objects)
     entries = []
     n = 0
@@ -102,10 +103,14 @@ def get_partial_ranklist(openid, objects):
     for i in indexlist:
         entry_object = objects[i]
         entry_user = RingUser.objects.get(user_id=entry_object.openid)
+        if type == "today":
+            score = entry_object.score_today
+        else:
+            score = entry_object.score_total
         entry = {
             "openid": entry_object.openid,
             "nickname": entry_user.nickname,
-            "score": entry_object.score_today,
+            "score": score,
             "rank": i+1,
             "headimgurl": entry_user.headimgurl
         }
@@ -135,7 +140,9 @@ def start_game(request):
         return HttpResponse(json.dumps({"result": "nouser"}))
     user = users[0]
     game = request.GET.get("game")
+    print 1.1
     if game == "bird":
+        print 1
         gameuser = BirdUser.objects.get(openid=openid)
         user.steps_totalused += 1000
         gameuser.steps_used += 1000
@@ -164,6 +171,11 @@ def game_rank(request):
     game = request.GET.get('game')
     start = request.GET.get('start')
     end = request.GET.get('end')
+    openid = request.GET.get('openid')
+    attention = RecordAttention.objects.filter(source_user_id=openid)
+    attention_list = []
+    for val in attention:
+        attention_list.append(val.target_user_id)
     if game == "bird":
         results_today = BirdUser.objects.all().order_by('-score_today')[start:end]
         results_total = BirdUser.objects.all().order_by('-score_total')[start:end]
@@ -171,20 +183,30 @@ def game_rank(request):
     ranklist_total = []
     for item in results_today:
         itemuser = RingUser.objects.get(user_id=item.openid)
+        if item.openid in attention_list:
+            is_attention = True
+        else:
+            is_attention = False
         rankitem = {
-            "openid":item.openid,
-            "nickname":itemuser.nickname,
-            "headimgurl":itemuser.headimgurl,
-            "score":item.score_today
+            "openid": item.openid,
+            "nickname": itemuser.nickname,
+            "headimgurl": itemuser.headimgurl,
+            "score": item.score_today,
+            "is_attention": is_attention
         }
         ranklist_today.append(rankitem)
     for item in results_total:
         itemuser = RingUser.objects.get(user_id=item.openid)
+        if item.openid in attention_list:
+            is_attention = True
+        else:
+            is_attention = False
         rankitem = {
-            "openid":item.openid,
-            "nickname":itemuser.nickname,
-            "headimgurl":itemuser.headimgurl,
-            "score":item.score_total
+            "openid": item.openid,
+            "nickname": itemuser.nickname,
+            "headimgurl": itemuser.headimgurl,
+            "score": item.score_total,
+            "is_attention": is_attention
         }
         ranklist_total.append(rankitem)
     result = {
@@ -211,3 +233,22 @@ def get_sportsdata(request):
         return HttpResponse("no user")
     data = access_exercising(openid)
     return HttpResponse(json.dumps(data))
+
+
+def cancel_follow(request, message):
+    source_id, target_id = message.split('@')
+    print source_id, target_id
+    RecordAttention.objects.get(source_user_id=source_id, target_user_id=target_id).delete()
+    return HttpResponse('OK')
+
+
+def add_follow(request, message):
+    source_id, target_id = message.split('@')
+    print source_id, target_id
+    new_relation = RecordAttention(
+        source_user_id=source_id,
+        target_user_id=target_id,
+        attentionTime=int(time.time())
+    )
+    new_relation.save()
+    return HttpResponse('OK')

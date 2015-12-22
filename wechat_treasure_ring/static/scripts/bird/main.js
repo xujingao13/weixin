@@ -119,7 +119,7 @@ function showSplash()
 
 function startGame()
 {
-   openid = 'oFX57wR4_d3ZHsJnaTGdyyIPsO9M';
+   //openid = 'oFX57wR4_d3ZHsJnaTGdyyIPsO9M';
    $.getJSON("data/startgame?game=bird&openid="+openid, function(data){
       update_lives();
    });
