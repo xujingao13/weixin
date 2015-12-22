@@ -16,11 +16,12 @@ $(document).ready(function(){
 function renderByJson(json){
     var data;
     if (json.isnull == true) {
-		data = getData();
+		data = [];
 	}else{
         data = json.data;
     }
-    for(var j = 0; j < 7; j++){
+    addDays(data.length);
+    for(var j = 0; j < data.length; j++){
         addItem(data[j][0]["startTime"].split(" ")[0], j);
         var i = 0;
         for(; i < data[j].length; i++){
@@ -32,8 +33,31 @@ function renderByJson(json){
     }
 }
 
+function addDays(days){
+    if(days > 1){
+       
+        for(var i = 1; i < days; i++){
+             var newCarousel = $("<li data-target=\"#myCarousel\" data-slide-to=\" " + i +" \"></li>");
+            var newItem = $(
+                " <div id=\"item" + i + "\" class=\"item\"> " +
+                    "<section id=\"cd-timeline" + i +"\" class=\"cd-container\">" +
+
+                    "</section>"+
+                " </div> "
+            );
+            $("#carousel").append(newCarousel);
+            $("#carousel-inner").append(newItem);
+        }
+    }
+    else if(days == 0){
+        data["imgString"] = "";
+        data["dataString"] = "There's no data in our database.";
+        addOneElement(data, 0);
+    }
+}
+
 function addItem(date, j){
-    $("#item"+j).append("<div class=\"carousel-caption\" color=\"black\">"+ date + "</div>");
+    $("#item"+j).append("<div class=\"carousel-caption\"><font style=\"color:black\">"+ date + "</font></div>");
     $("#item"+j).append("<div style=\"height:20px;\"></div>");
 }
 
@@ -53,7 +77,7 @@ function getHTMLDict(data){
     if("none" in data){
         return {
             imgString:getImgString(""),
-            dataString:getH2Element("Don't forget uploading data!~")
+            dataString:getH2Element("Don't forget uploading data~")
         }
     }
     else if(!("type" in data)){

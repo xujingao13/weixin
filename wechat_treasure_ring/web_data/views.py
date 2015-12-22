@@ -259,27 +259,30 @@ def get_sportsdata(request):
 
 
 def get_time_line_data(request):
-    print '2'
-    '''
-    testData = {}
-    testData['isnull'] = False
-    testData['data'] = [[{"type":1,"startTime":"2015-1-1"}], [{"none":1, "startTime":"2015-1-1"}],
-                        [{"type":2,"subType":1,"startTime":"2015-1-1"}],[{"type":2,"subType":1,"startTime":"2015-1-1"}],
-                        [{"type":3,"subType":1,"startTime":"2015-1-1"}],[{"type":2,"subType":2,"startTime":"2015-1-1"}],
-                        [{"type":2,"subType":3,"startTime":"2015-1-1"},{"type":2,"subType":3,"startTime":"2015-1-1"}]]
-    #return HttpResponse(json.dumps(testData))
-    '''
     openid = request.GET.get("openid")
-    if not RingUser.objects.filter(user_id=openid).exists():
-        print '0'
-        return HttpResponse("no user")
-
     data = {}
-    data['isnull'] = False
-    print 1
-    data['data'] = save_time_line(RingUser.objects.filter(user_id=openid)[0])
-    print data
+    if not RingUser.objects.filter(user_id=openid).exists():
+        data['isnull'] = True
+    else:
+        save_time_line(RingUser.objects.filter(user_id=openid)[0])
+        data['isnull'] = False
+        data['data'] = []
+        data['data'].append(get_today_time_line(RingUser.objects.filter(user_id=openid)[0]))
+        i = 1
+        while(True):
+            if i == 7:
+                break
+            if ActivityRecord.objects.filter(user_name=openid, day_num = i).exists():
+                data['data'].append(ActivityRecord.objects.filter(user_name=openid, day_num=i))[0]
+                i += 1
+            else:
+                break
+        data['data'] = save_time_line(RingUser.objects.filter(user_id=openid)[0])
+        print data
     return HttpResponse(json.dumps(data))
+
+
+
 
 
 def cancel_follow(request, message):
