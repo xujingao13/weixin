@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^data/getsportsdata', 'web_data.views.get_sportsdata'),
     url(r'^data/getTimeLineData', 'web_data.views.get_time_line_data'),
     url(r'^data/endgame', 'web_data.views.end_game'),
-    url(r'^data/start', 'web_data.views.start_game'),
+    url(r'^data/startgame', 'web_data.views.start_game'),
     url(r'^data/addfollow/(.*)', 'web_data.views.add_follow'),
     url(r'^data/cancelfollow/(.*)', 'web_data.views.cancel_follow')
 ]
