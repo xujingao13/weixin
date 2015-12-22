@@ -62,7 +62,14 @@ def register(request):
             score_today=0,
             score_total=0
         )
+        user_jump = JumpUser(
+            openid=user_openid,
+            steps_used=0,
+            score_today=0,
+            score_total=0
+        )
         user_bird.save()
+        user_jump.save()
     return HttpResponse("add info successfully")
 
 
@@ -140,10 +147,17 @@ def start_game(request):
         return HttpResponse(json.dumps({"result": "nouser"}))
     user = users[0]
     game = request.GET.get("game")
-    print 1.1
+
     if game == "bird":
         print 1
         gameuser = BirdUser.objects.get(openid=openid)
+        user.steps_totalused += 1000
+        gameuser.steps_used += 1000
+        user.save()
+        gameuser.save()
+    elif game == "jump":
+        print 2
+        gameuser = JumpUser.objects.get(openid=openid)
         user.steps_totalused += 1000
         gameuser.steps_used += 1000
         user.save()
@@ -157,6 +171,14 @@ def end_game(request):
     score = request.GET.get("score")
     if game == "bird":
         gameusers = BirdUser.objects.filter(openid=openid)
+        if len(gameusers) == 0:
+            return HttpResponse("no user")
+        gameuser = gameusers[0]
+        gameuser.score_today += int(score)
+        gameuser.score_total += int(score)
+        gameuser.save()
+    elif game == "jump":
+        gameusers = JumpUser.objects.filter(openid=openid)
         if len(gameusers) == 0:
             return HttpResponse("no user")
         gameuser = gameusers[0]
@@ -232,7 +254,35 @@ def get_sportsdata(request):
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
     data = access_exercising(openid)
+    data['isnull'] = False
     return HttpResponse(json.dumps(data))
+
+
+def get_time_line_data(request):
+    openid = request.GET.get("openid")
+    data = {}
+    if not RingUser.objects.filter(user_id=openid).exists():
+        data['isnull'] = True
+    else:
+        save_time_line(RingUser.objects.filter(user_id=openid)[0])
+        data['isnull'] = False
+        data['data'] = []
+        data['data'].append(get_today_time_line(RingUser.objects.filter(user_id=openid)[0]))
+        i = 1
+        while(True):
+            if i == 7:
+                break
+            if ActivityRecord.objects.filter(user_name=openid, day_num = i).exists():
+                data['data'].append(ActivityRecord.objects.filter(user_name=openid, day_num=i))[0]
+                i += 1
+            else:
+                break
+        data['data'] = save_time_line(RingUser.objects.filter(user_id=openid)[0])
+        print data
+    return HttpResponse(json.dumps(data))
+
+
+
 
 
 def cancel_follow(request, message):

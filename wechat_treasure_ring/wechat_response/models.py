@@ -31,6 +31,7 @@ class Record(models.Model):
     wakeTimes = models.IntegerField()
     score = models.FloatField()
 
+
 class RecordByDay(models.Model):
     user_name = models.CharField(max_length=30)
     year = models.IntegerField()
@@ -42,6 +43,7 @@ class RecordByDay(models.Model):
     steps = models.IntegerField()
     distance = models.IntegerField()
     score = models.FloatField()
+
 
 class ActivityRecord(models.Model):
     user_name = models.CharField(max_length=30)
@@ -55,6 +57,12 @@ class BirdUser(models.Model):
     score_today = models.IntegerField()
     score_total = models.IntegerField()
 
+
+class JumpUser(models.Model):
+    openid = models.CharField(max_length=30)
+    steps_used = models.IntegerField()
+    score_today = models.IntegerField()
+    score_total = models.IntegerField()
 
 
 class RecordAttention(models.Model):
