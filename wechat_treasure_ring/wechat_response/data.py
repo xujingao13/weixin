@@ -50,7 +50,6 @@ def get_raw_and_process_data(type_list, start_time, end_time, user=0, type="", s
             param["subType"] = subType
     get_url(param, 'http://wrist.ssast2015.com/bongdata')
     req = urllib.urlopen(url=get_url(param, 'http://wrist.ssast2015.com/bongdata'))
-    print req.url
     data = json.loads(req.read())
     return_data = dict()
     for type_name in type_list:
@@ -395,7 +394,7 @@ def save_time_line(user):
     last_time = time.localtime(last_time)
     start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
     end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
-    data = get_data(["user", 'startTime', 'endTime', 'type', 'distance', 'calories', 'steps', 'subType', 'actTime', 'nonActTime', 'dsNum', 'lsNum', 'wakeNum', 'wakeTimes', 'score'], start_time, end_time,  user.id, raw=True)
+    data = get_data(["user", 'startTime', 'endTime', 'type', 'subType'], start_time, end_time,  user.id, raw=True)
     last_time = time.mktime(last_time)
     last_time += 3 * 86400
     last_time = time.localtime(last_time)
@@ -408,22 +407,44 @@ def save_time_line(user):
         i += 1
         temp_local_time = transfer_time(data[i]["endTime"])
     new_data = split_condition(data[i:], today, month, year)
-    for val in new_data:
-        the_last_time = val[-1]["endTime"].split(" ")[1].split(":")
+    length = len(new_data)
+    for i in range(length-1):
+        the_last_time = new_data[i][-1]["endTime"].split(" ")[1].split(":")
         last_all_time = (24 - int(the_last_time[0])) * 3600 - int(the_last_time[1]) * 60 - int(the_last_time[2])
-        val.append({"type":val[-1]["type"], "subType":val[-1]["subType"], "startTime":val[-1]["endTime"], "endTime":((val[-1]["endTime"].split(" "))[0] + " 24:00:00"), "allTime":last_all_time, "distance":int(val[-1]["distance"] * last_all_time / val[-1]["allTime"]), "calories":int(val[-1]["calories"] * last_all_time / val[-1]["allTime"]), "sleepNum":int(val[-1]["sleepNum"] * last_all_time / val[-1]["allTime"]), "dsNum":int(val[-1]["dsNum"] * last_all_time / val[-1]["allTime"]), "steps":int(val[-1]["steps"] * last_all_time / val[-1]["allTime"]), "score":val[-1]["score"]})
-    check_and_update(new_data)
-    return_data = json.dumps(new_data)
+        new_data[i].append({"type":new_data[i+1][-1]["type"], "subType":new_data[i+1][-1]["subType"], "startTime":new_data[i][-1]["endTime"], "endTime":((new_data[i][-1]["endTime"].split(" "))[0] + " 24:00:00"), "allTime":last_all_time})
+    check_and_update(new_data, 30)
+    length = len(new_data)
+    new_data.pop()
     if ActivityRecord.objects.filter(user_name=user.user_id).exists():
         user_temp = ActivityRecord.objects.filter(user_name=user.user_id)[0]
-        print user_temp.data
-        user_temp.data = return_data
-        user_temp.save()
+        for i in range(length):
+            user_temp.day_num = i + 1
+            user_temp.data =json.dumps(new_data[i])
+            user_temp.save()
     else:
-        user_temp = ActivityRecord(user_name=user.user_id, data=return_data)
-        user_temp.save()
-    return return_data
+        for i in range(length):
+            user_temp = ActivityRecord(user_name=user.user_id, day_num=(i+1), data=json.dumps(new_data[i]))
+            user_temp.save()
 
+def get_today_time_line(user):
+    now_time = time.localtime()
+    last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
+    last_time -= 86400 * 3
+    last_time = time.localtime(last_time)
+    start_time = process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday) + " " + process_num(last_time.tm_hour) + ":" + process_num(last_time.tm_min) + ":" + process_num(last_time.tm_sec)
+    end_time = process_num(now_time.tm_year) + "-" + process_num(now_time.tm_mon) + "-" + process_num(now_time.tm_mday) + " " + process_num(now_time.tm_hour) + ":" + process_num(now_time.tm_min) + ":" + process_num(now_time.tm_sec)
+    data = get_data(["user", 'startTime', 'endTime', 'type', 'subType'], start_time, end_time,  user.id, raw=True)
+    today = last_time.tm_mday
+    month = last_time.tm_mon
+    year = last_time.tm_year
+    temp_local_time = transfer_time(data[0]["endTime"])
+    i = 0
+    while (temp_local_time[0] < year) or (temp_local_time[0] == year and temp_local_time[1] < month) or (temp_local_time[0] == year and temp_local_time[1] == month and temp_local_time[2] < today):
+        i += 1
+        temp_local_time = transfer_time(data[i]["endTime"])
+    new_data = split_condition(data[i:], today, month, year)
+    check_and_update(new_data, 1)
+    return new_data.pop()
     
 # 获取并存储按天算的运动数据,每天00:01:00更新
 def save_exercise_data(user):
@@ -485,21 +506,33 @@ def save_exercise_data(user):
 
 
 # 检查用户是否在某一天没有活动
-def check_and_update(new_data):
+def check_and_update(new_data, day_number):
     now_time = time.localtime()
     last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
-    last_time -= 86400 * 30
-    for val in new_data:
-        time_str_ = val[0]["endTime"].split(" ")[0].split("-")
+    last_time -= 86400 * day_number
+    i = 0
+    j = 0
+    while i < (day_number + 1):
+        time_str_ = new_data[j][0]["endTime"].split(" ")[0].split("-")
         time_now = time.mktime(time.struct_time([int(time_str_[0]), int(time_str_[1]), int(time_str_[2]), 0, 0, 0, 0, 0, 0]))
         if time_now > last_time:
             last_time = time.localtime(last_time)
-            new_data.insert(0, [{"startTime":process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday), "None":1}])
+            new_data.insert(j, [{"startTime":process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday), "none":1}])
+            j += 1
+            i += 1
             last_time = time.mktime(last_time)
             last_time += 24 * 3600
-        elif last_time >= time_now:
+        elif last_time == time_now:
+            length = len(new_data[j])
+            for k in range(length):
+                if "none" in new_data[j][k]:
+                    break
+                new_data[j][k] = {"startTime":new_data[j][k]["startTime"], "endTime":new_data[j][k]["endTime"], "type":new_data[j][k]["type"], "subType":new_data[j][k]["subType"]}
+            j += 1
+            i += 1
             last_time += 24 * 3600
-            continue
+        else:
+            new_data.pop(j)
 
 
 # 获取运动数据
@@ -542,11 +575,6 @@ def split_condition(data, today, month, year):
             rate = float(time_first - time_00) / new_data[0]["allTime"]
             new_data[0]["allTime"] -= (time_first - time_00)
             new_data[0]["startTime"] = (str(year) + "-" + str(month) + "-" + str(today) + " " + "00:00:00").encode("utf-8")
-            new_data[0]["distance"] = int(new_data[0]["distance"] * rate)
-            new_data[0]["steps"] = int(new_data[0]["steps"] * rate)
-            new_data[0]["calories"] = int(new_data[0]["calories"] * rate)
-            new_data[0]["dsNum"] = int(new_data[0]["dsNum"] * rate)
-            new_data[0]["sleepNum"] = int(new_data[0]["sleepNum"] * rate)
             all_data.append(new_data)
             temp_time = time.mktime(time.struct_time([year, month, today, 0, 0, 0, 0, 0, 0]))
             temp_time += 86400
@@ -562,7 +590,6 @@ def split_condition(data, today, month, year):
             today = temp_time.tm_mday
             month = temp_time.tm_mon
             year = temp_time.tm_year 
-            all_data.append({"none": 1})
     return all_data
     
 
