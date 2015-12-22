@@ -409,18 +409,18 @@ def save_time_line(user):
         last_all_time = (24 - int(the_last_time[0])) * 3600 - int(the_last_time[1]) * 60 - int(the_last_time[2])
         new_data[i].append({"type":new_data[i+1][-1]["type"], "subType":new_data[i+1][-1]["subType"], "startTime":new_data[i][-1]["endTime"], "endTime":((new_data[i][-1]["endTime"].split(" "))[0] + " 24:00:00"), "allTime":last_all_time})
     check_and_update(new_data, 30)
-    length = len(new_data)
     new_data.pop()
+    length = len(new_data)
     if ActivityRecord.objects.filter(user_name=user.user_id).exists():
-        user_temp = ActivityRecord.objects.filter(user_name=user.user_id)[0]
         for i in range(length):
-            user_temp.day_num = i + 1
-            user_temp.data =json.dumps(new_data[i])
-            user_temp.save()
-    else:
-        for i in range(length):
-            user_temp = ActivityRecord(user_name=user.user_id, day_num=(i+1), data=json.dumps(new_data[i]))
-            user_temp.save()
+            user_temp = ActivityRecord.objects.filter(user_name=user.user_id, day_num=(i+1))
+            if user_temp:
+                user_temp[0].day_num = i + 1
+                user_temp[0].data =json.dumps(new_data[i])
+                user_temp[0].save()
+            else:
+                user_temp = ActivityRecord(user_name=user.user_id, day_num=(i+1), data=json.dumps(new_data[i]))
+                user_temp.save()
 
 def get_today_time_line(user):
     now_time = time.localtime()
@@ -509,6 +509,8 @@ def check_and_update(new_data, day_number):
     i = 0
     j = 0
     while i < (day_number + 1):
+        if j >= len(new_data):
+            break
         time_str_ = new_data[j][0]["endTime"].split(" ")[0].split("-")
         time_now = time.mktime(time.struct_time([int(time_str_[0]), int(time_str_[1]), int(time_str_[2]), 0, 0, 0, 0, 0, 0]))
         if time_now > last_time:
@@ -529,6 +531,12 @@ def check_and_update(new_data, day_number):
             last_time += 24 * 3600
         else:
             new_data.pop(j)
+    while i < (day_number + 1):
+        last_time = time.localtime(last_time)
+        new_data.append([{"startTime":process_num(last_time.tm_year) + "-" + process_num(last_time.tm_mon) + "-" + process_num(last_time.tm_mday), "none":1}])
+        i += 1
+        last_time = time.mktime(last_time)
+        last_time += 24 * 3600
 
 
 # 获取运动数据

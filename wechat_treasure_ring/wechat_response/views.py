@@ -35,6 +35,21 @@ def weixin(request):
         signature = request.GET.get('signature')
         timestamp = request.GET.get('timestamp')
         nonce = request.GET.get('nonce')
+        sleep = int(request.GET.get('sleep'))
+        exercise_and_time = int(request.GET.get('exercise_and_time'))
+        if sleep == 1:
+            step_user = RingUser.objects.all()
+            for user in step_user:
+                save_sleep_data(user)
+        elif exercise_and_time == 1:
+            step_user = RingUser.objects.all()
+            for user in step_user:
+                save_exercise_data(user)
+                save_time_line(user)
+            data_objects = ActivityRecord.objects.filter(user_name=step_user[0].user_id, day_num=1)[0]
+            print data_objects.data
+
+
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
@@ -57,27 +72,6 @@ def weixin(request):
             return HttpResponse(response)
         if isinstance(message, EventMessage):
             if message.type == 'click':
-                if message.key == 'REGISTER':
-                    user_temp = RingUser(
-                        user_id = message.source,
-                        nickname = "models.CharField",
-                        headimgurl = "models.CharField",
-                        sex = "male",
-                        age = 18,
-                        height = 180,
-                        weight = 50,
-                        target = 20,
-                        last_record = 12213213,
-                        steps_totalused = 30)
-                    user_temp.save()
-                user_temp = RingUser.objects.filter(user_id=message.source)[0]
-                return HttpResponse(json.dumps(get_today_time_line(user_temp)))
-                '''user_temp = ActivityRecord.objects.filter(user_name=message.source)
-                    print user_temp
-                except Exception as e:
-                    print str(e) + "caozhangjie"
-                for i in range(30):
-                    exec("print user_temp[29].data")  '''
                 if message.key == 'STEP_COUNT':
                     step_user = RingUser.objects.filter(user_id=message.source)[0]
                     if step_user:
