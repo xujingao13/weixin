@@ -267,7 +267,11 @@ def get_time_line_data(request):
         save_time_line(RingUser.objects.filter(user_id=openid)[0])
         data['isnull'] = False
         data['data'] = []
-        data['data'].append(get_today_time_line(RingUser.objects.filter(user_id=openid)[0]))
+        try:
+            data['data'].append(get_today_time_line(RingUser.objects.filter(user_id=openid)[0]))
+        except:
+            data['isnull'] = True
+            return HttpResponse(json.dumps(data))
         i = 1
         while(True):
             if i == 7:

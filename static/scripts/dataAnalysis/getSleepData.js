@@ -105,3 +105,45 @@ function setSleepDeepRate(idString, data){
 	}
 	$("#" + idString).text(result);
 }
+
+//set the advise
+function setExpertiseAdvise(stark_sleep, avg_compare, sleep_time, anxious, regular){
+	var sleep_time_string = [
+		"您最近7天睡眠时间总体过多",
+		"您最近7天睡眠时间总体过少",
+		"您最近7天睡眠时间总体正常"
+	];
+	var stark_sleep_string = [
+		"每天睡眠时间刚好合适",
+		"其中一两天睡太久",
+		"其中一两天睡太少",
+	];
+	if(avg_compare != 1 && avg_compare != 2){
+		avg_compare = 3;
+	}
+	var avg_compare_string = [
+		"和过去30天相比，您的睡眠时间明显变少，注意休息",
+		"和过去30天相比，您的睡眠时间明显增多，不可太懒哟",
+		"和过去30天相比，您的睡眠时间没有明显变化",
+	];
+	var anxious_string = [
+		"最近7天您一直处于焦虑状态，建议您放松心情，不要给自己太大的压力",
+		"最近1个月您一直处于焦虑状态，建议您去学校的心理咨询中心释放一下情绪",
+		" 最近7天您的睡眠情况良好",
+	];
+	if(regular != 0){
+		regular = 1;
+	}
+	var regular_string = [
+		"最近7天您睡眠不规律，请及时调整。养成良好的作息习惯，学习工作才会事半功倍",
+		"最近7天您睡眠规律，请继续按时作息",
+		
+	];
+	$("#expertise-advise").text(
+		sleep_time_string[sleep_time - 1] + ',' + 
+		stark_sleep_string[stark_sleep] + ',' + 
+		avg_compare_string[avg_compare - 1] + ',' +
+		anxious_string[anxious - 1] + ',' + 
+		regular_string[regular] + '。'
+		);
+}
