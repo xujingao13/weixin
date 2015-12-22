@@ -50,6 +50,7 @@ function addDays(days){
         }
     }
     else if(days == 0){
+        data = {};
         data["imgString"] = "";
         data["dataString"] = "There's no data in our database.";
         addOneElement(data, 0);

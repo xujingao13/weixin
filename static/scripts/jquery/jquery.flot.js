@@ -1,4 +1,3 @@
-<<<<<<< HEAD:mysite/static/chart/js/jquery.flot.js
 /* Javascript plotting library for jQuery, version 0.8.3.
 
 Copyright (c) 2007-2014 IOLA and Ole Laursen.
@@ -3167,7 +3166,6 @@ Licensed under the MIT license.
     }
 
 })(jQuery);
-=======
 /*! Javascript plotting library for jQuery, v. 0.7.
  *
  * Released under the MIT license by IOLA, December 2007.
@@ -5767,4 +5765,3 @@ Licensed under the MIT license.
     }
     
 })(jQuery);
->>>>>>> rest_framework:wechat_treasure_ring/static/scripts/jquery/jquery.flot.js
