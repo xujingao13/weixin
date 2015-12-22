@@ -87,7 +87,7 @@ def weixin(request):
                             'title': u'Let us play Flappy Bird together',
                             'description': 'a simple but interesting game',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fbird.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fflyingdog.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'CHART':
