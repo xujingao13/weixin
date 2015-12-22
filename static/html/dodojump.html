@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
         <script src="jquery.min.js"></script>
         <script src="getuserinfo.js"></script>
+        <script src="user_data.js"></script>
         <script src="dodojump/prefixfree.min.js"></script>
     </head>
     <body>
@@ -20,14 +21,14 @@
             <h1>Dodo jump</h1>
             <h3>By treasure ring team</h3>
 
-            <a class="button" href="javascript:init()">Play</a>
+            <a class="button" href="javascript:start_game()">Play</a>
         </div>
 
         <div id="gameOverMenu">
             <h1>game over!</h1>
             <h3 id="go_score">you scored 0 points</h3>
 
-            <a class="button" href="javascript:reset()">Restart</a>
+            <a class="button" href="javascript:reset_game()">Restart</a>
             <a id="tweetBtn" target="_blank" class="button tweet" href="#">Tweet score</a>
 
             <a id="fbBtn" target="_blank" class="button fb" href="#">Post on FB</a>
