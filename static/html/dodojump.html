@@ -4,10 +4,12 @@
         <meta charset="utf-8">
         <title>HTML5 Doodle Jump</title>
         <link rel="stylesheet" href="dodojump/style.css">
+        <link rel="stylesheet" type="text/css" href="semantic/semantic.css">
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
         <script src="jquery.min.js"></script>
         <script src="getuserinfo.js"></script>
         <script src="user_data.js"></script>
+        <script src="semantic/semantic.min.js"></script>
         <script src="dodojump/prefixfree.min.js"></script>
     </head>
     <body>
@@ -28,10 +30,15 @@
             <h1>game over!</h1>
             <h3 id="go_score">you scored 0 points</h3>
 
-            <a class="button" href="javascript:reset_game()">Restart</a>
-            <a id="tweetBtn" target="_blank" class="button tweet" href="#">Tweet score</a>
+            <div id="list_title"  class="ui three item stackable tabs menu">
+                <a id="todaybird" class="item" onclick="get_todayRank();">今日排行</a>
+                <a id="allbird" class="item" onclick="get_allRank();">总体排行</a>
+            </div>
+            <div id="list_content"  class="ui inverted segment" style="background-color: #1E90FF">
+                <div id="rank_content" class="ui big inverted animated relaxed divided list"></div>
+            </div>
 
-            <a id="fbBtn" target="_blank" class="button fb" href="#">Post on FB</a>
+            <a class="button" href="javascript:reset_game()">Restart</a>
         </div>
 
         <img id="sprite" src="dodojump/sprite.png"/>
@@ -46,6 +53,6 @@
             <p style="font-size:xx-small;text-align: center">CopyRight &copy; 2015 珍环传</p>
             <p style="font-size:xx-small;text-align: center">All Rights Reserved</p>
         </div> <!-- /container -->
-        <script src="dodojump/main.js?rewrerewrerews"></script>
+        <script src="dodojump/main.js?rewrrews"></script>
     </body>
 </html>

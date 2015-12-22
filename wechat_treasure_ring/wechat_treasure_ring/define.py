@@ -80,4 +80,5 @@ def create_menu():
     print request.read()
 
 if __name__=='__main__':
+    print LOCAL_IP
     create_menu()

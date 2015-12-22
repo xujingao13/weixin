@@ -473,7 +473,6 @@ function init() {
     }
 
     function gameOver() {
-        $.getJSON("data/endgame?game=jump&openid="+openid+'&score='+score);
         platforms.forEach(function(p, i) {
             p.y -= 12;
         });
@@ -487,13 +486,6 @@ function init() {
             showGoMenu();
             hideScore();
             player.isDead = "lol";
-
-            var tweet = document.getElementById("tweetBtn");
-            tweet.href='http://twitter.com/share?url=http://is.gd/PnFFzu&text=I just scored ' +score+ ' points in the HTML5 Doodle Jump game!&count=horiztonal&via=cssdeck&related=solitarydesigns';
-
-            var facebook = document.getElementById("fbBtn");
-            facebook.href='http://facebook.com/sharer.php?s=100&p[url]=http://cssdeck.com/labs/html5-doodle-jump/8&p[title]=I just scored ' +score+ ' points in the HTML5 Doodle Jump game!&p[summary]=Can you beat me in this awesome recreation of Doodle Jump created in HTML5?';
-
         }
     }
 
@@ -529,21 +521,6 @@ function reset() {
     hideGoMenu();
     showScore();
     player.isDead = false;
-
-    $.getJSON("data/startgame?game=jump&openid="+openid, function(data){
-        $.getJSON("data/stepsinfo?openid="+openid, function(data){
-            lives = Math.floor(data.left/1000);
-            live_text = '';
-            for (i = 0; i < lives; i++) {
-                live_text += "❤";
-            }
-            if(lives <= 0) {
-                alert('已经没有机会了哦~多走几步再回来吧');
-                return;
-            }
-        });
-    });
-
     flag = 0;
     position = 0;
     score = 0;
@@ -572,6 +549,7 @@ function showGoMenu() {
     menu.style.visibility = "visible";
 
     var scoreText = document.getElementById("go_score");
+    $.getJSON("data/endgame?game=jump&openid="+openid+'&score='+score);
     scoreText.innerHTML = "You scored " + score + " points!";
 }
 
@@ -734,4 +712,80 @@ function reset_game(){
             reset();
         });
     });
+}
+
+function get_rank(data){
+    $('#rank_content').html("");
+    for(var i = 0; i < 4; i++){
+        var dom_template =
+            '<div class="item" style="background-color:'+data[i].user_color+'">'+
+                '<div class="ui big teal label">'+data[i].user_rank+'</div>'+
+                '<img class="ui avatar image" src='+data[i].user_photo+'>'+
+                '<div class="content">'+
+                    '<div class="header">'+data[i].user_name+'</div>'+
+                    '<div class="meta">'+
+                        '<span class="cinema">'+data[i].user_title+'</span>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="right floated content">'+
+                    '<span class="left floated content">'+data[i].user_num+'</span>'+
+                '</div>'+
+         '</div>';
+        $('#rank_content').append(dom_template);
+    }
+}
+
+function handle_data(data, data_list){
+    for(var i = 0; i < data_list.length; i++){
+        var color;
+        if(data_list[i].openid == openid){
+            color = "#00FF7F";
+        }
+        else{
+            color = "#1E90FF";
+        }
+        var data_object = {
+            user_rank: data_list[i].rank,
+            user_photo: data_list[i].headimgurl,
+            user_name: data_list[i].nickname,
+            user_num: data_list[i].score,
+            user_title: get_title(i),
+            user_color: color
+        };
+        data.push(data_object);
+    }
+}
+
+function get_todayRank() {
+   $('#todaybird').attr({'class':'item active'});
+   $('#allbird').attr({'class':'item'});
+   $.getJSON("data/ingamerank?game=jump&openid="+openid, function(data){
+      var datatoday = [];
+      handle_data(datatoday, data.today);
+      get_rank(datatoday);
+   });
+}
+
+
+function get_allRank() {
+   $('#allbird').attr({'class':'item active'});
+   $('#todaybird').attr({'class':'item'});
+   $.getJSON("data/ingamerank?game=jump&openid="+openid, function(data){
+      var datatotal = [];
+      handle_data(datatotal, data.total);
+      get_rank(datatotal);
+   });
+}
+
+
+function get_title(i){
+    if(i == 0)
+        return "王牌战鸡";
+    if(i == 1)
+        return "王牌飞鸡";
+    if(i == 2)
+        return "王牌僚鸡";
+    else{
+        return "菜鸡";
+    }
 }

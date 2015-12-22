@@ -81,6 +81,9 @@ def ingame_rank(request):
     if game == "bird":
         today_objects = BirdUser.objects.all().order_by('-score_today')
         total_objects = BirdUser.objects.all().order_by('-score_total')
+    elif game == "jump":
+        today_objects = JumpUser.objects.all().order_by('-score_today')
+        total_objects = JumpUser.objects.all().order_by('-score_total')
     today_entries = get_partial_ranklist(openid, today_objects, 'today')
     total_entries = get_partial_ranklist(openid, total_objects, 'total')
     result = {
