@@ -12,12 +12,12 @@ wechat_treasure_ring:
     - APP_ID=$APP_ID
     - APP_SECRET=$APP_SECRET
   links:
-    - db
+    - wtr_db
   volumes:
     - ./static:/usr/src/app/wechat_treasure_ring/static
   privileged: true
   restart: always
-db:
+wtr_db:
   image: mysql/mysql-server:5.7
   environment:
     - MYSQL_ROOT_PASSWORD=$WECHAT_ROOT_PASSWORD
@@ -27,8 +27,10 @@ db:
   volumes:
     - ./datadir:/var/lib/mysql
     - ./my.cnf:/etc/my.cnf
+  ports:
+    - "470005:3306"
   restart: always
-web:
+wtr_web:
   image: nginx:1.9.8
   volumes:
     - ./uwsgi_params:/etc/nginx/conf.d/uwsgi_params:ro
