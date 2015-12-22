@@ -13,7 +13,8 @@ from wechat_sdk.messages import (
     EventMessage,
     TextMessage
 )
-import urllib2
+
+import urllib
 import json
 import sys
 import wechat_response.data as data_tool
@@ -125,13 +126,13 @@ def get_userinfo(request):
     #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     try:
-        f = urllib2.urlopen(get_url)
+        f = urllib.urlopen(get_url)
         string_json = f.read()
         reply = json.loads(string_json)
         openid = reply['openid']
         access_token = reply['access_token']
         get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
-        f = urllib2.urlopen(get_url)
+        f = urllib.urlopen(get_url)
         string_json = f.read()
         reply = json.loads(string_json)
         result = {

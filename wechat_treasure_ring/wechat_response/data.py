@@ -2,13 +2,11 @@
 
 # for sleeping assess
 import urllib
-
-#for sleeping assess
 import json
 import time
 import numpy as np
-import random as ran
 from wechat_response.models import *
+
 
 def get_url(parameter, base_addr):
     if not parameter:
@@ -19,9 +17,8 @@ def get_url(parameter, base_addr):
     base_addr = base_addr.strip("&")
     return base_addr
 
+
 def get_data(type_list, start_time, end_time, user=0, type="", subType="", raw=False):
-    #start_time = "2015-11-10 00:10:05"
-    #end_time = "2015-12-10 20:08:05"
     param = {'startTime':start_time, 'endTime':end_time, 'user': user}
     if type:
         param["type"] = type
@@ -40,9 +37,8 @@ def get_data(type_list, start_time, end_time, user=0, type="", subType="", raw=F
             return_data[type_name].append(val[type_name])
     return return_data
 
+
 def get_raw_and_process_data(type_list, start_time, end_time, user=0, type="", subType="", raw=False):
-    #start_time = "2015-11-10 00:10:05"
-    #end_time = "2015-12-10 20:08:05"
     param = {'startTime':start_time, 'endTime':end_time, 'user': user}
     if type:
         param["type"] = type
@@ -58,30 +54,6 @@ def get_raw_and_process_data(type_list, start_time, end_time, user=0, type="", s
         for type_name in type_list:
             return_data[type_name].append(val[type_name])
     return [data, return_data]
-
-
-#数据由三层结构构成
-# type_list["distance", "score", "wakeNum", "dsNum", "calories", "subType", "nonActTime", "wakeTimes", "steps", "startTime", "actTime", "lsNum", "endTime", "type"]
-'''startTime   该区块的开始时间，例如，用户早起跑步的跑步区块从 8:31 开始。
-endTime 该区块的结束时间，例如这个用户跑了 20 分钟，那么区块结束时间是 8:51 分。通过块的划分，可以使用户和开发者均能方便对一天的活动状态做出归纳。
-type    该区块的类型，用这个来区分bong和非bong状态。如果这个区段是bong态，则返回值是「2」，如果是比较平静的非bong态，则返回值是「3」。
-distance    用户在该区段间走过的距离，单位是米。
-speed   用户在该区段的平均运动速度，单位是千米每小时。
-calories    用户在这段时间内消耗了多少热量，单位是千焦耳。
-steps   该区段的步数，单位是步。
-subType 该区段的子运动类型，bong态（当上文中提到的 type 为「2」时）下有4个子类型，具体描述见下，非bong态（type 为「3」时）下有2个子类型，具体描述见下。
-actTime 该区段用户的活动时间，单位是秒。
-nonActTime  该区段用户的非运动时间，单位是秒。
-dsNum   深睡眠时长，单位：分钟
-lsNum   浅睡眠时长，单位：分钟
-wakeNum 清醒时长，单位：分钟
-wakeTimes   清醒次数，单位：次
-score   睡眠质量评分'''
-# type=1(睡眠),type=2(bong),type=3(非bong)
-# subType 1: 1 深睡眠 深度睡眠 2 浅睡眠 浅度睡眠 3 清醒 一次睡眠中的清醒状态
-# subType 2: 1 热身运动 和字面意思相同，运动强度最轻的一类运动。2 健走 强度稍高。3 运动 球类等运动。4 跑步 有氧跑步运动。5 游泳 游泳等水中运动。6 自行车 骑车等。
-# subType 3: 1 静坐  例如坐在椅子上办公。2 散步 速度相当于走路。3 交通工具 开车、乘公交等快速交通工具。4 活动 例如在办公室短时间走动
-# print(get_data(["wakeNum"], "2015-11-05 10:05:06", "2015-11-05 10:06:06", "1","3"))
 
 
 # get "num" days list
@@ -112,7 +84,6 @@ def get_user_information(user_id):
     else:
         user = None
     return user
-
 
 
 # 把数据按天求和,第三个参数表示天数
@@ -426,6 +397,7 @@ def save_time_line(user):
                 user_temp = ActivityRecord(user_name=user.user_id, day_num=(i+1), data=json.dumps(new_data[i]))
                 user_temp.save()
 
+
 def get_today_time_line(user):
     now_time = time.localtime()
     last_time = time.mktime(time.struct_time([now_time.tm_year, now_time.tm_mon, now_time.tm_mday, 0, 0, 0, 0, 0, 0]))
@@ -445,7 +417,8 @@ def get_today_time_line(user):
     new_data = split_condition(data[i:], today, month, year)
     check_and_update(new_data, 1)
     return new_data.pop()
-    
+
+
 # 获取并存储按天算的运动数据,每天00:01:00更新
 def save_exercise_data(user):
     now_time = time.localtime()
@@ -601,7 +574,6 @@ def split_condition(data, today, month, year):
     return all_data
     
 
-
 # update the data of the particular user defined by parameter user
 def get_save(user):
     last_time = time.localtime(user.last_record)
@@ -653,17 +625,6 @@ def process_time_data(time_list):
 
 
 def access_sleeping(user_id):
-    '''now_time = time.localtime()
-    seconds = time.time()
-    if now_time[3] < 12:
-        modified_time = seconds + (12 - now_time[3]) * 3600 - (now_time[4] * 60) - now_time[5]
-        now_time = time.localtime(modified_time)
-        yesterday_time = time.localtime(modified_time - 24 * 3600)
-        data = get_data(["dsNum", "lsNum"], str(yesterday_time[0])+"-"+str(yesterday_time[1])+"-"+str(yesterday_time[2])+" "+"12:00:00", str(now_time[0])+"-"+str(now_time[1])+"-"+str(now_time[2])+" "+"12:00:00", "1")
-
-    else:
-        modified_time = seconds - ((now_time[3] - 12) * 3600 + (now_time[4] * 60) + now_time[5])'''
-
 # get user information
     information = get_user_information(user_id)
     if information:
