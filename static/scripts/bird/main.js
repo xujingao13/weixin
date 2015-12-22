@@ -585,7 +585,6 @@ function get_title(i){
 }
 
 function update_lives() {
-   //openid = 'oFX57wR4_d3ZHsJnaTGdyyIPsO9M';
    $.getJSON("data/stepsinfo?openid="+openid, function(data){
       lives = Math.floor(data.left/1000);
       text = '';
