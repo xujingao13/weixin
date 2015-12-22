@@ -1,110 +1,109 @@
 // RequestAnimFrame: a browser API for getting smooth animations
 window.requestAnimFrame = (function() {
-  return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
-  function(callback) {
-    window.setTimeout(callback, 1000 / 60);
-  };
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+    function(callback) {
+        window.setTimeout(callback, 1000 / 60);
+    };
 })();
 
 if ('requestWakeLock' in navigator) {
-  var wakelock = navigator.requestWakeLock('screen');
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-      wakelock.unlock();
-    }
-    else {
-      wakelock = navigator.requestWakeLock('screen');
-    }
-  });
+    var wakelock = navigator.requestWakeLock('screen');
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            wakelock.unlock();
+        }
+        else {
+            wakelock = navigator.requestWakeLock('screen');
+        }
+    });
 }
-
+var lives = 0;
+var live_text;
 var canvas = document.getElementById('canvas'),
-  ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d');
 
 var width = window.innerWidth,
-  height = window.innerHeight;
+    height = window.innerHeight;
 
 canvas.width = width;
 canvas.height = height;
 
 //Variables for game
 var platforms = [],
-  image = document.getElementById("sprite"),
-  player, platformCount = 10,
-  position = 0,
-  gravity = 0.2,
-  animloop,
-  flag = 0,
-  menuloop, broken = 0,
-  dir, score = 0, firstRun = true;
+    image = document.getElementById("sprite"),
+    player, platformCount = 10,
+    position = 0,
+    gravity = 0.2,
+    animloop,
+    flag = 0,
+    menuloop, broken = 0,
+    dir, score = 0, firstRun = true;
 
 //Base object
 var Base = function() {
-  this.height = 5;
-  this.width = width;
+    this.height = 5;
+    this.width = width;
 
   //Sprite clipping
-  this.cx = 0;
-  this.cy = 614;
-  this.cwidth = 100;
-  this.cheight = 5;
+    this.cx = 0;
+    this.cy = 614;
+    this.cwidth = 100;
+    this.cheight = 5;
+    this.moved = 0;
+    this.x = 0;
+    this.y = height - this.height;
 
-  this.moved = 0;
-
-  this.x = 0;
-  this.y = height - this.height;
-
-  this.draw = function() {
-    try {
-      ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
-    } catch (e) {}
-  };
+    this.draw = function() {
+        try {
+            ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
+        } catch (e) {}
+    };
 };
 
 var base = new Base();
 
 //Player object
 var Player = function() {
-  this.vy = 11;
-  this.vx = 0;
+    this.vy = 11;
+    this.vx = 0;
 
-  this.isMovingLeft = false;
-  this.isMovingRight = false;
-  this.isDead = false;
+    this.isMovingLeft = false;
+    this.isMovingRight = false;
+    this.isDead = false;
 
-  this.width = 55;
-  this.height = 40;
+    this.width = 55;
+    this.height = 40;
 
-  //Sprite clipping
-  this.cx = 0;
-  this.cy = 0;
-  this.cwidth = 110;
-  this.cheight = 80;
+    //Sprite clipping
+    this.cx = 0;
+    this.cy = 0;
+    this.cwidth = 110;
+    this.cheight = 80;
 
-  this.dir = "left";
+    this.dir = "left";
 
-  this.x = width / 2 - this.width / 2;
-  this.y = height;
+    this.x = width / 2 - this.width / 2;
+    this.y = height;
 
-  //Function to draw it
-  this.draw = function() {
-    try {
-      if (this.dir == "right") this.cy = 121;
-      else if (this.dir == "left") this.cy = 201;
-      else if (this.dir == "right_land") this.cy = 289;
-      else if (this.dir == "left_land") this.cy = 371;
+    //Function to draw it
+    this.draw = function() {
+        try {
+            if (this.dir == "right") this.cy = 121;
+            else if (this.dir == "left") this.cy = 201;
+            else if (this.dir == "right_land") this.cy = 289;
+            else if (this.dir == "left_land") this.cy = 371;
 
-      ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
-    } catch (e) {}
-  };
+            ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
+        } catch (e) {}
+    };
 
-  this.jump = function() {
-    this.vy = -8;
-  };
+    this.jump = function() {
+        this.vy = -8;
+    };
 
-  this.jumpHigh = function() {
-    this.vy = -16;
-  };
+    this.jumpHigh = function() {
+        this.vy = -16;
+    };
 
 };
 
@@ -113,37 +112,36 @@ player = new Player();
 //Platform class
 
 function Platform() {
-  this.width = 70;
-  this.height = 17;
+    this.width = 70;
+    this.height = 17;
 
-  this.x = Math.random() * (width - this.width);
-  this.y = position;
+    this.x = Math.random() * (width - this.width);
+    this.y = position;
 
-  position += (height / platformCount);
+    position += (height / platformCount);
 
-  this.flag = 0;
-  this.state = 0;
+    this.flag = 0;
+    this.state = 0;
 
-  //Sprite clipping
-  this.cx = 0;
-  this.cy = 0;
-  this.cwidth = 105;
-  this.cheight = 31;
+    //Sprite clipping
+    this.cx = 0;
+    this.cy = 0;
+    this.cwidth = 105;
+    this.cheight = 31;
 
   //Function to draw it
-  this.draw = function() {
-    try {
+    this.draw = function() {
+        try {
+            if (this.type == 1) this.cy = 0;
+            else if (this.type == 2) this.cy = 61;
+            else if (this.type == 3 && this.flag === 0) this.cy = 31;
+            else if (this.type == 3 && this.flag == 1) this.cy = 1000;
+            else if (this.type == 4 && this.state === 0) this.cy = 90;
+            else if (this.type == 4 && this.state == 1) this.cy = 1000;
 
-      if (this.type == 1) this.cy = 0;
-      else if (this.type == 2) this.cy = 61;
-      else if (this.type == 3 && this.flag === 0) this.cy = 31;
-      else if (this.type == 3 && this.flag == 1) this.cy = 1000;
-      else if (this.type == 4 && this.state === 0) this.cy = 90;
-      else if (this.type == 4 && this.state == 1) this.cy = 1000;
-
-      ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
-    } catch (e) {}
-  };
+            ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
+        } catch (e) {}
+    };
 
   //Platform types
   //1: Normal
@@ -151,63 +149,64 @@ function Platform() {
   //3: Breakable (Go through)
   //4: Vanishable
   //Setting the probability of which type of platforms should be shown at what score
-  if (score >= 5000) this.types = [2, 3, 3, 3, 4, 4, 4, 4];
-  else if (score >= 2000 && score < 5000) this.types = [2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4];
-  else if (score >= 1000 && score < 2000) this.types = [2, 2, 2, 3, 3, 3, 3, 3];
-  else if (score >= 500 && score < 1000) this.types = [1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3];
-  else if (score >= 100 && score < 500) this.types = [1, 1, 1, 1, 2, 2];
-  else this.types = [1];
+    if (score >= 5000) this.types = [2, 3, 3, 3, 4, 4, 4, 4];
+    else if (score >= 2000 && score < 5000) this.types = [2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4];
+    else if (score >= 1000 && score < 2000) this.types = [2, 2, 2, 3, 3, 3, 3, 3];
+    else if (score >= 500 && score < 1000) this.types = [1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3];
+    else if (score >= 100 && score < 500) this.types = [1, 1, 1, 1, 2, 2];
+    else this.types = [1];
 
-  this.type = this.types[Math.floor(Math.random() * this.types.length)];
+    this.type = this.types[Math.floor(Math.random() * this.types.length)];
 
   //We can't have two consecutive breakable platforms otherwise it will be impossible to reach another platform sometimes!
-  if (this.type == 3 && broken < 1) {
-    broken++;
-  } else if (this.type == 3 && broken >= 1) {
-    this.type = 1;
-    broken = 0;
-  }
+    if (this.type == 3 && broken < 1) {
+        broken++;
+    }
+    else if (this.type == 3 && broken >= 1) {
+        this.type = 1;
+        broken = 0;
+    }
 
-  this.moved = 0;
-  this.vx = 1;
+    this.moved = 0;
+    this.vx = 1;
 }
 
 for (var i = 0; i < platformCount; i++) {
-  platforms.push(new Platform());
+    platforms.push(new Platform());
 }
 
 //Broken platform object
 var Platform_broken_substitute = function() {
-  this.height = 30;
-  this.width = 70;
+    this.height = 30;
+    this.width = 70;
 
-  this.x = 0;
-  this.y = 0;
+    this.x = 0;
+    this.y = 0;
 
   //Sprite clipping
-  this.cx = 0;
-  this.cy = 554;
-  this.cwidth = 105;
-  this.cheight = 60;
+    this.cx = 0;
+    this.cy = 554;
+    this.cwidth = 105;
+    this.cheight = 60;
 
-  this.appearance = false;
+    this.appearance = false;
 
-  this.draw = function() {
-    try {
-      if (this.appearance === true) ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
-      else return;
-    } catch (e) {}
-  };
+    this.draw = function() {
+        try {
+            if (this.appearance === true) ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
+            else return;
+        } catch (e) {}
+    };
 };
 
 var platform_broken_substitute = new Platform_broken_substitute();
 
 //Spring Class
 var spring = function() {
-  this.x = 0;
-  this.y = 0;
+    this.x = 0;
+    this.y = 0;
 
-  this.width = 26;
+    this.width = 26;
   this.height = 30;
 
   //Sprite clipping
@@ -232,6 +231,23 @@ var Spring = new spring();
 
 function init() {
   //Variables for the game
+
+  get_userinfo(function(data){
+      openid = data.openid;
+      nickname = data.nickname;
+      headimgurl = data.headimgurl;
+  });
+    alert(openid);
+
+    $.getJSON("data/stepsinfo?openid="+openid, function(data){
+      lives = Math.floor(data.left/1000);
+        lives = lives - 1;
+      live_text = '';
+      for (i = 0; i < lives; i++) {
+          live_text += "❤";
+      }
+   });
+
   var dir = "left",
     jumpCount = 0;
 
@@ -455,7 +471,7 @@ function init() {
 
   function updateScore() {
     var scoreText = document.getElementById("score");
-    scoreText.innerHTML = score;
+    scoreText.innerHTML = score + '    剩余次数'+ live_text;
   }
 
   function gameOver() {
@@ -515,6 +531,11 @@ function reset() {
   showScore();
   player.isDead = false;
 
+    lives = lives - 1;
+      live_text = '';
+      for (i = 0; i < lives; i++) {
+          live_text += "❤";
+      }
   flag = 0;
   position = 0;
   score = 0;

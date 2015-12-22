@@ -51,6 +51,13 @@ class BirdUser(models.Model):
     score_total = models.IntegerField()
 
 
+class JumpUser(models.Model):
+    openid = models.CharField(max_length=30)
+    steps_used = models.IntegerField()
+    score_today = models.IntegerField()
+    score_total = models.IntegerField()
+
+
 class ActivityRecord(models.Model):
     user_name = models.CharField(max_length=30)
     data = models.CharField(max_length=20000)
