@@ -57,6 +57,27 @@ def weixin(request):
             return HttpResponse(response)
         if isinstance(message, EventMessage):
             if message.type == 'click':
+                if message.key == 'REGISTER':
+                    user_temp = RingUser(
+                        user_id = message.source,
+                        nickname = "models.CharField",
+                        headimgurl = "models.CharField",
+                        sex = "male",
+                        age = 18,
+                        height = 180,
+                        weight = 50,
+                        target = 20,
+                        last_record = 12213213,
+                        steps_totalused = 30)
+                    user_temp.save()
+                user_temp = RingUser.objects.filter(user_id=message.source)[0]
+                return HttpResponse(json.dumps(get_today_time_line(user_temp)))
+                '''user_temp = ActivityRecord.objects.filter(user_name=message.source)
+                    print user_temp
+                except Exception as e:
+                    print str(e) + "caozhangjie"
+                for i in range(30):
+                    exec("print user_temp[29].data")  '''
                 if message.key == 'STEP_COUNT':
                     step_user = RingUser.objects.filter(user_id=message.source)[0]
                     if step_user:

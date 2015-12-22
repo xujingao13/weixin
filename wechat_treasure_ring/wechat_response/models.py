@@ -45,7 +45,9 @@ class RecordByDay(models.Model):
 
 class ActivityRecord(models.Model):
     user_name = models.CharField(max_length=30)
-    data = models.CharField(max_length=20000)
+    day_num = models.IntegerField()
+    data = models.TextField(max_length = 30000)
+
 
 class RecordAttention(models.Model):
     source_user_id = models.CharField(max_length=30)
