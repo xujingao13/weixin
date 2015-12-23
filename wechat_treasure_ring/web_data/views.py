@@ -99,12 +99,13 @@ def calculate(request):
         people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
     elif choice == "B":
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsB)
+        print rate
         people = GuessInfomation.objects.filter(sub_id=subid, choice='B')
     for val in people:
         personal_info = RingUser.objects.filter(user_id=val.user_id)
-        personal_info[0].steps_totalused -= int(rate * val.steps)
-        print personal_info[0].steps_totalused
-        personal_info[0].save()
+        singleperson = personal_info[0]
+        singleperson.steps_totalused = personal_info[0].steps_totalused - int(rate * val.steps)
+        singleperson.save()
     return HttpResponse("success")
 
 
