@@ -634,7 +634,7 @@ def access_sleeping(user_id):
 
 # set variation threshold and fft threshold
     var_threshold = 1
-    reg_threshold = 1
+    reg_threshold = 0.01
 
 # get 30-day sleeping data and 7-day sleeping data
     thirty_sleep = np.array(data["sleepNum"][-30:])
@@ -649,7 +649,14 @@ def access_sleeping(user_id):
     report["30-days-deep-sleep"] = thirty_deep_sleep
     report["30-days-avg"] = np.average(thirty_sleep)
     report["30-days-var"] = np.abs(np.var(thirty_sleep))
-    report["30-days-reg"] = np.abs(np.fft.fft(thirty_sleep)[1:]).max()
+    report["regular"] = 0
+    for i in range(1, 30):
+        report["30-days-reg"] = np.abs(np.fft.fft(thirty_sleep[0:i]))
+        report["30-days-reg"][0] /= 30
+        report["30-days-reg"][1:15] /= 15
+        report["30-days-reg"] = report["30-days-reg"][0:15]
+        if max(report["30-days-reg"]) / (np.median(report["30-days-reg"]) * 10000) > reg_threshold:
+            report["regular"] = 1
     report["30-days-deep-avg"] = np.average(thirty_deep_sleep)
     if 0 in thirty_sleep:
         for i in range(len(thirty_sleep)):
@@ -735,12 +742,6 @@ def access_sleeping(user_id):
         report["anxious"] = 2
     else:
         report["anxious"] = 0
-
-    # whether sleep regularly
-    if report["30-days-reg"] < reg_threshold:
-        report["regular"] = 0
-    else:
-        report["regular"] = 1
 
     # whether you have stark sleeping
     if report["7-days-max"] > 12:

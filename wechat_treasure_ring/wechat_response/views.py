@@ -36,21 +36,8 @@ def weixin(request):
         signature = request.GET.get('signature')
         timestamp = request.GET.get('timestamp')
         nonce = request.GET.get('nonce')
-        sleep = int(request.GET.get('sleep'))
-        exercise_and_time = int(request.GET.get('exercise_and_time'))
-        if sleep == 1:
-            step_user = RingUser.objects.all()
-            for user in step_user:
-                save_sleep_data(user)
-        elif exercise_and_time == 1:
-            step_user = RingUser.objects.all()
-            for user in step_user:
-                save_exercise_data(user)
-                save_time_line(user)
-            data_objects = ActivityRecord.objects.filter(user_name=step_user[0].user_id, day_num=1)[0]
-            print data_objects.data
-
-
+        if "bet" in request.GET:
+            return get_user_bet(request)
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
@@ -76,10 +63,13 @@ def weixin(request):
                 if message.key == 'STEP_COUNT':
                     step_user = RingUser.objects.filter(user_id=message.source)[0]
                     if step_user:
-                        target = step_user.target
-                        step = get_today_step(step_user)
-                        goal_completion = int(float(step) / target * 100)
-                        response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
+                        try:
+                            target = step_user.target
+                            step = get_today_step(step_user)
+                            goal_completion = int(float(step) / target * 100)
+                            response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
+                        except Exception as e:
+                            print e
                         # 里面的数字应由其他函数获取
                         return HttpResponse(response)
                     else:
@@ -203,3 +193,25 @@ def process_text_message(msg):
         else:
             return u"没有此用户或此用户没有注册><"
 
+
+def get_user_bet(request):
+    openid = request.GET.get("openid")
+    bet_list = list()
+    if GuessInfomation.objects.filter(user_id=openid).exists():
+        data_objects = GuessInfomation.objects.filter(user_id=openid)
+        sub_list = list()
+        for val in data_objects:
+            if not (val.sub_id in sub_list):
+                sub_list.append(val.sub_id)
+        for val in sub_list:
+            activity = GuessSubject.objects.filter(id=int(val))[0]
+            datas = GuessInfomation.objects.filter(user_id=openid, id=val)
+            Astep = 0
+            Bstep = 0
+            for data in datas:
+                if data.choice == "A":
+                    Astep += data.steps
+                elif data.choice == "B":
+                    Bstep += data.steps
+            bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep})
+    return HttpResponse(json.dumps(bet_list))
