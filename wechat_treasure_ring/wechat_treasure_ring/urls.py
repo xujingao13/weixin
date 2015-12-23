@@ -38,5 +38,6 @@ urlpatterns = [
     url(r'^data/addguesssubject', 'web_data.views.add_guess_subject'),
     url(r'^data/getguesssubject', 'web_data.views.get_guess_subject'),
     url(r'^data/calculate', 'web_data.views.calculate'),
-    url(r'^data/autosave', 'web_data.views.auto_save')
+    url(r'^data/autosave', 'web_data.views.auto_save'),
+    url(r'^data/freeze', 'web_data.views.freeze_activity'),
 ]

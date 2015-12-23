@@ -1,55 +1,62 @@
 $(document).ready(function(){
-	$.getJSON('data/getguesssubject/', function(data){
-		setsubjects(data);
+	function suc(){
+		$.getJSON('data/getguesssubject/', function(data){
+			setsubjects(data);
 
-		$('.set').click(function(){
-			var subid = parseInt($(this).attr('id'));
-			steps = $('#'+subid+'input').val();
-			if (steps == 0) {
-				alert("您还没有下注哦");
-			} else {
-				var choice;
-				if ($('#'+subid+'A').attr('ifselect') == "true") {
-					choice = "A";
-				} else if ($('#'+subid+'B').attr('ifselect') == "true"){
-					choice = "B";
-				} else {
+			$('.set').click(function(){
+				var subid = parseInt($(this).attr('id'));
+				steps = $('#'+subid+'input').val();
+				if (steps == 0) {
 					alert("您还没有下注哦");
-					return;
-				}
-				$.getJSON("data/saveuserbet?openid="+openid+"&choice="+choice+"&subid="+subid+"&steps="+steps, function(data){
-					if (data.success == true){
-						var new_steps = parseInt($('#'+subid+'steps'+choice).html())+parseInt(steps);
-						$('#'+subid+'steps'+choice).html(new_steps.toString());
-						alert("下注成功");
+				} else {
+					var choice;
+					if ($('#'+subid+'A').attr('ifselect') == "true") {
+						choice = "A";
+					} else if ($('#'+subid+'B').attr('ifselect') == "true"){
+						choice = "B";
 					} else {
-						alert("下注失败,步数余额不足");
+						alert("您还没有下注哦");
+						return;
 					}
-				});
-			}
-		});
+					$.getJSON("data/saveuserbet?openid="+openid+"&choice="+choice+"&subid="+subid+"&steps="+steps, function(data){
+						if (data.success == true){
+							var new_steps = parseInt($('#'+subid+'steps'+choice).html())+parseInt(steps);
+							$('#'+subid+'steps'+choice).html(new_steps.toString());
+							alert("下注成功");
+						} else {
+							alert("下注失败,步数余额不足");
+						}
+					});
+				}
+			});
 
-		$('.choice').click(function(){
-			var subid = parseInt($(this).attr('id'));
-			var self, other;
-			if($(this).attr('ifselect') == 'false'){
-				$(this).attr('ifselect', 'true');
-				$(this).removeClass('btn-default').addClass('btn-info');
-			}
-			if (subid.toString()+'A'==$(this).attr('id')){
-				self='A';
-				other='B';
-			} else {
-				self='B';
-				other='A';
-			}
-			if($('#'+subid+other).attr('ifselect') == 'true'){
-				$('#'+subid+other).attr('ifselect', 'false');
-				$('#'+subid+other).removeClass('btn-info').addClass('btn-default')
-			}
+			$('.choice').click(function(){
+				var subid = parseInt($(this).attr('id'));
+				var self, other;
+				if($(this).attr('ifselect') == 'false'){
+					$(this).attr('ifselect', 'true');
+					$(this).removeClass('btn-default').addClass('btn-info');
+				}
+				if (subid.toString()+'A'==$(this).attr('id')){
+					self='A';
+					other='B';
+				} else {
+					self='B';
+					other='A';
+				}
+				if($('#'+subid+other).attr('ifselect') == 'true'){
+					$('#'+subid+other).attr('ifselect', 'false');
+					$('#'+subid+other).removeClass('btn-info').addClass('btn-default')
+				}
+			});
 		});
+	}
+	get_userinfo(function(data){
+		openid = data.openid;
+		nickname = data.nickname;
+		headimgurl = data.headimgurl;
+		suc();
 	});
-
 });
 
 function setsubjects(subjects){
