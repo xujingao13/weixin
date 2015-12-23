@@ -406,8 +406,6 @@ def get_time_line_data(request):
                 data['data'].append(ActivityRecord.objects.filter(user_name=openid, day_num=i))[0]
                 i += 1
             else:
-                print i
-                print 1
                 break
         print data
     return HttpResponse(json.dumps(data))
