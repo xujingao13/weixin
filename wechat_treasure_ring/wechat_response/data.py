@@ -334,10 +334,12 @@ def get_sleep_data(user):
         length = len(user_temp)
         for i in range(length):
             data["dsNum"][i] = user_temp[i].dsNum
-            data["sleepNum"][i] = user_temp[i].sleepNum
+            data["sleepNum"][i] = user_temp[i].allNum
             data["score"][i] = user_temp[i].score
-    data["date"] = get_date_list(30)
-    return data
+            data["date"] = get_date_list(30)
+            return data
+    else:
+        return None
 
 
  #  获取今天到目前为止的步数
@@ -529,8 +531,10 @@ def get_exercise_data(user):
             data["distance"][i] = user_temp[i].distance
             data["steps"][i] = user_temp[i].steps
             data["calories"][i] = user_temp[i].calories
-    data["date"] = get_date_list(30)
-    return data
+        data["date"] = get_date_list(30)
+        return data
+    else:
+        return None
 
 
 def split_condition(data, today, month, year):
@@ -630,6 +634,8 @@ def access_sleeping(user_id):
     if information:
         data = get_sleep_data(information)
     else:
+        return None
+    if not data:
         return None
 
 # set variation threshold and fft threshold
@@ -767,7 +773,8 @@ def access_exercising(user_id):
         data = get_exercise_data(information)
     else:
         return None
-
+    if not data:
+        return None
     report = dict()
 
 # get statical data

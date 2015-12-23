@@ -545,7 +545,7 @@ class test_datachart(TestCase):
 		auto_save(request1)
 		response = get_sleepdata(request2)
 		data = json.loads(response.content)
-		self.assertEqual(data["isnull"], False)
+		self.assertEqual(data["data"]["isnull"], False)
 
 	def test_getsleepdatanotexists(self):
 		request = self.factory.get('data/getsleepdata?openid=czj')
@@ -557,4 +557,4 @@ class test_datachart(TestCase):
 		request = self.factory.get('data/getsleepdata?openid=xja')
 		response = get_sleepdata(request)
 		data = json.loads(response.content)
-		self.assertEqual(data["isnull"], False)
+		self.assertEqual(data["data"]["isnull"], True)
