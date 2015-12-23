@@ -111,7 +111,7 @@ def weixin(request):
                         response = we_chat.response_news([{
                             'title': u'游戏龙虎榜',
                             'description': '龙虎榜',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/rank.png',
                             'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2frank.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     elif message.key == 'CHEER':
                         response = we_chat.response_text(u'We are family!')

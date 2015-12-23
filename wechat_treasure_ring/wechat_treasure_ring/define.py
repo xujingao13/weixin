@@ -86,6 +86,6 @@ def create_menu():
     request = urllib2.urlopen(post_url, (MENU % (USER_URL)).encode('utf-8'))
     print request.read()
 
-if __name__=='__main__':
+if __name__ == '__main__':
     print LOCAL_IP, AppID, AppSecret
     create_menu()

@@ -25,9 +25,6 @@ function renderByJson(json){
         addItem(data[j][0]["startTime"].split(" ")[0], j);
         var i = 0;
         for(; i < data[j].length; i++){
-            alert(data[j].length)
-            alert(i);
-            alert(data[j][i].type);
             addOneElement(getHTMLDict(data[j][i]), j);
             if(("none" in data[j][i])  || !("type" in data[j][i])){
                 i = data[j].length;
