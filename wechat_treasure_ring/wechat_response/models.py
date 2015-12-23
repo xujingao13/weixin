@@ -84,3 +84,5 @@ class GuessSubject(models.Model):
     choiceB = models.CharField(max_length = 100)
     stepsA = models.IntegerField()
     stepsB = models.IntegerField()
+    result = models.CharField(max_length=2)
+    disabled = models.BooleanField()
