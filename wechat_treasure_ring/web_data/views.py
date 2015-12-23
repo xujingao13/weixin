@@ -55,9 +55,9 @@ def save_user_bet(request):
         return HttpResponse(json.dumps(result))
     activity = GuessSubject.objects.filter(id=int(subid))[0]
     if choice == 'A':
-        activity.stepsA += steps
+        activity.stepsA = activity.stepsA + steps
     elif choice == 'B':
-        activity.stepsB += steps
+        activity.stepsB = activity.stepsB + steps
     activity.save()
     if GuessInfomation.objects.filter(user_id=openid, sub_id=int(subid), choice=choice).exists():
         data_object = GuessInfomation.objects.filter(user_id=openid, sub_id=int(subid), choice=choice)[0]

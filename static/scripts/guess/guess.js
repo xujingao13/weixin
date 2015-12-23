@@ -71,4 +71,7 @@ function setsubjects(subjects){
       'down">买定离手</button></div></div>';
 		$('#panelgroup').append(strHTML);
 	};
+	if (subjects.length == 0) {
+		$('body').html('<h>当前没有竞猜活动，稍后再来看看吧~</h>')
+	}
 }
