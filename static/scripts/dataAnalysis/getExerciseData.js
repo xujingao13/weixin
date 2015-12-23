@@ -119,7 +119,7 @@ function setExpertiseAdvise(yesterdayIntensity, sevenDayIntensity){
 		"训练强度基本无变化，建议多留意身体状况，并按照自己的训练强度继续坚持。",
 		"持续的专业训练，建议能够按照标准进行运动前的准备活动。并留意身体状况！",
 	];
-	$("#expertise-advise").text(pattern[sevenDayIntensity-1][yesterdayIntensity-1]);
+	$("#expertise-advise").text(pattern[sevenDayIntensity][yesterdayIntensity]);
 }
 //set data according to the data, "suffix" is the unit
 function setDataText(idString, data, suffix){
