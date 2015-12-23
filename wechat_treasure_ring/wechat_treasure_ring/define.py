@@ -5,9 +5,9 @@ import json
 import sys
 reload(sys)
 sys.setdefaultencoding('UTF-8')
-LOCAL_IP = os.environ.get('SITE_DOMAIN')
-AppID = os.environ.get('APP_ID')
-AppSecret = os.environ.get('APP_SECRET')
+LOCAL_IP = os.environ.get('SITE_DOMAIN', "123")
+AppID = os.environ.get('APP_ID', "123")
+AppSecret = os.environ.get('APP_SECRET', "123")
 MENU = """
 {
     "button": [

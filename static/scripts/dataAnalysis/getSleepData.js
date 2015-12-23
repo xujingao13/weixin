@@ -132,7 +132,7 @@ function setExpertiseAdvise(stark_sleep, avg_compare, sleep_time, anxious, regul
 	var anxious_string = [
 		"最近7天您一直处于焦虑状态，建议您放松心情，不要给自己太大的压力",
 		"最近1个月您一直处于焦虑状态，建议您去学校的心理咨询中心释放一下情绪",
-		" 最近7天您的睡眠情况良好",
+		"最近7天您的睡眠情况良好",
 	];
 	if(regular != 0){
 		regular = 1;
@@ -146,7 +146,7 @@ function setExpertiseAdvise(stark_sleep, avg_compare, sleep_time, anxious, regul
 		sleep_time_string[sleep_time - 1] + ',' + 
 		stark_sleep_string[stark_sleep] + ',' + 
 		avg_compare_string[avg_compare - 1] + ',' +
-		anxious_string[anxious - 1] + ',' + 
+		anxious_string[anxious] + ',' + 
 		regular_string[regular] + '。'
 		);
 }
