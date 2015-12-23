@@ -26,19 +26,18 @@ def ifregistered(request, openid):
 
 @csrf_exempt
 def add_guess_subject(request):
-	subject = GuessSubject()
-	subject.content = request.POST.get('content')
-	subject.choiceA = request.POST.get('choiceA')
-	subject.choiceB = request.POST.get('choiceB')
-	subject.stepsA = 0
-	subject.stepsB = 0
-	subject.save()
-	return HttpResponse("success")
+    subject = GuessSubject()
+    subject.content = request.POST.get('content')
+    subject.choiceA = request.POST.get('choiceA')
+    subject.choiceB = request.POST.get('choiceB')
+    subject.stepsA = 0
+    subject.stepsB = 0
+    subject.save()
+    return HttpResponse("success")
 
 
 @csrf_exempt
 def save_user_bet(request):
-    fail = False
     subid = request.GET.get("subid")
     openid = request.GET.get("openid")
     steps = int(request.GET.get("steps"))
@@ -49,9 +48,10 @@ def save_user_bet(request):
     user.steps_totalused += steps
     all_num = get_today_step(user)
     if user.steps_totalused > all_num:
-        steps -= user.steps_totalused - all_num
-        user.steps_totalused = all_num
-        fail = True
+        result = {
+            'success':False
+        }
+        return HttpResponse(json.dumps(result))
     activity = GuessSubject.objects.filter(id=int(subid))[0]
     if choice == 'A':
         activity.stepsA += steps
@@ -65,10 +65,11 @@ def save_user_bet(request):
     else:
         data_object = GuessInfomation(user_id=openid, sub_id=int(subid), choice = choice, steps = steps)
         data_object.save()
-    if fail:
-        return HttpResponse("failure")
-    else:
-        return HttpResponse("success")
+    user.save()
+    result = {
+        'success':True
+    }
+    return HttpResponse(json.dumps(result))
 
 
 @csrf_exempt
@@ -94,6 +95,7 @@ def calculate(request):
     activity = GuessSubject.objects.filter(id=int(subid))[0]
     if choice == "A":
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsA)
+        print rate
         people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
     elif choice == "B":
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsB)
@@ -101,6 +103,8 @@ def calculate(request):
     for val in people:
         personal_info = RingUser.objects.filter(user_id=val.user_id)
         personal_info[0].steps_totalused -= int(rate * val.steps)
+        print personal_info[0].steps_totalused
+        personal_info[0].save()
     return HttpResponse("success")
 
 
