@@ -238,6 +238,8 @@ def process_text_message(msg):
             else:
                 result = u"比赛仍在进行中"
             result_str += val[u"content"] + u"：你在" + val[u"choiceA"] + u"下注" + str(val[u"stepsA"]) + u"步， " + val[u"choiceB"] + u"下注" + str(val[u"stepsB"]) + u"步，" + result + u"\n"
+        if result_str == "":
+            result_str = u"你还没有参加竞猜活动，请点击 玩玩游戏->竞猜 来参与竞猜"
         return result_str
 
 

@@ -32,11 +32,14 @@ def add_guess_subject(request):
     subject.content = request.POST.get('content')
     subject.choiceA = request.POST.get('choiceA')
     subject.choiceB = request.POST.get('choiceB')
-    subject.stepsA = 0
-    subject.stepsB = 0
-    subject.disabled = False
-    subject.save()
-    return HttpResponse("success")
+    if subject.choiceA and subject.choiceB and subject.content:
+        subject.stepsA = 0
+        subject.stepsB = 0
+        subject.disabled = False
+        subject.save()
+        return HttpResponse("success")
+    else:
+        return HttpResponse("failure")
 
 
 @csrf_exempt
@@ -122,20 +125,31 @@ def calculate(request):
     subid = int(request.GET.get("subid"))
     choice = request.GET.get("choice")
     activity = GuessSubject.objects.filter(id=int(subid))[0]
-    if choice == "A":
-        activity.result = "A"
-        rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsA)
-        people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
-    elif choice == "B":
-        activity.result = "B"
-        rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsB)
-        people = GuessInfomation.objects.filter(sub_id=subid, choice='B')
-    for val in people:
-        personal_info = RingUser.objects.filter(user_id=val.user_id)
-        singleperson = personal_info[0]
-        singleperson.steps_totalused = personal_info[0].steps_totalused - int(rate * val.steps)
-        singleperson.save()
-    return HttpResponse("success")
+    if activity.disabled:
+        if activity.result:
+            return HttpResponse("already calculated")
+        if choice == "A":
+            activity.result = "A"
+            if activity.stepsA != 0:
+                rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsA)
+            else:
+                rate = 0
+            people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
+        elif choice == "B":
+            activity.result = "B"
+            if activity.stepsB != 0:
+                rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsB)
+            else:
+                rate = 0
+            people = GuessInfomation.objects.filter(sub_id=subid, choice='B')
+        for val in people:
+            personal_info = RingUser.objects.filter(user_id=val.user_id)
+            singleperson = personal_info[0]
+            singleperson.steps_totalused = personal_info[0].steps_totalused - int(rate * val.steps)
+            singleperson.save()
+        return HttpResponse("success")
+    else:
+        return HttpResponse("failure")
 
 
 @csrf_exempt
@@ -158,8 +172,9 @@ def auto_save(request):
 def clear_activity():
     not_valid = GuessSubject.objects.filter(disabled=True)
     for val in not_valid:
-        GuessInfomation.objects.filter(sub_id=val.id).delete()
-    not_valid.delete()
+        if val.result:
+            GuessInfomation.objects.filter(sub_id=val.id).delete()
+            val.delete()
 
 
 @csrf_exempt
@@ -170,6 +185,8 @@ def register(request):
     user_wight = request.GET.get("weight")
     user_goal = request.GET.get("goal_step")
     user_openid = request.GET.get("openid")
+    if not ((user_sex and user_age and user_height and user_goal and user_wight and user_goal and user_openid) and (user_wight.isdigit() and user_age.isdigit() and user_height.isdigit())):
+        return HttpResponse("failure")
     get_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'%(AppID,AppSecret)
     f = urllib.urlopen(get_url)
     string_json = f.read()
@@ -461,13 +478,12 @@ def get_sleepdata(request):
         return HttpResponse(json.dumps(data))
     data = access_sleeping(openid)
     data['isnull'] = False
-    print data
-    data['anxious'] = 1
     result = {
         "openid":openid,
         "data":data
     }
     return HttpResponse(json.dumps(result))
+
 
 
 def get_sportsdata(request):
@@ -486,7 +502,6 @@ def get_sportsdata(request):
         data['isnull'] = True
         return HttpResponse(json.dumps(data))
     data = access_exercising(openid)
-    print data
     data['isnull'] = False
     result = {
         "data":data,
@@ -526,7 +541,6 @@ def get_time_line_data(request):
                 i += 1
             else:
                 break
-        print data
     result = {
         'data':data,
         'openid':openid
