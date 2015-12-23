@@ -26,19 +26,19 @@ def ifregistered(request, openid):
 
 @csrf_exempt
 def add_guess_subject(request):
-	subject = GuessSubject()
-	subject.content = request.POST.get('content')
-	subject.choiceA = request.POST.get('choiceA')
-	subject.choiceB = request.POST.get('choiceB')
-	subject.stepsA = 0
-	subject.stepsB = 0
-	subject.save()
-	return HttpResponse("success")
+    subject = GuessSubject()
+    subject.content = request.POST.get('content')
+    subject.choiceA = request.POST.get('choiceA')
+    subject.choiceB = request.POST.get('choiceB')
+    subject.stepsA = 0
+    subject.stepsB = 0
+    subject.disabled = False
+    subject.save()
+    return HttpResponse("success")
 
 
 @csrf_exempt
 def save_user_bet(request):
-    fail = False
     subid = request.GET.get("subid")
     openid = request.GET.get("openid")
     steps = int(request.GET.get("steps"))
@@ -49,9 +49,10 @@ def save_user_bet(request):
     user.steps_totalused += steps
     all_num = get_today_step(user)
     if user.steps_totalused > all_num:
-        steps -= user.steps_totalused - all_num
-        user.steps_totalused = all_num
-        fail = True
+        result = {
+            'success':False
+        }
+        return HttpResponse(json.dumps(result))
     activity = GuessSubject.objects.filter(id=int(subid))[0]
     if choice == 'A':
         activity.stepsA += steps
@@ -65,26 +66,39 @@ def save_user_bet(request):
     else:
         data_object = GuessInfomation(user_id=openid, sub_id=int(subid), choice = choice, steps = steps)
         data_object.save()
-    if fail:
-        return HttpResponse("failure")
-    else:
-        return HttpResponse("success")
+    user.save()
+    result = {
+        'success':True
+    }
+    return HttpResponse(json.dumps(result))
 
 
 @csrf_exempt
 def get_guess_subject(request):
-	subjects = []
-	for dbitem in GuessSubject.objects.all():
-		item = {
-			'id':dbitem.id,
-			'content':dbitem.content,
-			'choiceA':dbitem.choiceA,
-			'choiceB':dbitem.choiceB,
-			'stepsA':dbitem.stepsA,
-			'stepsB':dbitem.stepsB
-		}
-		subjects.append(item)
-	return HttpResponse(json.dumps(subjects))
+    subjects = []
+    for dbitem in GuessSubject.objects.filter(disabled=False):
+        item = {
+            'id':dbitem.id,
+            'content':dbitem.content,
+            'choiceA':dbitem.choiceA,
+            'choiceB':dbitem.choiceB,
+            'stepsA':dbitem.stepsA,
+            'stepsB':dbitem.stepsB
+        }
+        subjects.append(item)
+    return HttpResponse(json.dumps(subjects))
+
+
+@csrf_exempt
+def freeze_activity(request):
+    subid = int(request.GET.get("subid"))
+    activity = GuessSubject.objects.filter(id=int(subid))
+    if activity:
+        activity[0].disabled = True
+        activity[0].save()
+        return HttpResponse("success")
+    else:
+        return HttpResponse("failure")
 
 
 @csrf_exempt
@@ -93,14 +107,19 @@ def calculate(request):
     choice = request.GET.get("choice")
     activity = GuessSubject.objects.filter(id=int(subid))[0]
     if choice == "A":
+        activity.result = "A"
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsA)
+        print rate
         people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
     elif choice == "B":
+        activity.result = "B"
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsB)
         people = GuessInfomation.objects.filter(sub_id=subid, choice='B')
     for val in people:
         personal_info = RingUser.objects.filter(user_id=val.user_id)
         personal_info[0].steps_totalused -= int(rate * val.steps)
+        print personal_info[0].steps_totalused
+        personal_info[0].save()
     return HttpResponse("success")
 
 
@@ -117,6 +136,15 @@ def auto_save(request):
         for user in step_user:
             save_exercise_data(user)
             save_time_line(user)
+        clear_activity()
+
+
+def clear_activity():
+    not_valid = GuessSubject.objects.filter(disabled=True)
+    for val in not_valid:
+        GuessInfomation.objects.filter(subid=val.id).delete()
+    not_valid.delete()
+
 
 @csrf_exempt
 def register(request):
