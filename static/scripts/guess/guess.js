@@ -1,7 +1,8 @@
 $(document).ready(function(){
-	function suc(){
-		$.getJSON('data/getguesssubject/', function(data){
-			setsubjects(data);
+	var code = getUrlParameter('code');
+		$.getJSON('data/getguesssubject?code='+code, function(data){
+			openid = data.openid
+			setsubjects(data.data);
 
 			$('.set').click(function(){
 				var subid = parseInt($(this).attr('id'));
@@ -50,13 +51,6 @@ $(document).ready(function(){
 				}
 			});
 		});
-	}
-	get_userinfo(function(data){
-		openid = data.openid;
-		nickname = data.nickname;
-		headimgurl = data.headimgurl;
-		suc();
-	});
 });
 
 function setsubjects(subjects){

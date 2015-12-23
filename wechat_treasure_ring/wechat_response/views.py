@@ -83,37 +83,37 @@ def weixin(request):
                                 'title': u'Let us play Dodo_jump together',
                                 'description': 'a simple but interesting game',
                                 'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/jump.png',
-                                'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fdodojump.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                                'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fdodojump.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     elif message.key == 'FLAPPY':
                         response = we_chat.response_news([{
                                 'title': u'Let us play Flappy Bird together',
                                 'description': 'a simple but interesting game',
                                 'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
-                                'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fflyingdog.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                                'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fbird.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     elif message.key == 'SLEEP_CHART':
                         response = we_chat.response_news([{
                             'title': u'睡眠质量分析',
                             'description': '综合一周睡眠情况和过去一个月的睡眠情况给出最权威的睡眠建议',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/sleep.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     elif message.key == 'EXERCISE_CHART':
                         response = we_chat.response_news([{
                             'title': u'运动质量分析',
                             'description': '图文并茂，专家指导，你值得拥有！',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fexerciseAnalysis.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fexerciseAnalysis.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     elif message.key == 'TIME_LINE':
                         response = we_chat.response_news([{
                             'title': u'时间线',
                             'description': '看看一天各个时段的运动状况',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/sport.png',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2ftimeline.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2ftimeline.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     elif message.key == 'SCORE_RANK':
                         response = we_chat.response_news([{
                             'title': u'游戏龙虎榜',
                             'description': '龙虎榜',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/rank.png',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2frank.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2frank.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     elif message.key == 'CHEER':
                         response = we_chat.response_text(u'We are family!')
                     elif message.key == 'GUESS':
@@ -121,7 +121,7 @@ def weixin(request):
                             'title': u'欢迎参加竞猜',
                             'description': '欢迎参加竞猜，用步数当赌注，竞猜体育赛事等当下活动，竞猜获得的步数可用于当日的游戏活动。',
                             'picurl': 'http://'+LOCAL_IP+'/guess/guess.png',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fguess.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fguess.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
                 else:
                     response = we_chat.response_text(u'请先注册哦~~(点击个人信息按钮即可注册)')
@@ -136,24 +136,12 @@ def get_userinfo(request):
         f = urllib.urlopen(get_url)
         string_json = f.read()
         reply = json.loads(string_json)
-        openid = reply['openid']
-        access_token = reply['access_token']
-        get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
-        f = urllib.urlopen(get_url)
-        string_json = f.read()
-        reply = json.loads(string_json)
-        result = {
-            "openid":reply['openid'],
-            "nickname":reply['nickname'],
-            "headimgurl":reply['headimgurl']
-        }
+        openid = reply[u'openid']
     except:
         return HttpResponse("Invalid code")
-    if RingUser.objects.filter(user_id=openid).exists():
-        user = RingUser.objects.get(user_id=openid)
-        user.nickname = reply['nickname']
-        user.headimgurl = reply['headimgurl']
-        user.save()
+    result = {
+        'openid':openid
+    }
     return HttpResponse(json.dumps(result))
 
 
@@ -283,3 +271,34 @@ def get_user_bet(msg):
             else:
                 bet_list.append({"content":activity.content, "choiceA":activity.choiceA, "choiceB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("0" + str(activity.result))})
     return bet_list
+
+@csrf_exempt
+def getid_register(request):
+    code = request.GET.get('code')
+    get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
+    try:
+        f = urllib.urlopen(get_url)
+        string_json = f.read()
+        reply = json.loads(string_json)
+        #print reply
+        openid = reply[u'openid']
+        #print openid
+        if RingUser.objects.filter(user_id=openid).exists():
+            user = RingUser.objects.filter(user_id=openid)[0]
+            result = {
+                "ifregistered": True,
+                "sex": user.sex,
+                "age": user.age,
+                "height": user.height,
+                "weight": user.weight,
+                "goal_step": user.target,
+                "openid": openid
+            }
+        else:
+            result = {
+                "openid":openid,
+                "ifregistered":False
+            }
+    except:
+        return HttpResponse("Invalid code")
+    return HttpResponse(json.dumps(result))

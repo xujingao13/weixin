@@ -538,6 +538,7 @@ class test_datachart(TestCase):
 				steps_totalused = 200
 		)
 
+
 	def test_getsleepdataexistshavedata(self):
 		request1 = self.factory.get('data/autosave?sleep=1&exercise_and_time=0')
 		request2 = self.factory.get('data/getsleepdata?openid=xja')

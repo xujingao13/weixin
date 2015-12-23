@@ -3,6 +3,29 @@ var data_allbird = [];
 var data_todayjump = [];
 var data_alljump = [];
 window.onload = function(){
+    var code = getUrlParameter('code');
+    $.getJSON("data/gamerank?code="+code, function(data){
+        openid = data.openid;
+        handle_data(data_todaybird, data.today_bird);
+        handle_data(data_allbird, data.total_bird);
+        handle_data(data_todayjump, data.today_jump);
+        handle_data(data_alljump, data.total_jump);
+        get_todayBird();
+    });
+    /*
+    $.getJSON("data/gamerank?game=bird&start=0&end=100&openid="+openid,function(data){
+        //alert(JSON.stringify(data));
+        handle_data(data_todaybird, data.today);
+        handle_data(data_allbird, data.total);
+        //get_todayBird();
+        $.getJSON("data/gamerank?game=jump&start=0&end=100&openid="+openid,function(data){
+            //alert(JSON.stringify(data));
+            handle_data(data_todayjump, data.today);
+            handle_data(data_alljump, data.total);
+            get_todayBird();
+        });
+    });*/
+    /*
     get_userinfo(function(data){
 		openid = data.openid;
 		nickname = data.nickname;
@@ -20,6 +43,7 @@ window.onload = function(){
             });
         });
 	});
+	*/
 }
 
 function handle_data(data,data_list){

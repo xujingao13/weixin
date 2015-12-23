@@ -2,6 +2,12 @@
  * Created by littlepig on 2015/12/20.
  */
 $(document).ready(function(){
+    var code = getUrlParameter('code');
+    $.getJSON("data/getTimeLineData?code="+code, function(data){
+        openid = data.openid;
+        renderByJson(data.data);
+    });
+    /*
     get_userinfo(function(data){
 		openid = data.openid;
 		nickname = data.nickname;
@@ -11,6 +17,7 @@ $(document).ready(function(){
 			renderByJson(data);
 		})
 	});
+	*/
 });
 
 function renderByJson(json){

@@ -2,12 +2,16 @@
  * Created by littlepig on 2015/11/30.
  */
 $(document).ready(function(){
-	$(function () {
-		$('#collapseOne').collapse('show');
-		$('#collapseTwo').collapse('show');
-		$('#collapseThree').collapse('hide');
-		$('#collapseFour').collapse('hide');
+	var code = getUrlParameter('code');
+	$('#collapseOne').collapse('show');
+	$('#collapseTwo').collapse('show');
+	$('#collapseThree').collapse('hide');
+	$('#collapseFour').collapse('hide');
+	$.getJSON("data/getsportsdata?code="+code, function(data){
+		openid = data.openid;
+		renderByJson(data.data);
 	});
+	/*
 	get_userinfo(function(data){
 		openid = data.openid;
 		nickname = data.nickname;
@@ -17,6 +21,7 @@ $(document).ready(function(){
 			renderByJson(sportsData);
 		})
 	});
+	*/
 })
 
 function draw(){
