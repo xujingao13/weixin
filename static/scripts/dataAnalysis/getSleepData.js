@@ -4,9 +4,8 @@
 $(document).ready(function(){
 	$(function () {
 		$('#collapseOne').collapse('show');
-		$('#collapseTwo').collapse('show');
-		$('#collapseThree').collapse('show');
-		$('#collapseFour').collapse('show');
+		$('#collapseTwo').collapse('hide');
+		$('#collapseThree').collapse('hide');
 	});
 	get_userinfo(function(data){
 		openid = data.openid;
@@ -14,6 +13,7 @@ $(document).ready(function(){
 		headimgurl = data.headimgurl;
 		headimgurl = data.headimgurl;
 		$.getJSON("data/getsleepdata?openid="+openid, function(sleepData){
+			
 			renderByJson(sleepData);
 		})
 	});
@@ -45,6 +45,7 @@ function renderByJson(json){
 	//alert(JSON.stringify(json));
 	if (json.isnull == true) {
 		draw();
+		return;
 	}
 	sleepChart(json["7-days-sleep"], json["7-days-deep-sleep"], 7, "week_sleep_chart");
 	sleepChart(json["30-days-sleep"], json["30-days-deep-sleep"], 30, "month_sleep_chart");
@@ -56,10 +57,12 @@ function renderByJson(json){
 	setSleepFluctuate("30-days-flac", json["30-days-flac"]);
 	setSleepDeepRate("7-deep-avg", json["7-days-avg"]);
 	setSleepDeepRate("30-deep-avg", json["30-deep-avg"]);
+	setExpertiseAdvise(json["stark-sleep"], json["avg-compare"], json["sleep-time-enough"], json["anxious"], json["regular"]);
 }
 
 //draw the sleep chart(including sleep time and deep sleep time)
 function sleepChart(chartSleepTime,chartDeepSleepTime, days, chartId){
+
 	var sleepTime = [], deepSleepTime = [];
     for (var i = 0; i < days; i += 1) {
         sleepTime.push([i,chartSleepTime[i]]);
@@ -104,4 +107,46 @@ function setSleepDeepRate(idString, data){
 		result = "Normal";
 	}
 	$("#" + idString).text(result);
+}
+
+//set the advise
+function setExpertiseAdvise(stark_sleep, avg_compare, sleep_time, anxious, regular){
+	var sleep_time_string = [
+		"您最近7天睡眠时间总体过多",
+		"您最近7天睡眠时间总体过少",
+		"您最近7天睡眠时间总体正常"
+	];
+	var stark_sleep_string = [
+		"每天睡眠时间刚好合适",
+		"其中一两天睡太久",
+		"其中一两天睡太少",
+	];
+	if(avg_compare != 1 && avg_compare != 2){
+		avg_compare = 3;
+	}
+	var avg_compare_string = [
+		"和过去30天相比，您的睡眠时间明显变少，注意休息",
+		"和过去30天相比，您的睡眠时间明显增多，不可太懒哟",
+		"和过去30天相比，您的睡眠时间没有明显变化",
+	];
+	var anxious_string = [
+		"最近7天您一直处于焦虑状态，建议您放松心情，不要给自己太大的压力",
+		"最近1个月您一直处于焦虑状态，建议您去学校的心理咨询中心释放一下情绪",
+		" 最近7天您的睡眠情况良好",
+	];
+	if(regular != 0){
+		regular = 1;
+	}
+	var regular_string = [
+		"最近7天您睡眠不规律，请及时调整。养成良好的作息习惯，学习工作才会事半功倍",
+		"最近7天您睡眠规律，请继续按时作息",
+		
+	];
+	$("#expertise-advice").text(
+		sleep_time_string[sleep_time - 1] + ',' + 
+		stark_sleep_string[stark_sleep] + ',' + 
+		avg_compare_string[avg_compare - 1] + ',' +
+		anxious_string[anxious - 1] + ',' + 
+		regular_string[regular] + '。'
+		);
 }
