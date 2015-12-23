@@ -4,6 +4,7 @@ from wechat_response.data import *
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from wechat_response.data import *
+from wechat_treasure_ring.settings import *
 import json
 import time
 
@@ -148,12 +149,24 @@ def clear_activity():
 
 @csrf_exempt
 def register(request):
-    user_sex = request.POST.get("sex")
-    user_age = request.POST.get("age")
-    user_height = request.POST.get("height")
-    user_wight = request.POST.get("weight")
-    user_goal = request.POST.get("goal_step")
-    user_openid = request.POST.get("openid")
+    user_sex = request.GET.get("sex")
+    user_age = request.GET.get("age")
+    user_height = request.GET.get("height")
+    user_wight = request.GET.get("weight")
+    user_goal = request.GET.get("goal_step")
+    user_openid = request.GET.get("openid")
+    get_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'%(AppID,AppSecret)
+    f = urllib.urlopen(get_url)
+    string_json = f.read()
+    reply = json.loads(string_json)
+    #print reply
+    access_token = reply[u'access_token']
+    get_url = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=zh_CN'%(access_token , user_openid)
+    f = urllib.urlopen(get_url)
+    string_json = f.read()
+    reply = json.loads(string_json)
+    nickname = reply[u'nickname']
+    headimgurl = reply[u'headimgurl']
     if RingUser.objects.filter(user_id=user_openid).exists():
         user = RingUser.objects.filter(user_id=user_openid)[0]
         user.sex = user_sex
@@ -161,6 +174,8 @@ def register(request):
         user.height=user_height
         user.weight=user_wight
         user.target=user_goal
+        user.headimgurl = headimgurl
+        user.nickname = nickname
         user.save()
     else:
         user_new = RingUser(
@@ -172,8 +187,8 @@ def register(request):
             target=user_goal,
             last_record=0,
             steps_totalused=0,
-            headimgurl="none",
-            nickname="none"
+            headimgurl=headimgurl,
+            nickname=nickname
         )
         user_new.save()
         user_bird = BirdUser(

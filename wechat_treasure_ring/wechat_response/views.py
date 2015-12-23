@@ -280,3 +280,34 @@ def get_user_bet(msg):
             else:
                 bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("0" + str(activity.result))})
     return bet_list
+
+@csrf_exempt
+def getid_register(request):
+    code = request.GET.get('code')
+    get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
+    try:
+        f = urllib.urlopen(get_url)
+        string_json = f.read()
+        reply = json.loads(string_json)
+        #print reply
+        openid = reply[u'openid']
+        #print openid
+        if RingUser.objects.filter(user_id=openid).exists():
+            user = RingUser.objects.filter(user_id=openid)[0]
+            result = {
+                "ifregistered": True,
+                "sex": user.sex,
+                "age": user.age,
+                "height": user.height,
+                "weight": user.weight,
+                "goal_step": user.target,
+                "openid": openid
+            }
+        else:
+            result = {
+                "openid":openid,
+                "ifregistered":False
+            }
+    except:
+        return HttpResponse("Invalid code")
+    return HttpResponse(json.dumps(result))

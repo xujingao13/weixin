@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^data/register$', 'web_data.views.register'),
     url(r'^data/ifregistered/(.*)', 'web_data.views.ifregistered'),
     url(r'^data/sleepData', 'web_data.views.getSleepData'),
+    url(r'^data/getidregister', 'wechat_response.views.getid_register'),
     url(r'^data/ingamerank', 'web_data.views.ingame_rank'),
     url(r'^data/gamerank', 'web_data.views.game_rank'),
     url(r'^data/stepsinfo', 'web_data.views.steps_info'),

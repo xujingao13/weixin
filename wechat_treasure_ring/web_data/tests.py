@@ -81,5 +81,9 @@ class test_saveuserbet(TestCase):
 		self.assertEqual(record.choice, 'A')
 
 
+class test_get_guess_subject(TestCase):
+	def setUp(self):
+		self.factory = RequestFactory
 
+	def test_
 

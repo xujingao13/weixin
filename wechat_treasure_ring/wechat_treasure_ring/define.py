@@ -76,7 +76,7 @@ MENU = """
 """
 
 
-USER_URL='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fregister.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'
+USER_URL='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fregister.html'+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'
 def create_menu():
     get_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (AppID,AppSecret)
     f = urllib2.urlopen(get_url)
