@@ -1,9 +1,9 @@
 wechat_treasure_ring:
-  image: sheep94lion/wechat_treasure_ring:1.0
+  image: sheep94lion/wechat_treasure_ring:2.0
   environment:
     - PRODUCTION=True
     - DB_NAME=wechat_treasure_ring
-    - DB_HOST=db
+    - DB_HOST=wtr_db
     - DB_USER=wechat_treasure_ring
     - DB_PASSWORD=$WECHAT_PASSWORD
     - DB_PORT=3306
@@ -27,8 +27,6 @@ wtr_db:
   volumes:
     - ./datadir:/var/lib/mysql
     - ./my.cnf:/etc/my.cnf
-  ports:
-    - "470005:3306"
   restart: always
 wtr_web:
   image: nginx:1.9.8
