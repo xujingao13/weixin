@@ -40,6 +40,7 @@ function set_userinfo(){
 	}, showinfo);
 }
 $(document).ready(function(){
+	alert(1);
 	$('#goal_step').on('input', update_dis);
 	$('#goal_dis').on('input', update_step);
 	get_userinfo(function(data){

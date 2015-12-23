@@ -320,6 +320,9 @@ def game_rank(request):
     if game == "bird":
         results_today = BirdUser.objects.all().order_by('-score_today')[start:end]
         results_total = BirdUser.objects.all().order_by('-score_total')[start:end]
+    elif game == "jump":
+        results_today = JumpUser.objects.all().order_by('-score_today')[start:end]
+        results_total = JumpUser.objects.all().order_by('-score_total')[start:end]
     ranklist_today = []
     ranklist_total = []
     for item in results_today:
