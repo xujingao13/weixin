@@ -46,10 +46,10 @@ function renderByJson(json){
 	if (json.isnull == true) {
 		draw();
 	}
-	drawChart(json["7-days-dis"], 7,"7-days-dis");
-	drawChart(json["7-days-steps"], 7, "7-days-steps");
-	drawChart(json["7-days-speed"], 7, "7-days-speed");
-	drawChart(json["7-days-calories"], 7, "7-days-calories");
+	drawChart(json["7-days-dis"], json["7-days-dis"].length,"7-days-dis");
+	drawChart(json["7-days-steps"], json["7-days-steps"].length, "7-days-steps");
+	drawChart(json["7-days-speed"], json["7-days-speed"].length, "7-days-speed");
+	drawChart(json["7-days-calories"], json["7-days-calories"].length, "7-days-calories");
 
 	drawChart(json["30-days-dis"], 30,"30-days-dis");
 	drawChart(json["30-days-dis"], 30, "30-days-steps");

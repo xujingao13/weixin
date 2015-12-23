@@ -47,8 +47,8 @@ function renderByJson(json){
 		draw();
 		return;
 	}
-	sleepChart(json["7-days-sleep"], json["7-days-deep-sleep"], 7, "week_sleep_chart");
-	sleepChart(json["30-days-sleep"], json["30-days-deep-sleep"], 30, "month_sleep_chart");
+	sleepChart(json["7-days-sleep"], json["7-days-deep-sleep"], json["7-days-sleep"].length, "week_sleep_chart");
+	sleepChart(json["30-days-sleep"], json["30-days-deep-sleep"], json["30-days-deep-sleep"].length, "month_sleep_chart");
 	setDataText("7-days-avg", json["7-days-avg"], "h");
 	setDataText("30-days-avg",json["30-days-avg"], "h");
 	setDataText("7-days-deep-avg", json["7-days-deep-avg"], "h");

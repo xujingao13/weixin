@@ -243,8 +243,10 @@ def game_rank(request):
 def get_sleepdata(request):
     #return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
+    data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
-        return HttpResponse("no user")
+        data['isnull'] = True
+        return HttpResponse(json.dumps(data))
     data = access_sleeping(openid)
     print data
     data['isnull'] = False
@@ -257,6 +259,7 @@ def get_sportsdata(request):
     if not RingUser.objects.filter(user_id=openid).exists():
         return HttpResponse("no user")
     data = access_exercising(openid)
+    print data
     data['isnull'] = False
     return HttpResponse(json.dumps(data))
 
