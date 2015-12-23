@@ -477,7 +477,10 @@ def get_sleepdata(request):
         data['isnull'] = True
         return HttpResponse(json.dumps(data))
     data = access_sleeping(openid)
-    data['isnull'] = False
+    if not data:
+        data = {'isnull': True}
+    else:
+        data['isnull'] = False
     result = {
         "openid":openid,
         "data":data
@@ -502,7 +505,10 @@ def get_sportsdata(request):
         data['isnull'] = True
         return HttpResponse(json.dumps(data))
     data = access_exercising(openid)
-    data['isnull'] = False
+    if not data:
+        data = {'isnull': True}
+    else:
+        data['isnull'] = False
     result = {
         "data":data,
         "openid":openid
