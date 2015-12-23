@@ -13,7 +13,8 @@ from wechat_sdk.messages import (
     EventMessage,
     TextMessage
 )
-import urllib2
+
+import urllib
 import json
 import sys
 import wechat_response.data as data_tool
@@ -35,6 +36,8 @@ def weixin(request):
         signature = request.GET.get('signature')
         timestamp = request.GET.get('timestamp')
         nonce = request.GET.get('nonce')
+        if "bet" in request.GET:
+            return get_user_bet(request)
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
@@ -60,10 +63,13 @@ def weixin(request):
                 if message.key == 'STEP_COUNT':
                     step_user = RingUser.objects.filter(user_id=message.source)[0]
                     if step_user:
-                        target = step_user.target
-                        step = get_today_step(step_user)
-                        goal_completion = int(float(step) / target * 100)
-                        response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
+                        try:
+                            target = step_user.target
+                            step = get_today_step(step_user)
+                            goal_completion = int(float(step) / target * 100)
+                            response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
+                        except Exception as e:
+                            print e
                         # 里面的数字应由其他函数获取
                         return HttpResponse(response)
                     else:
@@ -110,13 +116,13 @@ def get_userinfo(request):
     #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     try:
-        f = urllib2.urlopen(get_url)
+        f = urllib.urlopen(get_url)
         string_json = f.read()
         reply = json.loads(string_json)
         openid = reply['openid']
         access_token = reply['access_token']
         get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
-        f = urllib2.urlopen(get_url)
+        f = urllib.urlopen(get_url)
         string_json = f.read()
         reply = json.loads(string_json)
         result = {
@@ -187,3 +193,25 @@ def process_text_message(msg):
         else:
             return u"没有此用户或此用户没有注册><"
 
+
+def get_user_bet(request):
+    openid = request.GET.get("openid")
+    bet_list = list()
+    if GuessInfomation.objects.filter(user_id=openid).exists():
+        data_objects = GuessInfomation.objects.filter(user_id=openid)
+        sub_list = list()
+        for val in data_objects:
+            if not (val.sub_id in sub_list):
+                sub_list.append(val.sub_id)
+        for val in sub_list:
+            activity = GuessSubject.objects.filter(id=int(val))[0]
+            datas = GuessInfomation.objects.filter(user_id=openid, id=val)
+            Astep = 0
+            Bstep = 0
+            for data in datas:
+                if data.choice == "A":
+                    Astep += data.steps
+                elif data.choice == "B":
+                    Bstep += data.steps
+            bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep})
+    return HttpResponse(json.dumps(bet_list))

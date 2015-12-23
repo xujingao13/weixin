@@ -71,3 +71,16 @@ class RecordAttention(models.Model):
     attentionTime = models.IntegerField()
 
 
+class GuessInfomation(models.Model):
+    user_id = models.CharField(max_length=30)
+    sub_id = models.IntegerField()
+    choice = models.CharField(max_length=30)
+    steps = models.IntegerField()
+
+
+class GuessSubject(models.Model):
+    content = models.CharField(max_length = 400)
+    choiceA = models.CharField(max_length = 100)
+    choiceB = models.CharField(max_length = 100)
+    stepsA = models.IntegerField()
+    stepsB = models.IntegerField()
