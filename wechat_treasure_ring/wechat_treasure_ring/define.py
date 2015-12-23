@@ -51,8 +51,8 @@ MENU = """
             "sub_button": [
                 {
                     "type": "click",
-                    "name": "2048",
-                    "key": "2048"
+                    "name": "Do_jump",
+                    "key": "DOJUMP"
                 },
                 {
                     "type": "click",
@@ -87,5 +87,5 @@ def create_menu():
     print request.read()
 
 if __name__=='__main__':
-    print LOCAL_IP
+    print LOCAL_IP, AppID, AppSecret
     create_menu()
