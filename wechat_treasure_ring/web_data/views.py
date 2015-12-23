@@ -478,17 +478,12 @@ def get_sleepdata(request):
         return HttpResponse(json.dumps(data))
     data = access_sleeping(openid)
     data['isnull'] = False
-<<<<<<< HEAD
-    return HttpResponse(json.dumps(data))
-=======
-    print data
-    data['anxious'] = 1
     result = {
         "openid":openid,
         "data":data
     }
     return HttpResponse(json.dumps(result))
->>>>>>> jingao/rest_framework
+
 
 
 def get_sportsdata(request):
@@ -546,16 +541,11 @@ def get_time_line_data(request):
                 i += 1
             else:
                 break
-<<<<<<< HEAD
-    return HttpResponse(json.dumps(data))
-=======
-        print data
     result = {
         'data':data,
         'openid':openid
     }
     return HttpResponse(json.dumps(result))
->>>>>>> jingao/rest_framework
 
 
 
