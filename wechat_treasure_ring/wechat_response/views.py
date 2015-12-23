@@ -41,7 +41,6 @@ def weixin(request):
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
-            #create_menu()
             return HttpResponse(request.GET.get("echostr"), content_type="text/plain")
     else:
         signature = request.GET.get('signature')
@@ -58,8 +57,15 @@ def weixin(request):
             result = process_text_message(message)
             response = we_chat.response_text(result)
             return HttpResponse(response)
-        if isinstance(message, EventMessage):
-            if message.type == 'click':
+        elif isinstance(message, EventMessage):
+            if message.type == 'subscribe':
+                response = we_chat.response_text(u'''欢迎来到‘珍环传’运动手环微信公众平台，请先点击‘个人信息’按钮进行注册哦～。
+                    输入‘关注’+‘昵称’关注好友
+                    输入‘我的关注’或者‘关注列表’查看我关注的与关注我的人
+                    输入‘取消关注’+‘昵称’取消关注好友
+                    输入‘查看信息’+‘昵称’查看关注好友的信息''')
+                return HttpResponse(response)
+            elif message.type == 'click':
                 if RingUser.objects.filter(user_id=message.source).exists():
                     if message.key == 'STEP_COUNT':
                         step_user = RingUser.objects.filter(user_id=message.source)[0]
@@ -73,11 +79,11 @@ def weixin(request):
                         # 里面的数字应由其他函数获取
                     elif message.key == 'RANK_LIST':
                         response = RESPONSE_RANKLIST % (message.source, message.target)
-                    elif message.key == '2048':
+                    elif message.key == 'DOJUMP':
                         response = we_chat.response_news([{
-                                'title': u'Let us play 2048 together',
+                                'title': u'Let us play Dodo_jump together',
                                 'description': 'a simple but interesting game',
-                                'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
+                                'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/jump.png',
                                 'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fdodojump.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     elif message.key == 'FLAPPY':
                         response = we_chat.response_news([{
@@ -89,7 +95,7 @@ def weixin(request):
                         response = we_chat.response_news([{
                             'title': u'睡眠质量分析',
                             'description': '综合一周睡眠情况和过去一个月的睡眠情况给出最权威的睡眠建议',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/sleep.jpg',
                             'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     elif message.key == 'EXERCISE_CHART':
                         response = we_chat.response_news([{
@@ -100,8 +106,8 @@ def weixin(request):
                     elif message.key == 'TIME_LINE':
                         response = we_chat.response_news([{
                             'title': u'时间线',
-                            'description': '时间线',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'description': '看看一天各个时段的运动状况',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/sport.png',
                             'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2ftimeline.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     elif message.key == 'SCORE_RANK':
                         response = we_chat.response_news([{
@@ -120,7 +126,6 @@ def weixin(request):
 
 def get_userinfo(request):
     code = request.GET.get("code")
-    #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     try:
         f = urllib.urlopen(get_url)
@@ -169,6 +174,22 @@ def process_text_message(msg):
             return message_return
         else:
             return u"没有此用户或此用户没有注册><"
+    elif con[0] == u"查看信息":
+        if argus == 1:
+            return u"输入‘查看信息’+‘昵称’查看关注人的运动信息"
+        step_user = RingUser.objects.filter(nickname=con[1])
+        relation = RecordAttention.objects.filter(source_user_id=msg.source)
+        if step_user:
+            for var in relation:
+                if var.target_user_id == step_user[0].user_id:
+                    target = step_user[0].target
+                    step = get_today_step(step_user[0])
+                    goal_completion = int(float(step) / target * 100)
+                    message_return = con[1] + u"已经走了" + str(step) + u"步了，" + u"完成今日目标：" + str(goal_completion) + u'%'
+                    return message_return
+            return u"你没有关注"+con[1]+u",不能查看他的信息"
+        else:
+            return u"没有此用户或此用户没有注册><"
     elif con[0] == u"关注列表" or con[0] == u"我的关注":
         name_list = ""
         step_user = RecordAttention.objects.filter(source_user_id=msg.source)
@@ -177,6 +198,20 @@ def process_text_message(msg):
             target_user = RingUser.objects.filter(user_id=target_user_id)[0]
             name_list += target_user.nickname + "\n"
         length = len(name_list)
+        if length == 0:
+            return u"你还没有关注任何人那～"
+        name_list = name_list[0:(length-1)]
+        return name_list
+    elif con[0] == u"谁关注我" or con[0] == u"关注我的人":
+        name_list = ""
+        relation = RecordAttention.objects.filter(target_user_id=msg.source)
+        for val in relation:
+            source_user_id = val.source_user_id
+            source_user = RingUser.objects.filter(user_id=source_user_id)[0]
+            name_list += source_user.nickname + "\n"
+        length = len(name_list)
+        if length == 0:
+            return u"没有任何人关注你哦～"
         name_list = name_list[0:(length-1)]
         return name_list
     elif con[0] == u"取消关注":
