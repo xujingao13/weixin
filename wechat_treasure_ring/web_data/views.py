@@ -32,6 +32,7 @@ def add_guess_subject(request):
     subject.choiceB = request.POST.get('choiceB')
     subject.stepsA = 0
     subject.stepsB = 0
+    subject.disabled = False
     subject.save()
     return HttpResponse("success")
 
@@ -74,18 +75,30 @@ def save_user_bet(request):
 
 @csrf_exempt
 def get_guess_subject(request):
-	subjects = []
-	for dbitem in GuessSubject.objects.all():
-		item = {
-			'id':dbitem.id,
-			'content':dbitem.content,
-			'choiceA':dbitem.choiceA,
-			'choiceB':dbitem.choiceB,
-			'stepsA':dbitem.stepsA,
-			'stepsB':dbitem.stepsB
-		}
-		subjects.append(item)
-	return HttpResponse(json.dumps(subjects))
+    subjects = []
+    for dbitem in GuessSubject.objects.filter(disabled=False):
+        item = {
+            'id':dbitem.id,
+            'content':dbitem.content,
+            'choiceA':dbitem.choiceA,
+            'choiceB':dbitem.choiceB,
+            'stepsA':dbitem.stepsA,
+            'stepsB':dbitem.stepsB
+        }
+        subjects.append(item)
+    return HttpResponse(json.dumps(subjects))
+
+
+@csrf_exempt
+def freeze_activity(request):
+    subid = int(request.GET.get("subid"))
+    activity = GuessSubject.objects.filter(id=int(subid))
+    if activity:
+        activity[0].disabled = True
+        activity[0].save()
+        return HttpResponse("success")
+    else:
+        return HttpResponse("failure")
 
 
 @csrf_exempt
@@ -94,10 +107,12 @@ def calculate(request):
     choice = request.GET.get("choice")
     activity = GuessSubject.objects.filter(id=int(subid))[0]
     if choice == "A":
+        activity.result = "A"
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsA)
         print rate
         people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
     elif choice == "B":
+        activity.result = "B"
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsB)
         people = GuessInfomation.objects.filter(sub_id=subid, choice='B')
     for val in people:
@@ -121,6 +136,15 @@ def auto_save(request):
         for user in step_user:
             save_exercise_data(user)
             save_time_line(user)
+        clear_activity()
+
+
+def clear_activity():
+    not_valid = GuessSubject.objects.filter(disabled=True)
+    for val in not_valid:
+        GuessInfomation.objects.filter(subid=val.id).delete()
+    not_valid.delete()
+
 
 @csrf_exempt
 def register(request):
