@@ -111,6 +111,12 @@ def weixin(request):
                             'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2frank.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     elif message.key == 'CHEER':
                         response = we_chat.response_text(u'We are family!')
+                    elif message.key == 'GUESS':
+                        response = we_chat.response_news([{
+                            'title': u'欢迎参加竞猜',
+                            'description': '欢迎参加竞猜，用步数当赌注，竞猜体育赛事等当下活动，竞猜获得的步数可用于当日的游戏活动。',
+                            'picurl': 'https://ss0.baidu.com/73t1bjeh1BF3odCf/it/u=3296618969,3251750186&fm=96&s=CF02458FC64610ED8428C8AF0300F012',
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fguess.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
                 else:
                     response = we_chat.response_text(u'请先注册哦~~(点击个人信息按钮即可注册)')

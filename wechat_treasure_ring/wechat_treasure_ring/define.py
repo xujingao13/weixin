@@ -63,6 +63,11 @@ MENU = """
                     "type": "click",
                     "name": "龙虎榜",
                     "key": "SCORE_RANK"
+                },
+                {
+                    "type":"click",
+                    "name":"竞猜",
+                    "key":"GUESS"
                 }
             ]
         }
