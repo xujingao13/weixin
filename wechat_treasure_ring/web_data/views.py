@@ -37,7 +37,7 @@ def add_guess_subject(request):
         subject.stepsB = 0
         subject.disabled = False
         subject.save()
-        return HttpResponse("success")
+        return HttpResponse("success"+str(subject.id))
     else:
         return HttpResponse("failure")
 
@@ -530,14 +530,17 @@ def get_time_line_data(request):
     if not RingUser.objects.filter(user_id=openid).exists():
         data['isnull'] = True
     else:
-        save_time_line(RingUser.objects.filter(user_id=openid)[0])
         data['isnull'] = False
         data['data'] = []
         try:
             data['data'].append(get_today_time_line(RingUser.objects.filter(user_id=openid)[0]))
         except:
             data['isnull'] = True
-            return HttpResponse(json.dumps(data))
+            result = {
+                'data':data,
+                'openid':openid
+            }
+            return HttpResponse(json.dumps(result))
         i = 1
         while(True):
             if i == 7:
