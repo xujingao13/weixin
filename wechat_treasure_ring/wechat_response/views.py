@@ -220,5 +220,11 @@ def get_user_bet(request):
                     Astep += data.steps
                 elif data.choice == "B":
                     Bstep += data.steps
-            bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep})
+            if activity.disabled:
+                if activity.result == "A":
+                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("finished, result: " + activity.choiceA)})
+                elif activity.result == "B":
+                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("finished, result: " + activity.choiceB)})
+            else:
+                bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("processing" + str(activity.result))})
     return HttpResponse(json.dumps(bet_list))

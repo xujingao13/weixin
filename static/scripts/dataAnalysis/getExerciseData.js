@@ -35,8 +35,6 @@ function draw(){
 	setDataText("30-days-dis-avg",  Math.floor(Math.random()*24)+1, "");
 	setDataText("7-days-steps-avg",  Math.floor(Math.random()*24)+1, "");
 	setDataText("30-days-steps-avg",  Math.floor(Math.random()*24)+1, "");
-	setDataText("7-days-speed-avg",  Math.floor(Math.random()*24)+1, "");
-	setDataText("30-days-speed-avg",  Math.floor(Math.random()*24)+1, "");
 	setDataText("7-days-calories-avg",  Math.floor(Math.random()*24)+1, "");
 	setDataText("30-days-calories-avg",  Math.floor(Math.random()*24)+1, "");
 	setExpertiseAdvise(Math.floor(Math.random()*3)+1,Math.floor(Math.random()*24)+1);
@@ -50,20 +48,16 @@ function renderByJson(json){
 	}
 	drawChart(json["7-days-dis"], json["7-days-dis"].length,"7-days-dis");
 	drawChart(json["7-days-steps"], json["7-days-steps"].length, "7-days-steps");
-	drawChart(json["7-days-speed"], json["7-days-speed"].length, "7-days-speed");
 	drawChart(json["7-days-calories"], json["7-days-calories"].length, "7-days-calories");
 
 	drawChart(json["30-days-dis"], 30,"30-days-dis");
 	drawChart(json["30-days-steps"], 30, "30-days-steps");
-	drawChart(json["30-days-speed"], 30, "30-days-speed");
 	drawChart(json["30-days-calories"], 30, "30-days-calories");
 
 	setDataText("7-days-dis-avg", json["7-days-dis-avg"], "");
 	setDataText("30-days-dis-avg", json["30-days-dis-avg"], "");
 	setDataText("7-days-steps-avg", json["7-days-steps-avg"], "");
 	setDataText("30-days-steps-avg", json["30-days-steps-avg"], "");
-	setDataText("7-days-speed-avg", json["7-days-speed-avg"], "");
-	setDataText("30-days-speed-avg", json["30-days-speed-avg"], "");
 	setDataText("7-days-calories-avg", json["7-days-calories-avg"], "");
 	setDataText("30-days-calories-avg", json["30-days-calories-avg"], "");
 	setExpertiseAdvise(json["yesterday-intensity"], json["7-days-intensity"]);
