@@ -51,8 +51,8 @@ function addDays(days){
     }
     else if(days == 0){
         data = {};
-        data["imgString"] = "";
-        data["dataString"] = "There's no data in our database.";
+        data["imgString"] = getImgString("question.png");
+        data["dataString"] = getH2Element("There's no data in our database.");
         addOneElement(data, 0);
     }
 }
@@ -77,7 +77,7 @@ function addOneElement(data, num){
 function getHTMLDict(data){
     if("none" in data){
         return {
-            imgString:getImgString(""),
+            imgString:getImgString("question.png"),
             dataString:getH2Element("Don't forget uploading data~")
         }
     }

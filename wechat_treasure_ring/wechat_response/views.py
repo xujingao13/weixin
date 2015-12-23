@@ -60,9 +60,9 @@ def weixin(request):
             return HttpResponse(response)
         if isinstance(message, EventMessage):
             if message.type == 'click':
-                if message.key == 'STEP_COUNT':
-                    step_user = RingUser.objects.filter(user_id=message.source)[0]
-                    if step_user:
+                if RingUser.objects.filter(user_id=message.source).exists():
+                    if message.key == 'STEP_COUNT':
+                        step_user = RingUser.objects.filter(user_id=message.source)[0]
                         try:
                             target = step_user.target
                             step = get_today_step(step_user)
@@ -71,42 +71,49 @@ def weixin(request):
                         except Exception as e:
                             print e
                         # 里面的数字应由其他函数获取
-                        return HttpResponse(response)
-                    else:
-                        response = we_chat.response_text(u'Sorry, there\' no data about you in our database.')
-                        return HttpResponse(response)
-
-                elif message.key == 'RANK_LIST':
-                    response = RESPONSE_RANKLIST % (message.source, message.target)
-                    return HttpResponse(response)  
-
-                elif message.key == '2048':
-                    response = we_chat.response_news([{
-                            'title': u'Let us play 2048 together',
-                            'description': 'a simple but interesting game',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fdodojump.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                    elif message.key == 'RANK_LIST':
+                        response = RESPONSE_RANKLIST % (message.source, message.target)
+                    elif message.key == '2048':
+                        response = we_chat.response_news([{
+                                'title': u'Let us play 2048 together',
+                                'description': 'a simple but interesting game',
+                                'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
+                                'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fdodojump.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                    elif message.key == 'FLAPPY':
+                        response = we_chat.response_news([{
+                                'title': u'Let us play Flappy Bird together',
+                                'description': 'a simple but interesting game',
+                                'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
+                                'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fflyingdog.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                    elif message.key == 'SLEEP_CHART':
+                        response = we_chat.response_news([{
+                            'title': u'睡眠质量分析',
+                            'description': '综合一周睡眠情况和过去一个月的睡眠情况给出最权威的睡眠建议',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                    elif message.key == 'EXERCISE_CHART':
+                        response = we_chat.response_news([{
+                            'title': u'运动质量分析',
+                            'description': '图文并茂，专家指导，你值得拥有！',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fexerciseAnalysis.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                    elif message.key == 'TIME_LINE':
+                        response = we_chat.response_news([{
+                            'title': u'时间线',
+                            'description': '时间线',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2ftimeline.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                    elif message.key == 'SCORE_RANK':
+                        response = we_chat.response_news([{
+                            'title': u'游戏龙虎榜',
+                            'description': '龙虎榜',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2frank.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                    elif message.key == 'CHEER':
+                        response = we_chat.response_text(u'We are family!')
                     return HttpResponse(response)
-
-                elif message.key == 'FLAPPY':
-                    response = we_chat.response_news([{
-                            'title': u'Let us play Flappy Bird together',
-                            'description': 'a simple but interesting game',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fflyingdog.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
-                    return HttpResponse(response)
-
-                elif message.key == 'CHART':
-                    print "here"
-                    response = we_chat.response_news([{
-                        'title': u'Today\'s amount of exercise',
-                        'description': 'data analysis',
-                        'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
-                        'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fsleepAnalysis.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
-                    return HttpResponse(response)
-
-                elif message.key == 'CHEER':
-                    response = we_chat.response_text(u'We are family!')
+                else:
+                    response = we_chat.response_text(u'请先注册哦~~(点击个人信息按钮即可注册)')
                     return HttpResponse(response)
             return HttpResponse('OK')
 

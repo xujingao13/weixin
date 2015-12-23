@@ -335,20 +335,33 @@ def game_rank(request):
 def get_sleepdata(request):
     #return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
+    data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
-        return HttpResponse("no user")
+        data['isnull'] = True
+        return HttpResponse(json.dumps(data))
     data = access_sleeping(openid)
     data['isnull'] = False
+    print data
+    data['sleep-time-enough'] = 1
+    data['anxious'] = 1
+    data['30-days-reg'] = []
     return HttpResponse(json.dumps(data))
 
 
 def get_sportsdata(request):
     #return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
+    data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
-        return HttpResponse("no user")
+        data['isnull'] = True
+        return HttpResponse(json.dumps(data))
     data = access_exercising(openid)
+    print data
     data['isnull'] = False
+    if "7-days-speed" not in data:
+        data["7-days-speed"] = []
+    if "30-days-speed" not in data:
+        data["30-days-speed"] = []
     return HttpResponse(json.dumps(data))
 
 
@@ -375,7 +388,7 @@ def get_time_line_data(request):
                 i += 1
             else:
                 break
-        data['data'] = save_time_line(RingUser.objects.filter(user_id=openid)[0])
+        print data
     return HttpResponse(json.dumps(data))
 
 
