@@ -335,6 +335,9 @@ def game_rank(request):
     if game == "bird":
         results_today = BirdUser.objects.all().order_by('-score_today')[start:end]
         results_total = BirdUser.objects.all().order_by('-score_total')[start:end]
+    elif game == "jump":
+        results_today = JumpUser.objects.all().order_by('-score_today')[start:end]
+        results_total = JumpUser.objects.all().order_by('-score_total')[start:end]
     ranklist_today = []
     ranklist_total = []
     for item in results_today:
@@ -420,8 +423,6 @@ def get_time_line_data(request):
                 data['data'].append(ActivityRecord.objects.filter(user_name=openid, day_num=i))[0]
                 i += 1
             else:
-                print i
-                print 1
                 break
         print data
     return HttpResponse(json.dumps(data))

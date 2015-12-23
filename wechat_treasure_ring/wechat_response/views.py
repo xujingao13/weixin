@@ -71,7 +71,8 @@ def weixin(request):
                             target = step_user.target
                             step = get_today_step(step_user)
                             goal_completion = int(float(step) / target * 100)
-                            response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
+                            left_step = step - step_user.steps_totalused
+                            response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%，剩余可用步数' + str(left_step))
                         except Exception as e:
                             print e
                         # 里面的数字应由其他函数获取
@@ -111,7 +112,7 @@ def weixin(request):
                         response = we_chat.response_news([{
                             'title': u'游戏龙虎榜',
                             'description': '龙虎榜',
-                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/info.jpg',
+                            'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/rank.png',
                             'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2frank.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     elif message.key == 'CHEER':
                         response = we_chat.response_text(u'We are family!')
@@ -188,8 +189,9 @@ def process_text_message(msg):
                 if var.target_user_id == step_user[0].user_id:
                     target = step_user[0].target
                     step = get_today_step(step_user[0])
+                    left_step = step - step_user[0].steps_totalused
                     goal_completion = int(float(step) / target * 100)
-                    message_return = con[1] + u"已经走了" + str(step) + u"步了，" + u"完成今日目标：" + str(goal_completion) + u'%'
+                    message_return = con[1] + u"已经走了" + str(step) + u"步了，" + u"完成今日目标：" + str(goal_completion) + u'%，剩余可用步数：' + str(left_step)
                     return message_return
             return u"你没有关注"+con[1]+u",不能查看他的信息"
         else:
@@ -238,17 +240,16 @@ def process_text_message(msg):
         else:
             return u"没有此用户或此用户没有注册><"
     elif con[0] == u"竞猜":
+        result_str = ''
         activity_list = get_user_bet(msg)
-        print activity_list
-        result_str = u""
+        if activity_list == []:
+            return u"你还没有参与任何竞彩活动"
         for val in activity_list:
-            if val["state"][0] == u"1":
-                result = val["state"][1:] + u"赢了"
+            if val[u"state"][0] == u"1":
+                result = val[u"state"][1:] + u"赢了"
             else:
                 result = u"比赛仍在进行中"
-            result_str += val["content"] + u"\n你在" + val["choiceA"] + u"下注" + val["stepA"] + u"步， " + val["choiceB"] + u"下注" + val["stepB"] + u"步\n" + result + u"\n"
-        if result_str==u"":
-            result_str=u"您还没有参与任何竞猜，点击 玩玩游戏->竞猜 参与竞猜"
+            result_str += val[u"content"] + u"：你在" + val[u"choiceA"] + u"下注" + str(val[u"stepsA"]) + u"步， " + val[u"choiceB"] + u"下注" + str(val[u"stepsB"]) + u"步，" + result + u"\n"
         return result_str
 
 
@@ -264,21 +265,21 @@ def get_user_bet(msg):
                 sub_list.append(val.sub_id)
         for val in sub_list:
             activity = GuessSubject.objects.filter(id=int(val))[0]
-            datas = GuessInfomation.objects.filter(user_id=openid, id=val)
+            datas = GuessInfomation.objects.filter(user_id=openid, sub_id=val)
             Astep = 0
             Bstep = 0
             for data in datas:
                 if data.choice == "A":
                     Astep = Astep + data.steps
                 elif data.choice == "B":
-                    Bstep = Bstep + data.steps
-            if activity.disabled and (activity.result == "A" or activity.result == "B"):
+                    Bstep += data.steps
+            if activity.disabled == 1:
                 if activity.result == "A":
-                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("1" + activity.choiceA)})
+                    bet_list.append({"content":activity.content, "choiceA":activity.choiceA, "choiceB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("1" + activity.choiceA)})
                 elif activity.result == "B":
-                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("1" + activity.choiceB)})
+                    bet_list.append({"content":activity.content, "choiceA":activity.choiceA, "choiceB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("1" + activity.choiceB)})
             else:
-                bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("0" + str(activity.result))})
+                bet_list.append({"content":activity.content, "choiceA":activity.choiceA, "choiceB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("0" + str(activity.result))})
     return bet_list
 
 @csrf_exempt

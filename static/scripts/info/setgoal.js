@@ -35,6 +35,7 @@ function set_userinfo(){
 	alert("success");
 }
 $(document).ready(function(){
+	alert(1);
 	$('#goal_step').on('input', update_dis);
 	$('#goal_dis').on('input', update_step);
 	var code = getUrlParameter('code');
