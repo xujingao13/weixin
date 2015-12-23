@@ -338,9 +338,7 @@ def get_sleepdata(request):
     data = access_sleeping(openid)
     data['isnull'] = False
     print data
-    data['sleep-time-enough'] = 1
     data['anxious'] = 1
-    data['30-days-reg'] = []
     return HttpResponse(json.dumps(data))
 
 
@@ -354,10 +352,6 @@ def get_sportsdata(request):
     data = access_exercising(openid)
     print data
     data['isnull'] = False
-    if "7-days-speed" not in data:
-        data["7-days-speed"] = []
-    if "30-days-speed" not in data:
-        data["30-days-speed"] = []
     return HttpResponse(json.dumps(data))
 
 
@@ -383,6 +377,8 @@ def get_time_line_data(request):
                 data['data'].append(ActivityRecord.objects.filter(user_name=openid, day_num=i))[0]
                 i += 1
             else:
+                print i
+                print 1
                 break
         print data
     return HttpResponse(json.dumps(data))
