@@ -39,7 +39,6 @@ def add_guess_subject(request):
 
 @csrf_exempt
 def save_user_bet(request):
-    fail = False
     subid = request.GET.get("subid")
     openid = request.GET.get("openid")
     steps = int(request.GET.get("steps"))
@@ -50,9 +49,10 @@ def save_user_bet(request):
     user.steps_totalused += steps
     all_num = get_today_step(user)
     if user.steps_totalused > all_num:
-        steps -= user.steps_totalused - all_num
-        user.steps_totalused = all_num
-        fail = True
+        result = {
+            'success':False
+        }
+        return HttpResponse(json.dumps(result))
     activity = GuessSubject.objects.filter(id=int(subid))[0]
     if choice == 'A':
         activity.stepsA += steps
@@ -66,10 +66,11 @@ def save_user_bet(request):
     else:
         data_object = GuessInfomation(user_id=openid, sub_id=int(subid), choice = choice, steps = steps)
         data_object.save()
-    if fail:
-        return HttpResponse("failure")
-    else:
-        return HttpResponse("success")
+    user.save()
+    result = {
+        'success':True
+    }
+    return HttpResponse(json.dumps(result))
 
 
 @csrf_exempt
@@ -108,6 +109,7 @@ def calculate(request):
     if choice == "A":
         activity.result = "A"
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsA)
+        print rate
         people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
     elif choice == "B":
         activity.result = "B"
@@ -116,6 +118,8 @@ def calculate(request):
     for val in people:
         personal_info = RingUser.objects.filter(user_id=val.user_id)
         personal_info[0].steps_totalused -= int(rate * val.steps)
+        print personal_info[0].steps_totalused
+        personal_info[0].save()
     return HttpResponse("success")
 
 
@@ -355,20 +359,33 @@ def game_rank(request):
 def get_sleepdata(request):
     #return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
+    data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
-        return HttpResponse("no user")
+        data['isnull'] = True
+        return HttpResponse(json.dumps(data))
     data = access_sleeping(openid)
     data['isnull'] = False
+    print data
+    data['sleep-time-enough'] = 1
+    data['anxious'] = 1
+    data['30-days-reg'] = []
     return HttpResponse(json.dumps(data))
 
 
 def get_sportsdata(request):
     #return HttpResponse(json.dumps({'isnull':True}))
     openid = request.GET.get("openid")
+    data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
-        return HttpResponse("no user")
+        data['isnull'] = True
+        return HttpResponse(json.dumps(data))
     data = access_exercising(openid)
+    print data
     data['isnull'] = False
+    if "7-days-speed" not in data:
+        data["7-days-speed"] = []
+    if "30-days-speed" not in data:
+        data["30-days-speed"] = []
     return HttpResponse(json.dumps(data))
 
 
@@ -395,7 +412,7 @@ def get_time_line_data(request):
                 i += 1
             else:
                 break
-        data['data'] = save_time_line(RingUser.objects.filter(user_id=openid)[0])
+        print data
     return HttpResponse(json.dumps(data))
 
 
