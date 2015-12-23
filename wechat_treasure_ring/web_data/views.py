@@ -109,12 +109,10 @@ def calculate(request):
     if choice == "A":
         activity.result = "A"
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsA)
-        print rate
         people = GuessInfomation.objects.filter(sub_id=subid, choice='A')
     elif choice == "B":
         activity.result = "B"
         rate = float(activity.stepsB + activity.stepsA) / float(activity.stepsB)
-        print rate
         people = GuessInfomation.objects.filter(sub_id=subid, choice='B')
     for val in people:
         personal_info = RingUser.objects.filter(user_id=val.user_id)
@@ -138,12 +136,13 @@ def auto_save(request):
             save_exercise_data(user)
             save_time_line(user)
         clear_activity()
+    return HttpResponse('success')
 
 
 def clear_activity():
     not_valid = GuessSubject.objects.filter(disabled=True)
     for val in not_valid:
-        GuessInfomation.objects.filter(subid=val.id).delete()
+        GuessInfomation.objects.filter(sub_id=val.id).delete()
     not_valid.delete()
 
 

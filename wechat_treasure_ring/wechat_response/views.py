@@ -36,8 +36,6 @@ def weixin(request):
         signature = request.GET.get('signature')
         timestamp = request.GET.get('timestamp')
         nonce = request.GET.get('nonce')
-        if "bet" in request.GET:
-            return get_user_bet(request)
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
@@ -117,6 +115,12 @@ def weixin(request):
                             'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2frank.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     elif message.key == 'CHEER':
                         response = we_chat.response_text(u'We are family!')
+                    elif message.key == 'GUESS':
+                        response = we_chat.response_news([{
+                            'title': u'欢迎参加竞猜',
+                            'description': '欢迎参加竞猜，用步数当赌注，竞猜体育赛事等当下活动，竞猜获得的步数可用于当日的游戏活动。',
+                            'picurl': 'https://ss0.baidu.com/73t1bjeh1BF3odCf/it/u=3296618969,3251750186&fm=96&s=CF02458FC64610ED8428C8AF0300F012',
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fguess.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
                 else:
                     response = we_chat.response_text(u'请先注册哦~~(点击个人信息按钮即可注册)')
@@ -225,7 +229,6 @@ def process_text_message(msg):
                 if val.target_user_id == target_user[0].user_id:
                     temp = 1
                     break
-            print temp
             if temp == 1:
                 RecordAttention.objects.get(source_user_id=msg.source, target_user_id=target_user[0].user_id).delete()
                 message_return = u"取消关注:" + con[1] + u" 成功"
@@ -234,10 +237,20 @@ def process_text_message(msg):
             return message_return
         else:
             return u"没有此用户或此用户没有注册><"
+    elif con[0] == u"竞猜":
+        activity_list = get_user_bet(msg)
+        result_str = ""
+        for val in activity_list:
+            if val["state"][0] == "1":
+                result = val["state"][1:] + "赢了"
+            else:
+                result = "比赛仍在进行中"
+            result_str += val["content"] + "\n你在" + val["choiceA"] + "下注" + val["stepA"] + "步， " + val["choiceB"] + "下注" + val["stepB"] + "步\n" + result + "\n"
+        return result_str
 
 
-def get_user_bet(request):
-    openid = request.GET.get("openid")
+def get_user_bet(msg):
+    openid = msg.source
     bet_list = list()
     if GuessInfomation.objects.filter(user_id=openid).exists():
         data_objects = GuessInfomation.objects.filter(user_id=openid)
@@ -257,9 +270,9 @@ def get_user_bet(request):
                     Bstep += data.steps
             if activity.disabled:
                 if activity.result == "A":
-                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("finished, result: " + activity.choiceA)})
+                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("1" + activity.choiceA)})
                 elif activity.result == "B":
-                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("finished, result: " + activity.choiceB)})
+                    bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("1" + activity.choiceB)})
             else:
-                bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("processing" + str(activity.result))})
-    return HttpResponse(json.dumps(bet_list))
+                bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("0" + str(activity.result))})
+    return bet_list

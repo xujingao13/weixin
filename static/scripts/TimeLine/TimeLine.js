@@ -156,6 +156,13 @@ function getHTMLDict(data){
                     getTime(data["startTime"])
             }
         }
+        else if(data["subType"] == 4){
+            return {
+                imgString:getImgString("computer.png"),
+                dataString:getH2Element("Activity in Office") +
+                    getTime(data["startTime"])
+            }
+        }
     }
 }
 
