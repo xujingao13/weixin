@@ -2,11 +2,16 @@
  * Created by littlepig on 2015/11/29.
  */
 $(document).ready(function(){
-	$(function () {
-		$('#collapseOne').collapse('show');
-		$('#collapseTwo').collapse('hide');
-		$('#collapseThree').collapse('hide');
+
+	$('#collapseOne').collapse('show');
+	$('#collapseTwo').collapse('hide');
+	$('#collapseThree').collapse('hide');
+	var code = getUrlParameter('code');
+	$.getJSON("data/getsleepdata?code="+code, function(data){
+		openid = data.openid;
+		renderByJson(data.data);
 	});
+	/*
 	get_userinfo(function(data){
 		openid = data.openid;
 		nickname = data.nickname;
@@ -16,7 +21,7 @@ $(document).ready(function(){
 			
 			renderByJson(sleepData);
 		})
-	});
+	});*/
 });
 
 //test drawing
