@@ -58,10 +58,10 @@ def weixin(request):
         elif isinstance(message, EventMessage):
             if message.type == 'subscribe':
                 response = we_chat.response_text(u'''欢迎来到‘珍环传’运动手环微信公众平台，请先点击‘个人信息’按钮进行注册哦～。
-                    输入‘关注’+‘昵称’关注好友
-                    输入‘我的关注’或者‘关注列表’查看我关注的与关注我的人
-                    输入‘取消关注’+‘昵称’取消关注好友
-                    输入‘查看信息’+‘昵称’查看关注好友的信息''')
+输入‘关注’+‘昵称’关注好友
+输入‘我的关注’或者‘关注列表’查看我关注的与关注我的人
+输入‘取消关注’+‘昵称’取消关注好友
+输入‘查看信息’+‘昵称’查看关注好友的信息''')
                 return HttpResponse(response)
             elif message.type == 'click':
                 if RingUser.objects.filter(user_id=message.source).exists():
@@ -119,7 +119,7 @@ def weixin(request):
                         response = we_chat.response_news([{
                             'title': u'欢迎参加竞猜',
                             'description': '欢迎参加竞猜，用步数当赌注，竞猜体育赛事等当下活动，竞猜获得的步数可用于当日的游戏活动。',
-                            'picurl': 'https://ss0.baidu.com/73t1bjeh1BF3odCf/it/u=3296618969,3251750186&fm=96&s=CF02458FC64610ED8428C8AF0300F012',
+                            'picurl': 'http://'+LOCAL_IP+'/guess/guess.png',
                             'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fguess.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
                 else:
@@ -239,22 +239,26 @@ def process_text_message(msg):
             return u"没有此用户或此用户没有注册><"
     elif con[0] == u"竞猜":
         activity_list = get_user_bet(msg)
-        result_str = ""
+        print activity_list
+        result_str = u""
         for val in activity_list:
-            if val["state"][0] == "1":
-                result = val["state"][1:] + "赢了"
+            if val["state"][0] == u"1":
+                result = val["state"][1:] + u"赢了"
             else:
-                result = "比赛仍在进行中"
-            result_str += val["content"] + "\n你在" + val["choiceA"] + "下注" + val["stepA"] + "步， " + val["choiceB"] + "下注" + val["stepB"] + "步\n" + result + "\n"
+                result = u"比赛仍在进行中"
+            result_str += val["content"] + u"\n你在" + val["choiceA"] + u"下注" + val["stepA"] + u"步， " + val["choiceB"] + u"下注" + val["stepB"] + u"步\n" + result + u"\n"
+        if result_str==u"":
+            result_str=u"您还没有参与任何竞猜，点击 玩玩游戏->竞猜 参与竞猜"
         return result_str
 
 
 def get_user_bet(msg):
     openid = msg.source
-    bet_list = list()
+    print openid
+    bet_list = []
     if GuessInfomation.objects.filter(user_id=openid).exists():
         data_objects = GuessInfomation.objects.filter(user_id=openid)
-        sub_list = list()
+        sub_list = []
         for val in data_objects:
             if not (val.sub_id in sub_list):
                 sub_list.append(val.sub_id)
@@ -265,10 +269,10 @@ def get_user_bet(msg):
             Bstep = 0
             for data in datas:
                 if data.choice == "A":
-                    Astep += data.steps
+                    Astep = Astep + data.steps
                 elif data.choice == "B":
-                    Bstep += data.steps
-            if activity.disabled:
+                    Bstep = Bstep + data.steps
+            if activity.disabled and (activity.result == "A" or activity.result == "B"):
                 if activity.result == "A":
                     bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep, "state":("1" + activity.choiceA)})
                 elif activity.result == "B":
