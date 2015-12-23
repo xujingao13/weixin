@@ -13,7 +13,8 @@ from wechat_sdk.messages import (
     EventMessage,
     TextMessage
 )
-import urllib2
+
+import urllib
 import json
 import sys
 import wechat_response.data as data_tool
@@ -35,6 +36,8 @@ def weixin(request):
         signature = request.GET.get('signature')
         timestamp = request.GET.get('timestamp')
         nonce = request.GET.get('nonce')
+        if "bet" in request.GET:
+            return get_user_bet(request)
         if not we_chat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
             return HttpResponse("Verify failed")
         else:
@@ -60,10 +63,13 @@ def weixin(request):
                 if message.key == 'STEP_COUNT':
                     step_user = RingUser.objects.filter(user_id=message.source)[0]
                     if step_user:
-                        target = step_user.target
-                        step = get_today_step(step_user)
-                        goal_completion = int(float(step) / target * 100)
-                        response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
+                        try:
+                            target = step_user.target
+                            step = get_today_step(step_user)
+                            goal_completion = int(float(step) / target * 100)
+                            response = we_chat.response_text(u'跑了' + str(step) + u'步咯，完成今日目标：' + str(goal_completion) + u'%')
+                        except Exception as e:
+                            print e
                         # 里面的数字应由其他函数获取
                         return HttpResponse(response)
                     else:
@@ -79,7 +85,7 @@ def weixin(request):
                             'title': u'Let us play 2048 together',
                             'description': 'a simple but interesting game',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/2048.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2f2048.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fdodojump.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'FLAPPY':
@@ -87,7 +93,7 @@ def weixin(request):
                             'title': u'Let us play Flappy Bird together',
                             'description': 'a simple but interesting game',
                             'picurl': 'http://7xn2s5.com1.z0.glb.clouddn.com/flappy_bird.jpg',
-                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fbird.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
+                            'url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+AppID+'&redirect_uri=http%3a%2f%2f'+LOCAL_IP+'%2fflyingdog.html'+'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'}])
                     return HttpResponse(response)
 
                 elif message.key == 'CHART':
@@ -110,13 +116,13 @@ def get_userinfo(request):
     #return 1
     get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
     try:
-        f = urllib2.urlopen(get_url)
+        f = urllib.urlopen(get_url)
         string_json = f.read()
         reply = json.loads(string_json)
         openid = reply['openid']
         access_token = reply['access_token']
         get_url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN'%(access_token,openid)
-        f = urllib2.urlopen(get_url)
+        f = urllib.urlopen(get_url)
         string_json = f.read()
         reply = json.loads(string_json)
         result = {
@@ -136,7 +142,10 @@ def get_userinfo(request):
 
 def process_text_message(msg):
     con = msg.content.split(" ")
+    argus = len(con)
     if con[0] == u"关注":
+        if argus == 1:
+            return u"输入‘关注’+‘用户名’关注别人"
         step_user = RingUser.objects.filter(nickname=con[1])
         relation = RecordAttention.objects.filter(source_user_id=msg.source)
         if step_user:
@@ -164,6 +173,8 @@ def process_text_message(msg):
         name_list = name_list[0:(length-1)]
         return name_list
     elif con[0] == u"取消关注":
+        if argus == 1:
+            return u"输入‘取消关注’+‘用户名’取消关注他人"
         target_user = RingUser.objects.filter(nickname=con[1])
         if target_user:
             step_user = RecordAttention.objects.filter(source_user_id=msg.source)
@@ -183,12 +194,24 @@ def process_text_message(msg):
             return u"没有此用户或此用户没有注册><"
 
 
-@csrf_exempt
-def create_menu():
-    get_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (AppID,AppSecret)
-    f = urllib2.urlopen(get_url)
-    string_json = f.read()
-    access_token = json.loads(string_json)['access_token']
-    post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
-    request = urllib2.urlopen(post_url, (MENU % (USER_URL,RANK_URL)).encode('utf-8'))
-    print request.read()
+def get_user_bet(request):
+    openid = request.GET.get("openid")
+    bet_list = list()
+    if GuessInfomation.objects.filter(user_id=openid).exists():
+        data_objects = GuessInfomation.objects.filter(user_id=openid)
+        sub_list = list()
+        for val in data_objects:
+            if not (val.sub_id in sub_list):
+                sub_list.append(val.sub_id)
+        for val in sub_list:
+            activity = GuessSubject.objects.filter(id=int(val))[0]
+            datas = GuessInfomation.objects.filter(user_id=openid, id=val)
+            Astep = 0
+            Bstep = 0
+            for data in datas:
+                if data.choice == "A":
+                    Astep += data.steps
+                elif data.choice == "B":
+                    Bstep += data.steps
+            bet_list.append({"content":activity.content, "contentA":activity.choiceA, "contentB":activity.choiceB, "stepsA":Astep, "stepsB":Bstep})
+    return HttpResponse(json.dumps(bet_list))

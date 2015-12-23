@@ -31,6 +31,7 @@ class Record(models.Model):
     wakeTimes = models.IntegerField()
     score = models.FloatField()
 
+
 class RecordByDay(models.Model):
     user_name = models.CharField(max_length=30)
     year = models.IntegerField()
@@ -44,6 +45,12 @@ class RecordByDay(models.Model):
     score = models.FloatField()
 
 
+class ActivityRecord(models.Model):
+    user_name = models.CharField(max_length=30)
+    day_num = models.IntegerField()
+    data = models.TextField(max_length = 30000)
+
+
 class BirdUser(models.Model):
     openid = models.CharField(max_length=30)
     steps_used = models.IntegerField()
@@ -51,10 +58,12 @@ class BirdUser(models.Model):
     score_total = models.IntegerField()
 
 
-class ActivityRecord(models.Model):
-    user_name = models.CharField(max_length=30)
-    data = models.CharField(max_length=20000)
-    
+class JumpUser(models.Model):
+    openid = models.CharField(max_length=30)
+    steps_used = models.IntegerField()
+    score_today = models.IntegerField()
+    score_total = models.IntegerField()
+
 
 class RecordAttention(models.Model):
     source_user_id = models.CharField(max_length=30)
@@ -62,3 +71,16 @@ class RecordAttention(models.Model):
     attentionTime = models.IntegerField()
 
 
+class GuessInfomation(models.Model):
+    user_id = models.CharField(max_length=30)
+    sub_id = models.IntegerField()
+    choice = models.CharField(max_length=30)
+    steps = models.IntegerField()
+
+
+class GuessSubject(models.Model):
+    content = models.CharField(max_length = 400)
+    choiceA = models.CharField(max_length = 100)
+    choiceB = models.CharField(max_length = 100)
+    stepsA = models.IntegerField()
+    stepsB = models.IntegerField()
