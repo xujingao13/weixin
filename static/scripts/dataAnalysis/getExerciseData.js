@@ -128,7 +128,7 @@ function setExpertiseAdvise(yesterdayIntensity, sevenDayIntensity){
 }
 //set data according to the data, "suffix" is the unit
 function setDataText(idString, data, suffix){
-	$("#" + idString).text(String(data) + suffix);
+	$("#" + idString).text(String(Math.floor(data)) + suffix);
 }
 //test for random data
 function getRandomArray(length){

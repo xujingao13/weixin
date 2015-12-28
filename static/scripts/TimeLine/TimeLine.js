@@ -130,7 +130,7 @@ function getHTMLDict(data){
                     getTime(data["startTime"])
             }
         }
-        else if(data["subType"] == 5){
+        else{
             return {
                 imgString:getImgString("swim.png"),
                 dataString:getH2Element("Swim") +
@@ -160,7 +160,7 @@ function getHTMLDict(data){
                     getTime(data["startTime"])
             }
         }
-        else if(data["subType"] == 4){
+        else {
             return {
                 imgString:getImgString("computer.png"),
                 dataString:getH2Element("Activity in Office") +

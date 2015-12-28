@@ -392,12 +392,14 @@ def save_time_line(user):
         for i in range(length):
             user_temp = ActivityRecord.objects.filter(user_name=user.user_id, day_num=(i+1))
             if user_temp:
-                user_temp[0].day_num = i + 1
-                user_temp[0].data =json.dumps(new_data[i])
-                user_temp[0].save()
-            else:
-                user_temp = ActivityRecord(user_name=user.user_id, day_num=(i+1), data=json.dumps(new_data[i]))
-                user_temp.save()
+                user_case = user_temp[0]
+                user_case.day_num = i + 1
+                user_case.data =json.dumps(new_data[i])
+                user_case.save()
+    else:
+        for i in range(length):
+            user_temp = ActivityRecord(user_name=user.user_id, day_num=(i+1), data=json.dumps(new_data[i]))
+            user_temp.save()
 
 
 def get_today_time_line(user):
@@ -826,6 +828,6 @@ def calc_intensity(cb_rate):
         intensity = 2
     elif 0.55 < cb_rate < 0.725:
         intensity = 3
-    elif 0.725 < cb_rate < 0.9:
+    elif 0.725 < cb_rate:
         intensity = 4
     return intensity

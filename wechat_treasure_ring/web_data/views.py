@@ -546,7 +546,7 @@ def get_time_line_data(request):
             if i == 7:
                 break
             if ActivityRecord.objects.filter(user_name=openid, day_num = i).exists():
-                data['data'].append(ActivityRecord.objects.filter(user_name=openid, day_num=i))[0]
+                data['data'].append(json.loads(ActivityRecord.objects.filter(user_name=openid, day_num=i)[0].data))
                 i += 1
             else:
                 break
@@ -554,7 +554,9 @@ def get_time_line_data(request):
         'data':data,
         'openid':openid
     }
-    return HttpResponse(json.dumps(result))
+    result_str = json.dumps(result)
+    result_str1 = result_str.replace("u\'","\'")
+    return HttpResponse(result_str1)
 
 
 

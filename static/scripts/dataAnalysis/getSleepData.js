@@ -82,14 +82,14 @@ function sleepChart(chartSleepTime,chartDeepSleepTime, days, chartId){
 
 			grid: { hoverable: true, clickable: true },
 			xaxis: { min: 1, max: days },
-			yaxis: { min: 1, max: 15 },
+			yaxis: { min: 1, max: 30 },
 			colors: ["#F90", "#3C4049"]
 		});
 }
 
 //set data according to the data, "suffix" is the unit
 function setDataText(idString, data, suffix){
-	$("#" + idString).text(String(data) + suffix);
+	$("#" + idString).text(String(Math.floor(data)) + suffix);
 }
 //judge whether the fluctuation is normal
 function setSleepFluctuate(idString, data){

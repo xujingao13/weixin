@@ -27,8 +27,6 @@ wtr_db:
   volumes:
     - ./datadir:/var/lib/mysql
     - ./my.cnf:/etc/my.cnf
-  ports:
-    - "47005:3306"
   restart: always
 wtr_web:
   image: nginx:1.9.8
