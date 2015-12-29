@@ -250,8 +250,10 @@ def get_partial_ranklist(openid, objects, type):
         indexlist = [0, 1, 2, 3]
     elif n == l - 1 or n == l - 2:
         indexlist = [l - 4, l - 3, l - 2, l - 1]
-    else:
+    elif n > 0 and n < l - 1:
         indexlist = [n - 1, n, n + 1, n + 2]
+    else:
+        return []
     if l <= 4:
         indexlist = range(l)
     for i in indexlist:
@@ -333,60 +335,7 @@ def end_game(request):
     return HttpResponse(json.dumps({"result": "success"}))
 
 
-@csrf_exempt
-def game_rank(request):
-    game = request.GET.get('game')
-    start = request.GET.get('start')
-    end = request.GET.get('end')
-    openid = request.GET.get('openid')
-    attention = RecordAttention.objects.filter(source_user_id=openid)
-    attention_list = []
-    for val in attention:
-        attention_list.append(val.target_user_id)
-    if game == "bird":
-        results_today = BirdUser.objects.all().order_by('-score_today')[start:end]
-        results_total = BirdUser.objects.all().order_by('-score_total')[start:end]
-    elif game == "jump":
-        results_today = JumpUser.objects.all().order_by('-score_today')[start:end]
-        results_total = JumpUser.objects.all().order_by('-score_total')[start:end]
-    ranklist_today = []
-    ranklist_total = []
-    for item in results_today:
-        itemuser = RingUser.objects.get(user_id=item.openid)
-        if item.openid in attention_list:
-            is_attention = True
-        else:
-            is_attention = False
-        rankitem = {
-            "openid": item.openid,
-            "nickname": itemuser.nickname,
-            "headimgurl": itemuser.headimgurl,
-            "score": item.score_today,
-            "is_attention": is_attention
-        }
-        ranklist_today.append(rankitem)
-    for item in results_total:
-        itemuser = RingUser.objects.get(user_id=item.openid)
-        if item.openid in attention_list:
-            is_attention = True
-        else:
-            is_attention = False
-        rankitem = {
-            "openid": item.openid,
-            "nickname": itemuser.nickname,
-            "headimgurl": itemuser.headimgurl,
-            "score": item.score_total,
-            "is_attention": is_attention
-        }
-        ranklist_total.append(rankitem)
-    result = {
-        "today":ranklist_today,
-        "total":ranklist_total
-    }
-    return HttpResponse(json.dumps(result))
-
-
-def get_rankList(results, attention_list):
+def get_rankList(results, attention_list, type):
     ranklist = []
     for item in results:
         itemuser = RingUser.objects.get(user_id=item.openid)
@@ -394,19 +343,32 @@ def get_rankList(results, attention_list):
             is_attention = True
         else:
             is_attention = False
-        rankitem = {
-            "openid": item.openid,
-            "nickname": itemuser.nickname,
-            "headimgurl": itemuser.headimgurl,
-            "score": item.score_today,
-            "is_attention": is_attention
-        }
+        if type == 0:
+            rankitem = {
+                "openid": item.openid,
+                "nickname": itemuser.nickname,
+                "headimgurl": itemuser.headimgurl,
+                "score": item.score_today,
+                "is_attention": is_attention
+            }
+        elif type == 1:
+            rankitem = {
+                "openid": item.openid,
+                "nickname": itemuser.nickname,
+                "headimgurl": itemuser.headimgurl,
+                "score": item.score_total,
+                "is_attention": is_attention
+            }
+
         ranklist.append(rankitem)
     return ranklist
 
 
 def get_game_rank(request):
     openid = request.GET.get('openid')
+    ifuser = RingUser.objects.filter(user_id=openid)
+    if not ifuser:
+        return HttpResponse("User Not Exists")
     attention = RecordAttention.objects.filter(source_user_id=openid)
     attention_list = []
     for val in attention:
@@ -416,10 +378,10 @@ def get_game_rank(request):
     results_today_jump = JumpUser.objects.all().order_by('-score_today')[0:100]
     results_total_jump = JumpUser.objects.all().order_by('-score_total')[0:100]
 
-    ranklist_today_bird = get_rankList(results_today_bird, attention_list)
-    ranklist_total_bird = get_rankList(results_total_bird, attention_list)
-    ranklist_today_jump = get_rankList(results_today_jump, attention_list)
-    ranklist_total_jump = get_rankList(results_total_jump, attention_list)
+    ranklist_today_bird = get_rankList(results_today_bird, attention_list, 0)
+    ranklist_total_bird = get_rankList(results_total_bird, attention_list, 1)
+    ranklist_today_jump = get_rankList(results_today_jump, attention_list, 0)
+    ranklist_total_jump = get_rankList(results_total_jump, attention_list, 1)
     result = {
         "openid":openid,
         "today_bird":ranklist_today_bird,
@@ -507,7 +469,9 @@ def get_time_line_data(request):
 
 def cancel_follow(request, message):
     source_id, target_id = message.split('@')
-    RecordAttention.objects.get(source_user_id=source_id, target_user_id=target_id).delete()
+    data = RecordAttention.objects.filter(source_user_id=source_id, target_user_id=target_id)
+    if data:
+        RecordAttention.objects.get(source_user_id=source_id, target_user_id=target_id).delete()
     return HttpResponse('OK')
 
 
