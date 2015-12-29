@@ -37,7 +37,7 @@ def add_guess_subject(request):
         subject.stepsB = 0
         subject.disabled = False
         subject.save()
-        return HttpResponse("success"+str(subject.id))
+        return HttpResponse("success")
     else:
         return HttpResponse("failure")
 
@@ -80,16 +80,7 @@ def save_user_bet(request):
 
 @csrf_exempt
 def get_guess_subject(request):
-    code = request.GET.get('code')
-    get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
-    try:
-        f = urllib.urlopen(get_url)
-        string_json = f.read()
-        reply = json.loads(string_json)
-        openid = reply[u'openid']
-    except:
-        return HttpResponse("Invalid code")
-        #openid = "oDetGv9_dqQBv1V-0ySwyDqdLtLs"
+    openid = request.GET.get("openid")
     subjects = []
     for dbitem in GuessSubject.objects.filter(disabled=False):
         item = {
@@ -185,20 +176,8 @@ def register(request):
     user_wight = request.GET.get("weight")
     user_goal = request.GET.get("goal_step")
     user_openid = request.GET.get("openid")
-    if not ((user_sex and user_age and user_height and user_goal and user_wight and user_goal and user_openid) and (user_wight.isdigit() and user_age.isdigit() and user_height.isdigit())):
+    if not (user_goal and user_sex and user_age and user_height and user_wight and user_openid):
         return HttpResponse("failure")
-    get_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'%(AppID,AppSecret)
-    f = urllib.urlopen(get_url)
-    string_json = f.read()
-    reply = json.loads(string_json)
-    #print reply
-    access_token = reply[u'access_token']
-    get_url = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=zh_CN'%(access_token , user_openid)
-    f = urllib.urlopen(get_url)
-    string_json = f.read()
-    reply = json.loads(string_json)
-    nickname = reply[u'nickname']
-    headimgurl = reply[u'headimgurl']
     if RingUser.objects.filter(user_id=user_openid).exists():
         user = RingUser.objects.filter(user_id=user_openid)[0]
         user.sex = user_sex
@@ -206,8 +185,8 @@ def register(request):
         user.height=user_height
         user.weight=user_wight
         user.target=user_goal
-        user.headimgurl = headimgurl
-        user.nickname = nickname
+        user.headimgurl = ""
+        user.nickname = "e"
         user.save()
     else:
         user_new = RingUser(
@@ -219,8 +198,8 @@ def register(request):
             target=user_goal,
             last_record=0,
             steps_totalused=0,
-            headimgurl=headimgurl,
-            nickname=nickname
+            headimgurl="",
+            nickname=""
         )
         user_new.save()
         user_bird = BirdUser(
@@ -427,17 +406,7 @@ def get_rankList(results, attention_list):
 
 
 def get_game_rank(request):
-    code = request.GET.get('code')
-    get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
-    try:
-        f = urllib.urlopen(get_url)
-        string_json = f.read()
-        reply = json.loads(string_json)
-        openid = reply[u'openid']
-    except:
-        return HttpResponse("Invalid code")
-        #openid = "oDetGv9_dqQBv1V-0ySwyDqdLtLs"
-
+    openid = request.GET.get('openid')
     attention = RecordAttention.objects.filter(source_user_id=openid)
     attention_list = []
     for val in attention:
@@ -462,16 +431,7 @@ def get_game_rank(request):
 
 
 def get_sleepdata(request):
-    code = request.GET.get('code')
-    get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
-    try:
-        f = urllib.urlopen(get_url)
-        string_json = f.read()
-        reply = json.loads(string_json)
-        openid = reply[u'openid']
-    except:
-        return HttpResponse("Invalid code")
-    #return HttpResponse(json.dumps({'isnull':True}))
+    openid = request.GET.get("openid")
     data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
         data['isnull'] = True
@@ -490,16 +450,7 @@ def get_sleepdata(request):
 
 
 def get_sportsdata(request):
-    code = request.GET.get('code')
-    get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
-    try:
-        f = urllib.urlopen(get_url)
-        string_json = f.read()
-        reply = json.loads(string_json)
-        openid = reply[u'openid']
-    except:
-        return HttpResponse("Invalid code")
-    #return HttpResponse(json.dumps({'isnull':True}))
+    openid = request.GET.get('openid')
     data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
         data['isnull'] = True
@@ -517,15 +468,7 @@ def get_sportsdata(request):
 
 
 def get_time_line_data(request):
-    code = request.GET.get('code')
-    get_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code'%(AppID,AppSecret,code)
-    try:
-        f = urllib.urlopen(get_url)
-        string_json = f.read()
-        reply = json.loads(string_json)
-        openid = reply[u'openid']
-    except:
-        return HttpResponse("Invalid code")
+    openid = request.GET.get('openid')
     data = {}
     if not RingUser.objects.filter(user_id=openid).exists():
         data['isnull'] = True
