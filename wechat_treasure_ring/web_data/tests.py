@@ -495,7 +495,7 @@ class test_register(TestCase):
 		)
 
 	def test_normalregister(self):
-		request = self.factory.post('data/register', {"sex":"male", "age":20, "height":182, "weight":75, 'goal_step':100, "openid":'czj'})
+		request = self.factory.post('data/register?sex=male&age=20&height=182&weight=75&goal_step=100&openid=czj')
 		response = register(request)
 		self.assertContains(response, "add info successfully", count=1, status_code=200)
 		user = RingUser.objects.filter(user_id="czj")
@@ -504,7 +504,7 @@ class test_register(TestCase):
 		self.assertEqual(user[0].user_id, "czj")
 
 	def test_alreadyregistered(self):
-		request = self.factory.post('data/register', {"sex":"female", "age":20, "height":182, "weight":75, 'goal_step':100, "openid":'xja'})
+		request = self.factory.post('data/register?sex=female&age=20&height=182&weight=75&goal_step=100&openid=xja')
 		response = register(request)
 		self.assertContains(response, "add info successfully", count=1, status_code=200)
 		user = RingUser.objects.all()
@@ -516,7 +516,7 @@ class test_register(TestCase):
 		self.assertEqual(user[0].user_id, "xja")
 
 	def test_notcomplete(self):
-		request = self.factory.post('data/register', {"sex":"female", "height":182, "weight":75, 'goal_step':100, "openid":'xja'})
+		request = self.factory.post('data/register?sex=male&height=182&weight=75&goal_step=100&openid=xja')
 		response = register(request)
 		self.assertContains(response, "failure", count=1, status_code=200)
 
@@ -556,5 +556,45 @@ class test_datachart(TestCase):
 	def test_getsleepdataexistsnodata(self):
 		request = self.factory.get('data/getsleepdata?openid=xja')
 		response = get_sleepdata(request)
+		data = json.loads(response.content)
+		self.assertEqual(data["data"]["isnull"], True)
+
+	def test_getexercisedataexistshavedata(self):
+		request1 = self.factory.get('data/autosave?sleep=0&exercise_and_time=1')
+		request2 = self.factory.get('data/getsportsdata?openid=xja')
+		auto_save(request1)
+		response = get_sportsdata(request2)
+		data = json.loads(response.content)
+		self.assertEqual(data["data"]["isnull"], False)
+
+	def test_getexercisedatanotexists(self):
+		request = self.factory.get('data/getsportsdata?openid=czj')
+		response = get_sportsdata(request)
+		data = json.loads(response.content)
+		self.assertEqual(data["isnull"], True)
+
+	def test_getexercisedataexistsnodata(self):
+		request = self.factory.get('data/getsportsdata?openid=xja')
+		response = get_sportsdata(request)
+		data = json.loads(response.content)
+		self.assertEqual(data["data"]["isnull"], True)
+
+	def test_gettimelinedataexistshavedata(self):
+		request1 = self.factory.get('data/autosave?sleep=0&exercise_and_time=1')
+		request2 = self.factory.get('data/getTimeLineData?openid=xja')
+		auto_save(request1)
+		response = get_sportsdata(request2)
+		data = json.loads(response.content)
+		self.assertEqual(data["data"]["isnull"], False)
+
+	def test_gettimelinedatanotexists(self):
+		request = self.factory.get('data/getTimeLineData?openid=czj')
+		response = get_sportsdata(request)
+		data = json.loads(response.content)
+		self.assertEqual(data["isnull"], True)
+
+	def test_gettimelinedataexistsnodata(self):
+		request = self.factory.get('data/getTimeLineData?openid=xja')
+		response = get_sportsdata(request)
 		data = json.loads(response.content)
 		self.assertEqual(data["data"]["isnull"], True)
