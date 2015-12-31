@@ -29,7 +29,7 @@ function renderByJson(json){
     }
     addDays(data.length);
     for(var j = 0; j < data.length; j++){
-        addItem(data[j][0]["startTime"].split(" ")[0], j);
+        setOneDate(data[j][0]["startTime"].split(" ")[0], j);
         var i = 0;
         for(; i < data[j].length; i++){
             addOneElement(getHTMLDict(data[j][i]), j);
@@ -64,12 +64,12 @@ function addDays(days){
     }
 }
 
-function addItem(date, j){
-    $("#item"+j).append("<div class=\"carousel-caption\"><font style=\"color:black\">"+ date + "</font></div>");
-    $("#item"+j).append("<div style=\"height:20px;\"></div>");
+function setOneDate(date, day){
+    $("#item"+day).append("<div class=\"carousel-caption\"><font style=\"color:black\">"+ date + "</font></div>");
+    $("#item"+day).append("<div style=\"height:20px;\"></div>");
 }
 
-function addOneElement(data, num){
+function addOneElement(data, day){
     var newElement =  $("<div class=\"cd-timeline-block\">" +
             "<div class=\"cd-timeline-img cd-picture\"> " +
                 data["imgString"] +
@@ -78,7 +78,7 @@ function addOneElement(data, num){
                 data["dataString"] +
             "</div>" +
             "</div>");
-    $("#cd-timeline" + num).append(newElement);
+    $("#cd-timeline" + day).append(newElement);
 }
 
 function getHTMLDict(data){
