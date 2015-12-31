@@ -32,7 +32,7 @@ function renderByJson(json){
         setOneDate(data[j][0]["startTime"].split(" ")[0], j);
         var i = 0;
         for(; i < data[j].length; i++){
-            addOneElement(getHTMLDict(data[j][i]), j);
+            addOneActivity(getHTMLDict(data[j][i]), j);
             if(("none" in data[j][i])  || !("type" in data[j][i])){
                 i = data[j].length;
             }
@@ -60,7 +60,7 @@ function addDays(days){
         data = {};
         data["imgString"] = getImgString("question.png");
         data["dataString"] = getH2Element("There's no data in our database.");
-        addOneElement(data, 0);
+        addOneActivity(data, 0);
     }
 }
 
@@ -69,7 +69,7 @@ function setOneDate(date, day){
     $("#item"+day).append("<div style=\"height:20px;\"></div>");
 }
 
-function addOneElement(data, day){
+function addOneActivity(data, day){
     var newElement =  $("<div class=\"cd-timeline-block\">" +
             "<div class=\"cd-timeline-img cd-picture\"> " +
                 data["imgString"] +
@@ -170,8 +170,8 @@ function getHTMLDict(data){
     }
 }
 
-function getImgString(data){
-    return "<img src=\"/TimeLine/" + data  + "\"alt=\"Picture\"> "
+function getImgString(imgName){
+    return "<img src=\"/TimeLine/" + imgName  + "\"alt=\"Picture\"> "
 }
 
 function getPElement(data){
